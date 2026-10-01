@@ -1,0 +1,103 @@
+{
+  "_conventions": {
+    "weight_rule": "Record exactly what the machine or bar shows. Stack number as displayed; plates are per side. The app never converts.",
+    "weight_units": ["lbs", "kg", "plates"],
+    "date_format": "YYYY-MM-DD, or null when unknown",
+    "machine_null": "null means no equipment recorded (e.g. bodyweight or unspecified)"
+  },
+  "gym": { "name": "Main gym" },
+  "muscle_groups": ["Chest", "Back", "Legs", "Biceps", "Triceps", "Forearms", "Abs", "Shoulders"],
+  "machines": [
+    "Barbell",
+    "Pec dec",
+    "Individual cable",
+    "Power tower - single pulley",
+    "Power tower - dual pulley",
+    "Dual cable",
+    "Both-legs machine",
+    "Individual leg machine",
+    "Lying machine",
+    "Hip thrust machine",
+    "Dumbbell",
+    "Incline bench"
+  ],
+  "lifts": [
+    { "name": "Bench", "muscle_group": "Chest" },
+    { "name": "Flys", "muscle_group": "Chest" },
+    { "name": "Lat pulldown", "muscle_group": "Back" },
+    { "name": "Row", "muscle_group": "Back" },
+    { "name": "Single arm kneeling", "muscle_group": "Back" },
+    { "name": "Reverse fly", "muscle_group": "Back" },
+    { "name": "Leg extension", "muscle_group": "Legs" },
+    { "name": "Hamstring curl", "muscle_group": "Legs" },
+    { "name": "Hip thrust", "muscle_group": "Legs" },
+    { "name": "Leg press", "muscle_group": "Legs" },
+    { "name": "Hammer curl", "muscle_group": "Biceps" },
+    { "name": "Curl", "muscle_group": "Biceps" },
+    { "name": "Extensions", "muscle_group": "Triceps" },
+    { "name": "Overhead extensions", "muscle_group": "Triceps" },
+    { "name": "Meows", "muscle_group": "Forearms" },
+    { "name": "Overhand curls", "muscle_group": "Forearms" },
+    { "name": "Abdominal crunch", "muscle_group": "Abs" },
+    { "name": "Lateral raises", "muscle_group": "Shoulders" }
+  ],
+  "sets": [
+    { "lift": "Bench", "machine": "Barbell", "weight_value": 185, "weight_unit": "lbs", "reps": 5, "approximate": false, "performed_on": "2026-09-25", "notes": null },
+    { "lift": "Bench", "machine": "Barbell", "weight_value": 185, "weight_unit": "lbs", "reps": 4, "approximate": false, "performed_on": "2026-09-11", "notes": null },
+    { "lift": "Bench", "machine": "Barbell", "weight_value": 175, "weight_unit": "lbs", "reps": 6, "approximate": false, "performed_on": "2026-09-25", "notes": null },
+    { "lift": "Bench", "machine": "Barbell", "weight_value": 155, "weight_unit": "lbs", "reps": 10, "approximate": false, "performed_on": "2026-09-01", "notes": null },
+    { "lift": "Bench", "machine": "Barbell", "weight_value": 135, "weight_unit": "lbs", "reps": 16, "approximate": false, "performed_on": null, "notes": null },
+
+    { "lift": "Flys", "machine": "Pec dec", "weight_value": 167.5, "weight_unit": "lbs", "reps": 9, "approximate": false, "performed_on": "2026-09-11", "notes": null },
+    { "lift": "Flys", "machine": "Pec dec", "weight_value": 140, "weight_unit": "lbs", "reps": 10, "approximate": false, "performed_on": "2026-09-01", "notes": null },
+    { "lift": "Flys", "machine": "Pec dec", "weight_value": 120, "weight_unit": "lbs", "reps": 16, "approximate": false, "performed_on": "2026-09-01", "notes": null },
+    { "lift": "Flys", "machine": "Pec dec", "weight_value": 107.5, "weight_unit": "lbs", "reps": 12, "approximate": false, "performed_on": "2026-08-21", "notes": null },
+
+    { "lift": "Lat pulldown", "machine": "Individual cable", "weight_value": 152, "weight_unit": "lbs", "reps": 8, "approximate": false, "performed_on": "2026-08-25", "notes": null },
+    { "lift": "Lat pulldown", "machine": "Power tower - single pulley", "weight_value": 155.5, "weight_unit": "lbs", "reps": 7, "approximate": false, "performed_on": null, "notes": null },
+    { "lift": "Lat pulldown", "machine": "Power tower - single pulley", "weight_value": 145, "weight_unit": "lbs", "reps": 10, "approximate": false, "performed_on": null, "notes": null },
+    { "lift": "Lat pulldown", "machine": "Power tower - dual pulley", "weight_value": 80, "weight_unit": "lbs", "reps": 9, "approximate": false, "performed_on": "2026-09-25", "notes": null },
+    { "lift": "Lat pulldown", "machine": "Power tower - dual pulley", "weight_value": 72.5, "weight_unit": "lbs", "reps": 9, "approximate": false, "performed_on": "2026-09-25", "notes": null },
+
+    { "lift": "Row", "machine": "Power tower - single pulley", "weight_value": 160, "weight_unit": "lbs", "reps": 7, "approximate": false, "performed_on": "2026-09-29", "notes": null },
+    { "lift": "Row", "machine": "Power tower - single pulley", "weight_value": 160, "weight_unit": "lbs", "reps": 6, "approximate": false, "performed_on": "2026-09-11", "notes": null },
+
+    { "lift": "Single arm kneeling", "machine": "Dual cable", "weight_value": 70, "weight_unit": "lbs", "reps": 9, "approximate": false, "performed_on": "2026-08-21", "notes": null },
+
+    { "lift": "Reverse fly", "machine": "Pec dec", "weight_value": 80, "weight_unit": "lbs", "reps": 10, "approximate": false, "performed_on": "2026-08-25", "notes": null },
+
+    { "lift": "Leg extension", "machine": "Both-legs machine", "weight_value": 205, "weight_unit": "lbs", "reps": 7, "approximate": true, "performed_on": "2026-09-09", "notes": null },
+    { "lift": "Leg extension", "machine": "Individual leg machine", "weight_value": 110, "weight_unit": "lbs", "reps": 7, "approximate": false, "performed_on": "2026-09-23", "notes": null },
+    { "lift": "Leg extension", "machine": "Individual leg machine", "weight_value": 105, "weight_unit": "lbs", "reps": 11, "approximate": false, "performed_on": null, "notes": null },
+    { "lift": "Leg extension", "machine": "Individual leg machine", "weight_value": 100, "weight_unit": "lbs", "reps": 12, "approximate": false, "performed_on": null, "notes": null },
+
+    { "lift": "Hamstring curl", "machine": "Lying machine", "weight_value": 150, "weight_unit": "lbs", "reps": 8, "approximate": false, "performed_on": "2026-09-09", "notes": null },
+
+    { "lift": "Hip thrust", "machine": "Hip thrust machine", "weight_value": 8, "weight_unit": "plates", "reps": 10, "approximate": false, "performed_on": "2026-09-23", "notes": null },
+    { "lift": "Hip thrust", "machine": "Hip thrust machine", "weight_value": 8, "weight_unit": "plates", "reps": 8, "approximate": false, "performed_on": "2026-08-23", "notes": null },
+
+    { "lift": "Leg press", "machine": "Individual leg machine", "weight_value": 5, "weight_unit": "plates", "reps": 8, "approximate": false, "performed_on": "2026-08-30", "notes": null },
+
+    { "lift": "Hammer curl", "machine": "Dumbbell", "weight_value": 35, "weight_unit": "lbs", "reps": 8, "approximate": false, "performed_on": null, "notes": null },
+
+    { "lift": "Curl", "machine": "Dual cable", "weight_value": 60, "weight_unit": "lbs", "reps": 6, "approximate": false, "performed_on": "2026-08-24", "notes": null },
+    { "lift": "Curl", "machine": "Incline bench", "weight_value": 35, "weight_unit": "lbs", "reps": 5, "approximate": false, "performed_on": "2026-09-07", "notes": null },
+    { "lift": "Curl", "machine": "Incline bench", "weight_value": 32.5, "weight_unit": "lbs", "reps": 7, "approximate": false, "performed_on": "2026-09-24", "notes": null },
+
+    { "lift": "Extensions", "machine": "Dual cable", "weight_value": 65, "weight_unit": "lbs", "reps": 5, "approximate": false, "performed_on": "2026-09-14", "notes": null },
+    { "lift": "Extensions", "machine": "Dual cable", "weight_value": 60, "weight_unit": "lbs", "reps": 9, "approximate": false, "performed_on": "2026-09-07", "notes": null },
+    { "lift": "Extensions", "machine": "Dual cable", "weight_value": 55, "weight_unit": "lbs", "reps": 9, "approximate": false, "performed_on": "2026-08-31", "notes": null },
+
+    { "lift": "Overhead extensions", "machine": "Dual cable", "weight_value": 50, "weight_unit": "lbs", "reps": 7, "approximate": false, "performed_on": "2026-09-03", "notes": null },
+    { "lift": "Overhead extensions", "machine": "Dual cable", "weight_value": 45, "weight_unit": "lbs", "reps": 10, "approximate": false, "performed_on": "2026-09-03", "notes": null },
+
+    { "lift": "Meows", "machine": "Dual cable", "weight_value": 80, "weight_unit": "lbs", "reps": 10, "approximate": false, "performed_on": "2026-09-10", "notes": null },
+    { "lift": "Meows", "machine": "Dual cable", "weight_value": 70, "weight_unit": "lbs", "reps": 16, "approximate": false, "performed_on": null, "notes": null },
+
+    { "lift": "Overhand curls", "machine": "Dual cable", "weight_value": 45, "weight_unit": "lbs", "reps": 7, "approximate": false, "performed_on": "2026-09-07", "notes": null },
+
+    { "lift": "Abdominal crunch", "machine": null, "weight_value": 60, "weight_unit": "lbs", "reps": 6, "approximate": false, "performed_on": "2026-08-23", "notes": null },
+
+    { "lift": "Lateral raises", "machine": "Dual cable", "weight_value": 15, "weight_unit": "lbs", "reps": 6, "approximate": false, "performed_on": "2026-08-24", "notes": null }
+  ]
+}
