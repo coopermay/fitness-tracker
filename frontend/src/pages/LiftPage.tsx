@@ -1,4 +1,5 @@
-import { Link, useLocation, useParams } from 'react-router'
+import { useEffect, useState } from 'react'
+import { Link, useLocation, useNavigate, useParams } from 'react-router'
 import { ApiError } from '../api/client'
 import { useLiftRecords, useMuscleGroups } from '../api/queries'
 import { MachineCard } from '../components/MachineCard'
@@ -11,8 +12,21 @@ export function LiftPage() {
   const liftId = Number(useParams().liftId)
   const records = useLiftRecords(liftId)
   const muscleGroups = useMuscleGroups() // cached; used for the back link's label
-  // Set by the log/edit pages when they send us back here after saving.
-  const flash = (useLocation().state as LiftPageState | null)?.flash
+  const location = useLocation()
+  const navigate = useNavigate()
+
+  // The log/edit pages pass a message in router state when they send us back
+  // here. Copy it into component state once (the function passed to useState
+  // runs only on the first render)...
+  const [flash] = useState(() => (location.state as LiftPageState | null)?.flash)
+
+  // ...then clear it from the browser history, so refreshing the page
+  // doesn't show "New best!" again.
+  useEffect(() => {
+    if (location.state) {
+      navigate(location.pathname, { replace: true, state: null })
+    }
+  }, [location.state, location.pathname, navigate])
 
   if (records.error instanceof ApiError && records.error.status === 404) {
     return <NotFoundPage />

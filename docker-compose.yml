@@ -1,5 +1,6 @@
-# Phase 0: Postgres only. The backend and frontend services are added in Phase 6.
-# These credentials are for local development only.
+# Whole stack:      docker compose up -d --build   -> app on http://localhost:8080
+# Database only:    docker compose up -d db        (for local development)
+# These credentials are for local/home use only.
 services:
   db:
     image: postgres:16
@@ -8,7 +9,7 @@ services:
       POSTGRES_PASSWORD: lifts
       POSTGRES_DB: lifts
     ports:
-      - "5432:5432"
+      - "5432:5432" # for local dev tools (uvicorn, pytest, psql)
     volumes:
       - pgdata:/var/lib/postgresql/data
     healthcheck:
@@ -16,6 +17,28 @@ services:
       interval: 5s
       timeout: 3s
       retries: 10
+    restart: unless-stopped
+
+  backend:
+    build: ./backend
+    environment:
+      DATABASE_URL: postgresql+psycopg://lifts:lifts@db:5432/lifts
+    volumes:
+      # So the seed script can run inside the container:
+      #   docker compose exec backend uv run --no-sync python -m scripts.seed
+      - ./seed_data.json:/seed_data.json:ro
+    depends_on:
+      db:
+        condition: service_healthy
+    restart: unless-stopped
+
+  frontend:
+    build: ./frontend
+    ports:
+      - "8080:80"
+    depends_on:
+      - backend
+    restart: unless-stopped
 
 volumes:
   pgdata:

@@ -38,7 +38,8 @@
 }
 
 .numberInput {
-  width: 6.5em;
+  width: 5em;
+  flex-shrink: 0;
   font-size: 1.4rem;
   font-weight: 600;
   font-variant-numeric: tabular-nums;
@@ -47,6 +48,18 @@
 .textInput {
   width: 100%;
   font-size: 1rem; /* 16px+ stops iOS Safari zooming in on focus */
+}
+
+/* iOS Safari otherwise draws date inputs at their own size, ignoring width */
+input[type='date'].textInput {
+  display: block;
+  -webkit-appearance: none;
+  appearance: none;
+  text-align: left;
+}
+
+input[type='date'].textInput::-webkit-date-and-time-value {
+  text-align: left;
 }
 
 textarea.textInput {
@@ -58,6 +71,7 @@ textarea.textInput {
 .segmented {
   display: flex;
   flex: 1;
+  min-width: 0; /* allow shrinking on narrow phones */
   overflow: hidden;
   border: 1px solid var(--border-strong);
   border-radius: var(--radius);
@@ -66,7 +80,9 @@ textarea.textInput {
 .segment,
 .segmentActive {
   flex: 1;
+  min-width: 0;
   min-height: var(--tap-size);
+  padding: 0 4px;
   border: none;
   background: var(--surface);
   color: var(--text);

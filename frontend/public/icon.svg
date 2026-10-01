@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <!-- Full-bleed background: phones crop icons to their own shape (circle, squircle). -->
+  <rect width="512" height="512" fill="#1f6feb"/>
+  <!-- Dumbbell, kept inside the central "safe zone" so cropping never cuts it. -->
+  <g fill="#ffffff">
+    <rect x="150" y="242" width="212" height="28" rx="6"/>
+    <rect x="150" y="166" width="40" height="180" rx="12"/>
+    <rect x="322" y="166" width="40" height="180" rx="12"/>
+    <rect x="110" y="196" width="32" height="120" rx="10"/>
+    <rect x="370" y="196" width="32" height="120" rx="10"/>
+  </g>
+</svg>

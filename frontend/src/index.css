@@ -39,15 +39,23 @@
   }
 }
 
+html {
+  touch-action: manipulation; /* no double-tap-to-zoom, so taps register instantly */
+  -webkit-text-size-adjust: 100%; /* stop iOS enlarging text in landscape */
+}
+
 body {
   margin: 0;
   background: var(--bg);
 }
 
+/* env(safe-area-inset-*) is the space taken by the notch / home bar when the
+   app runs full screen from the home screen (see viewport-fit in index.html). */
 #root {
   max-width: 640px;
   margin: 0 auto;
-  padding: 8px 16px 32px;
+  padding: max(8px, env(safe-area-inset-top)) max(16px, env(safe-area-inset-right))
+    max(32px, env(safe-area-inset-bottom)) max(16px, env(safe-area-inset-left));
 }
 
 a {
