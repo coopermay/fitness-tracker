@@ -1,25 +1,39 @@
-/* Global styles. Kept minimal for now; the mobile layout pass happens in Phase 6. */
+/* Global styles and design tokens. Component styles live in *.module.css files. */
 :root {
   --text: #1f2328;
   --text-muted: #6b6f76;
-  --bg: #ffffff;
+  --bg: #f6f7f9;
+  --surface: #ffffff;
+  --surface-pressed: #eceef2;
   --border: #e3e4e8;
+  --border-strong: #c9ccd3;
+  --accent: #1f6feb;
+  --on-accent: #ffffff;
   --ok: #1a7f37;
   --error: #cf222e;
+
+  --radius: 12px;
+  --tap-size: 48px; /* minimum height for anything tappable */
 
   font: 16px/1.5 system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
   color-scheme: light dark;
   color: var(--text);
   background: var(--bg);
   -webkit-font-smoothing: antialiased;
+  -webkit-tap-highlight-color: transparent;
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
     --text: #e6e7ea;
     --text-muted: #9a9ea6;
-    --bg: #15161a;
+    --bg: #111215;
+    --surface: #1b1d22;
+    --surface-pressed: #262930;
     --border: #2c2e35;
+    --border-strong: #3d4049;
+    --accent: #4c8dff;
+    --on-accent: #ffffff;
     --ok: #3fb950;
     --error: #f85149;
   }
@@ -33,5 +47,13 @@ body {
 #root {
   max-width: 640px;
   margin: 0 auto;
-  padding: 16px;
+  padding: 8px 16px 32px;
+}
+
+a {
+  color: var(--accent);
+}
+
+button {
+  cursor: pointer;
 }

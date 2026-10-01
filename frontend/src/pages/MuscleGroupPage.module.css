@@ -1,0 +1,48 @@
+.back {
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--tap-size);
+  color: var(--text-muted);
+  text-decoration: none;
+}
+
+.title {
+  margin: 0 0 16px;
+  font-size: 1.5rem;
+}
+
+.list {
+  margin: 0 0 16px;
+  padding: 0;
+  list-style: none;
+  border-top: 1px solid var(--border);
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  min-height: 60px;
+  border-bottom: 1px solid var(--border);
+  color: var(--text);
+  text-decoration: none;
+}
+
+.row:active {
+  background: var(--surface-pressed);
+}
+
+.liftName {
+  font-size: 1.1rem;
+  font-weight: 600;
+}
+
+.lastDate {
+  color: var(--text-muted);
+  white-space: nowrap;
+}
+
+.empty {
+  color: var(--text-muted);
+}
