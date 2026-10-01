@@ -12,6 +12,10 @@
 }
 
 .logButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
   width: 100%;
   min-height: 56px;
   margin-bottom: 20px;
@@ -22,11 +26,25 @@
   font: inherit;
   font-size: 1.15rem;
   font-weight: 700;
+  text-decoration: none;
 }
 
-.logButton:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
+.flash,
+.flashRecord {
+  margin: 0 0 16px;
+  padding: 12px 16px;
+  border-radius: var(--radius);
+  font-weight: 600;
+}
+
+.flash {
+  background: var(--surface-pressed);
+}
+
+.flashRecord {
+  background: #1a7f37; /* same in light and dark mode so white text stays readable */
+  color: #ffffff;
+  font-size: 1.15rem;
 }
 
 .cards {

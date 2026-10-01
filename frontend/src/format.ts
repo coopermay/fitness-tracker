@@ -13,6 +13,14 @@ export function formatReps(reps: number, approximate: boolean): string {
   return approximate ? `${reps}~` : `${reps}`
 }
 
+// Today in the browser's timezone as "YYYY-MM-DD" (the format <input type="date"> uses).
+export function todayIsoDate(): string {
+  const now = new Date()
+  const month = String(now.getMonth() + 1).padStart(2, '0')
+  const day = String(now.getDate()).padStart(2, '0')
+  return `${now.getFullYear()}-${month}-${day}`
+}
+
 // "2026-09-25" -> "Sep 25" (adds the year if it isn't the current year).
 // Built from the parts rather than `new Date("2026-09-25")`, which would treat
 // the string as UTC midnight and can show the previous day in US timezones.

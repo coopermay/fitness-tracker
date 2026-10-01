@@ -1,4 +1,4 @@
-import { useState, type FormEvent } from 'react'
+import { useState, type SubmitEvent } from 'react'
 import styles from './AddByName.module.css'
 
 // "Props" are a component's inputs, like function arguments. The parent
@@ -30,7 +30,7 @@ export function AddByName({ buttonLabel, placeholder, onAdd, subtle = false }: A
     setError(null)
   }
 
-  async function handleSubmit(event: FormEvent) {
+  async function handleSubmit(event: SubmitEvent) {
     event.preventDefault() // stop the browser's default full-page form submit
     if (name.trim() === '') {
       return

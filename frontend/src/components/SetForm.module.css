@@ -1,0 +1,142 @@
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.label {
+  font-weight: 600;
+}
+
+.hint {
+  color: var(--text-muted);
+  font-weight: normal;
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.numberInput,
+.textInput {
+  box-sizing: border-box;
+  min-height: var(--tap-size);
+  padding: 0 12px;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius);
+  background: var(--surface);
+  color: var(--text);
+  font: inherit;
+}
+
+.numberInput {
+  width: 6.5em;
+  font-size: 1.4rem;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+.textInput {
+  width: 100%;
+  font-size: 1rem; /* 16px+ stops iOS Safari zooming in on focus */
+}
+
+textarea.textInput {
+  padding: 10px 12px;
+  resize: vertical;
+}
+
+/* lbs / kg / plates */
+.segmented {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius);
+}
+
+.segment,
+.segmentActive {
+  flex: 1;
+  min-height: var(--tap-size);
+  border: none;
+  background: var(--surface);
+  color: var(--text);
+  font: inherit;
+}
+
+.segment + .segment,
+.segment + .segmentActive,
+.segmentActive + .segment {
+  border-left: 1px solid var(--border-strong);
+}
+
+.segmentActive {
+  background: var(--accent);
+  color: var(--on-accent);
+  font-weight: 600;
+}
+
+.toggle {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  gap: 10px;
+  min-height: var(--tap-size);
+}
+
+.toggle input {
+  width: 24px;
+  height: 24px;
+  margin: 0;
+}
+
+.error {
+  margin: 0;
+  color: var(--error);
+}
+
+.submit {
+  min-height: 56px;
+  border: none;
+  border-radius: var(--radius);
+  background: var(--accent);
+  color: var(--on-accent);
+  font: inherit;
+  font-size: 1.15rem;
+  font-weight: 700;
+}
+
+.submit:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.cancel {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: var(--tap-size);
+  margin-top: -8px;
+  color: var(--text-muted);
+  text-decoration: none;
+}
+
+.delete {
+  min-height: var(--tap-size);
+  margin-top: 16px;
+  border: 1px solid var(--error);
+  border-radius: var(--radius);
+  background: none;
+  color: var(--error);
+  font: inherit;
+  font-weight: 600;
+}

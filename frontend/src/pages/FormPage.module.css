@@ -1,0 +1,9 @@
+.title {
+  margin: 12px 0 20px;
+  font-size: 1.5rem;
+}
+
+.liftName {
+  color: var(--text-muted);
+  font-weight: normal;
+}

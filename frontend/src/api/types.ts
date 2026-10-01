@@ -51,6 +51,37 @@ export interface WorkoutSet {
   updated_at: DateString
 }
 
+export interface SetCreated extends WorkoutSet {
+  is_new_record: boolean
+}
+
+// The editable fields of a set: the PATCH /sets/{id} body.
+export interface SetFields {
+  machine_id: number | null
+  weight_value: number
+  weight_unit: WeightUnit
+  reps: number
+  approximate: boolean
+  performed_on: DateString | null
+  notes: string | null
+}
+
+// POST /sets body: the editable fields plus which lift.
+export interface SetCreate extends SetFields {
+  lift_id: number
+}
+
+export interface Gym {
+  id: number
+  name: string
+  archived: boolean
+  created_at: DateString
+}
+
+export interface Settings {
+  default_unit: WeightUnit
+}
+
 // --- GET /lifts/{id}/records ---
 
 export interface RecordRow {

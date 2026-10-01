@@ -6,10 +6,18 @@
 
 .row {
   display: grid;
-  grid-template-columns: 5.5em 1fr;
+  grid-template-columns: 5.5em 1fr auto;
+  align-items: center;
   column-gap: 12px;
-  padding: 10px 0;
+  min-height: var(--tap-size);
+  padding: 4px 0;
   border-top: 1px solid var(--border);
+  color: var(--text);
+  text-decoration: none;
+}
+
+.row:active {
+  background: var(--surface-pressed);
 }
 
 .date {
@@ -20,8 +28,14 @@
   font-variant-numeric: tabular-nums;
 }
 
+.chevron {
+  color: var(--text-muted);
+  font-size: 1.25rem;
+}
+
 .notes {
-  grid-column: 2;
+  grid-column: 2 / 4;
+  padding-bottom: 6px;
   color: var(--text-muted);
   font-size: 0.9rem;
 }

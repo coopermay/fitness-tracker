@@ -1,8 +1,9 @@
-import { Link, useParams } from 'react-router'
+import { Link, useLocation, useParams } from 'react-router'
 import { ApiError } from '../api/client'
 import { useLiftRecords, useMuscleGroups } from '../api/queries'
 import { MachineCard } from '../components/MachineCard'
 import { QueryStatus } from '../components/QueryStatus'
+import type { LiftPageState } from '../flash'
 import { NotFoundPage } from './NotFoundPage'
 import styles from './LiftPage.module.css'
 
@@ -10,6 +11,8 @@ export function LiftPage() {
   const liftId = Number(useParams().liftId)
   const records = useLiftRecords(liftId)
   const muscleGroups = useMuscleGroups() // cached; used for the back link's label
+  // Set by the log/edit pages when they send us back here after saving.
+  const flash = (useLocation().state as LiftPageState | null)?.flash
 
   if (records.error instanceof ApiError && records.error.status === 404) {
     return <NotFoundPage />
@@ -28,10 +31,15 @@ export function LiftPage() {
       </Link>
       <h1 className={styles.title}>{lift.name}</h1>
 
-      {/* Wired up in Phase 5 (log/edit set form). */}
-      <button type="button" className={styles.logButton} disabled>
+      {flash && (
+        <p className={flash.isRecord ? styles.flashRecord : styles.flash} role="status">
+          {flash.text}
+        </p>
+      )}
+
+      <Link className={styles.logButton} to={`/lifts/${lift.id}/log`}>
         Log set
-      </button>
+      </Link>
 
       {machineGroups.length === 0 ? (
         <p className={styles.empty}>No sets logged yet.</p>

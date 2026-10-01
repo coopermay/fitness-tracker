@@ -1,6 +1,8 @@
 import { Route, Routes } from 'react-router'
+import { EditSetPage } from './pages/EditSetPage'
 import { HomePage } from './pages/HomePage'
 import { LiftPage } from './pages/LiftPage'
+import { LogSetPage } from './pages/LogSetPage'
 import { MuscleGroupPage } from './pages/MuscleGroupPage'
 import { NotFoundPage } from './pages/NotFoundPage'
 
@@ -14,6 +16,8 @@ function App() {
         <Route path="/" element={<HomePage />} />
         <Route path="/muscle-groups/:muscleGroupId" element={<MuscleGroupPage />} />
         <Route path="/lifts/:liftId" element={<LiftPage />} />
+        <Route path="/lifts/:liftId/log" element={<LogSetPage />} />
+        <Route path="/lifts/:liftId/sets/:setId" element={<EditSetPage />} />
         <Route path="*" element={<NotFoundPage />} />
       </Routes>
     </main>
