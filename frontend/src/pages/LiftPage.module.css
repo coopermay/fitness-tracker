@@ -1,0 +1,40 @@
+.back {
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--tap-size);
+  color: var(--text-muted);
+  text-decoration: none;
+}
+
+.title {
+  margin: 0 0 16px;
+  font-size: 1.5rem;
+}
+
+.logButton {
+  width: 100%;
+  min-height: 56px;
+  margin-bottom: 20px;
+  border: none;
+  border-radius: var(--radius);
+  background: var(--accent);
+  color: var(--on-accent);
+  font: inherit;
+  font-size: 1.15rem;
+  font-weight: 700;
+}
+
+.logButton:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.cards {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.empty {
+  color: var(--text-muted);
+}

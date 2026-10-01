@@ -27,3 +27,56 @@ export interface Lift {
 export interface LiftListItem extends Lift {
   last_performed_on: DateString | null
 }
+
+export interface Machine {
+  id: number
+  name: string
+  archived: boolean
+  created_at: DateString
+  gym_id: number
+}
+
+// One logged set ("set" in the API; WorkoutSet in the backend).
+export interface WorkoutSet {
+  id: number
+  lift_id: number
+  machine_id: number | null
+  weight_value: number
+  weight_unit: WeightUnit
+  reps: number
+  approximate: boolean
+  performed_on: DateString | null
+  notes: string | null
+  created_at: DateString
+  updated_at: DateString
+}
+
+// --- GET /lifts/{id}/records ---
+
+export interface RecordRow {
+  set_id: number
+  weight_value: number
+  weight_unit: WeightUnit
+  reps: number
+  approximate: boolean
+  performed_on: DateString | null
+  notes: string | null
+  estimated_1rm: number | null // null for plates
+}
+
+export interface UnitRecords {
+  weight_unit: WeightUnit
+  records: RecordRow[] // heaviest first
+}
+
+export interface MachineRecords {
+  machine: Machine | null // null = sets with no machine recorded
+  last_performed_on: DateString | null
+  units: UnitRecords[] // most recently used first
+  history: WorkoutSet[] // newest first, undated last
+}
+
+export interface LiftRecords {
+  lift: Lift
+  machine_groups: MachineRecords[] // most recently used first
+}

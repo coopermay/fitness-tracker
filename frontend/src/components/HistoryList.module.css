@@ -1,0 +1,27 @@
+.list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.row {
+  display: grid;
+  grid-template-columns: 5.5em 1fr;
+  column-gap: 12px;
+  padding: 10px 0;
+  border-top: 1px solid var(--border);
+}
+
+.date {
+  color: var(--text-muted);
+}
+
+.main {
+  font-variant-numeric: tabular-nums;
+}
+
+.notes {
+  grid-column: 2;
+  color: var(--text-muted);
+  font-size: 0.9rem;
+}

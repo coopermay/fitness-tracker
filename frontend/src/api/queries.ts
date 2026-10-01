@@ -10,7 +10,7 @@
 
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { apiGet, apiPost } from './client'
-import type { Lift, LiftListItem, MuscleGroup } from './types'
+import type { Lift, LiftListItem, LiftRecords, MuscleGroup } from './types'
 
 // Query keys identify cached data. Keeping them in one place avoids typos.
 // Invalidating ['lifts'] also invalidates every ['lifts', ...] key under it.
@@ -18,6 +18,7 @@ export const queryKeys = {
   muscleGroups: ['muscle-groups'] as const,
   lifts: ['lifts'] as const,
   liftsForMuscleGroup: (muscleGroupId: number) => ['lifts', { muscleGroupId }] as const,
+  liftRecords: (liftId: number) => ['lift-records', liftId] as const,
 }
 
 export function useMuscleGroups() {
@@ -33,6 +34,15 @@ export function useLifts(muscleGroupId: number) {
     queryKey: queryKeys.liftsForMuscleGroup(muscleGroupId),
     queryFn: () => apiGet<LiftListItem[]>(`/lifts?muscle_group_id=${muscleGroupId}`),
     staleTime: Infinity,
+  })
+}
+
+// Records change whenever a set is logged, so they use the default staleTime
+// (refetch when the page is opened again) rather than Infinity.
+export function useLiftRecords(liftId: number) {
+  return useQuery({
+    queryKey: queryKeys.liftRecords(liftId),
+    queryFn: () => apiGet<LiftRecords>(`/lifts/${liftId}/records`),
   })
 }
 

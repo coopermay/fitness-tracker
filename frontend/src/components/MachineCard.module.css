@@ -1,0 +1,84 @@
+.card {
+  padding: 16px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface);
+}
+
+.header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 8px;
+}
+
+.title {
+  margin: 0;
+  font-size: 1.1rem;
+}
+
+.archived {
+  color: var(--text-muted);
+  font-weight: normal;
+  font-size: 0.9rem;
+}
+
+.lastDate {
+  color: var(--text-muted);
+  font-size: 0.9rem;
+  white-space: nowrap;
+}
+
+.unitHeading {
+  margin: 12px 0 4px;
+  color: var(--text-muted);
+  font-size: 0.8rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.records {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.recordLine {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 6px 0;
+}
+
+/* Big and bold: readable at a glance between sets */
+.recordMain {
+  font-size: 1.25rem;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+.recordDate {
+  color: var(--text-muted);
+  font-size: 1rem;
+  font-weight: normal;
+}
+
+.oneRepMax {
+  color: var(--text-muted);
+  font-size: 0.85rem;
+  white-space: nowrap;
+}
+
+.toggle {
+  width: 100%;
+  min-height: 44px;
+  margin-top: 8px;
+  border: none;
+  border-top: 1px solid var(--border);
+  background: none;
+  color: var(--accent);
+  font: inherit;
+}
