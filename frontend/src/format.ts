@@ -2,6 +2,18 @@
 
 import type { WeightUnit } from './api/types'
 
+// "2026-09-25" -> "Friday, Sep 25" (adds the year if it isn't the current year)
+export function formatLongDate(isoDate: string): string {
+  const [year, month, day] = isoDate.split('-').map(Number)
+  const date = new Date(year, month - 1, day)
+  return date.toLocaleDateString('en-US', {
+    weekday: 'long',
+    month: 'short',
+    day: 'numeric',
+    year: year === new Date().getFullYear() ? undefined : 'numeric',
+  })
+}
+
 // 185, "lbs" -> "185 lbs";  72.5 -> "72.5 lbs";  8, "plates" -> "8 plates";  1 -> "1 plate"
 export function formatWeight(value: number, unit: WeightUnit): string {
   const unitLabel = unit === 'plates' && value === 1 ? 'plate' : unit

@@ -1,0 +1,94 @@
+/* Sits just above the fixed tab bar */
+.sheet {
+  position: fixed;
+  z-index: 15;
+  right: 0;
+  bottom: calc(var(--tab-bar-height) + env(safe-area-inset-bottom));
+  left: 0;
+  box-sizing: border-box;
+  max-width: 640px;
+  max-height: 50vh;
+  margin: 0 auto;
+  padding: 16px;
+  overflow-y: auto;
+  border: 1px solid var(--border-strong);
+  border-bottom: none;
+  border-radius: var(--radius) var(--radius) 0 0;
+  background: var(--surface);
+  box-shadow: 0 -8px 24px rgb(0 0 0 / 0.2);
+}
+
+.header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.date {
+  margin: 0;
+  font-size: 1.1rem;
+}
+
+.summary {
+  margin: 2px 0 0;
+  color: var(--text-muted);
+}
+
+.close {
+  width: var(--tap-size);
+  height: var(--tap-size);
+  margin: -12px -12px 0 0;
+  border: none;
+  background: none;
+  color: var(--text-muted);
+  font: inherit;
+  font-size: 1.1rem;
+}
+
+.lifts {
+  margin: 12px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.lifts > li + li {
+  margin-top: 12px;
+}
+
+.liftName {
+  display: inline-flex;
+  align-items: center;
+  min-height: 36px;
+  color: var(--text);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.sets {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.set {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 4px 0;
+  font-variant-numeric: tabular-nums;
+}
+
+.machine {
+  color: var(--text-muted);
+}
+
+.prBadge {
+  padding: 1px 8px;
+  border-radius: 999px;
+  background: #1a7f37; /* same green as the "New best" banner */
+  color: #ffffff;
+  font-size: 0.75rem;
+  font-weight: 700;
+}

@@ -8,6 +8,12 @@
   --border: #e3e4e8;
   --border-strong: #c9ccd3;
   --figure: #c4c8cf; /* un-highlighted body parts on the home tiles */
+  /* Calendar intensity: no sets, then light to busiest (blues ending in --accent) */
+  --heat-0: #ebedf0;
+  --heat-1: #c4d9fc;
+  --heat-2: #86b1f7;
+  --heat-3: #4a8af0;
+  --heat-4: #1f6feb;
   --accent: #1f6feb;
   --on-accent: #ffffff;
   --ok: #1a7f37;
@@ -35,6 +41,11 @@
     --border: #2c2e35;
     --border-strong: #3d4049;
     --figure: #393c45;
+    --heat-0: #262930;
+    --heat-1: #15305c;
+    --heat-2: #1d4a94;
+    --heat-3: #2f6ad1;
+    --heat-4: #4c8dff;
     --accent: #4c8dff;
     --on-accent: #ffffff;
     --ok: #3fb950;
@@ -50,6 +61,7 @@ html {
 body {
   margin: 0;
   background: var(--bg);
+  overflow-x: clip; /* pages sliding in briefly overhang the edge; don't let that scroll */
 }
 
 /* env(safe-area-inset-*) is the space taken by the notch / home bar when the

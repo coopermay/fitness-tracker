@@ -1,0 +1,94 @@
+.title {
+  margin: 12px 0 2px;
+  font-size: 1.5rem;
+}
+
+.totals {
+  margin: 0 0 16px;
+  color: var(--text-muted);
+}
+
+/* Month label column, then 7 equal day columns. Squares stretch to fill the
+   width (about 36px on a phone), capped so they don't get huge on wide screens. */
+.grid {
+  display: grid;
+  grid-template-columns: 2.5rem repeat(7, minmax(0, 1fr));
+  gap: 5px;
+  max-width: 420px;
+  /* Room so the last weeks can scroll clear of the details panel */
+  padding-bottom: 8px;
+}
+
+.weekday {
+  color: var(--text-muted);
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-align: center;
+}
+
+.month {
+  align-self: start;
+  color: var(--text-muted);
+  font-size: 0.75rem;
+  font-weight: 600;
+  line-height: 1.6;
+}
+
+.square {
+  aspect-ratio: 1;
+  padding: 0;
+  border: none;
+  border-radius: 6px;
+}
+
+.today {
+  outline: 2px solid var(--text-muted);
+  outline-offset: 1px;
+}
+
+.selected {
+  outline: 2px solid var(--text); /* not blue, which would blend into the squares */
+  outline-offset: 1px;
+}
+
+/* Intensity levels; colours are defined in index.css (light and dark) */
+.level0 {
+  background: var(--heat-0);
+}
+
+.level1 {
+  background: var(--heat-1);
+}
+
+.level2 {
+  background: var(--heat-2);
+}
+
+.level3 {
+  background: var(--heat-3);
+}
+
+.level4 {
+  background: var(--heat-4);
+}
+
+.legend {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 4px;
+  max-width: 420px;
+  margin-top: 12px;
+  color: var(--text-muted);
+  font-size: 0.75rem;
+}
+
+.legendSquare {
+  width: 12px;
+  height: 12px;
+  border-radius: 3px;
+}
+
+.sheetSpacer {
+  height: 50vh;
+}

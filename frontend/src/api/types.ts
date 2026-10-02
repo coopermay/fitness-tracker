@@ -117,3 +117,29 @@ export interface LiftRecords {
   lift: Lift
   machine_groups: MachineRecords[] // most recently used first
 }
+
+// --- GET /calendar ---
+
+export interface CalendarSet {
+  id: number
+  machine_name: string | null
+  weight_value: number
+  weight_unit: WeightUnit
+  reps: number
+  approximate: boolean
+  is_pr: boolean
+}
+
+export interface CalendarLift {
+  lift_id: number
+  lift_name: string
+  sets: CalendarSet[]
+}
+
+// Only days with at least one dated set are returned, newest first.
+export interface CalendarDay {
+  date: DateString
+  set_count: number
+  pr_count: number
+  lifts: CalendarLift[]
+}

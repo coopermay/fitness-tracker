@@ -1,13 +1,15 @@
 import type { ReactNode } from 'react'
 import { Link, useLocation } from 'react-router'
+import { slideStateFor, tabIndex, TAB_PATHS } from '../tabs'
 import styles from './TabBar.module.css'
 
 // The bar fixed to the bottom of every screen, like a social media app.
-// Five slots: blank placeholders for future tabs, Home in the middle, and
-// Settings on the right.
+// Five slots: blank placeholders for future tabs, Home in the middle, then
+// Calendar and Settings on the right.
 export function TabBar() {
   const { pathname } = useLocation()
   const onSettings = pathname.startsWith('/settings')
+  const onCalendar = pathname.startsWith('/calendar')
 
   return (
     <nav className={styles.bar} aria-label="Main">
@@ -16,8 +18,8 @@ export function TabBar() {
         <span className={styles.placeholder} aria-hidden="true" />
         {/* Home stays highlighted on muscle group and lift pages too, since
             they're all reached from Home. */}
-        <Tab to="/" label="Home" active={!onSettings} icon={<HomeIcon />} />
-        <span className={styles.placeholder} aria-hidden="true" />
+        <Tab to="/" label="Home" active={!onSettings && !onCalendar} icon={<HomeIcon />} />
+        <Tab to="/calendar" label="Calendar" active={onCalendar} icon={<CalendarIcon />} />
         <Tab to="/settings" label="Settings" active={onSettings} icon={<SettingsIcon />} />
       </div>
     </nav>
@@ -33,9 +35,13 @@ interface TabProps {
 }
 
 function Tab({ to, label, active, icon }: TabProps) {
+  // Tapping a tab slides the page in from the same side a swipe would.
+  const { pathname } = useLocation()
+  const slideState = slideStateFor(tabIndex(pathname), TAB_PATHS.indexOf(to))
   return (
     <Link
       to={to}
+      state={slideState}
       className={active ? styles.tabActive : styles.tab}
       aria-current={active ? 'page' : undefined}
     >
@@ -52,6 +58,16 @@ function HomeIcon() {
       strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
       <path d="M3 10.5 12 3l9 7.5" />
       <path d="M5 9.5V21h5v-6h4v6h5V9.5" />
+    </svg>
+  )
+}
+
+function CalendarIcon() {
+  return (
+    <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor"
+      strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <rect x="3" y="5" width="18" height="16" rx="2" />
+      <path d="M3 10h18M8 3v4M16 3v4" />
     </svg>
   )
 }

@@ -1,0 +1,35 @@
+/* Fill the screen so a swipe anywhere above the tab bar counts, even on
+   short pages like Settings. */
+.page {
+  min-height: calc(100svh - var(--tab-bar-height) - 64px);
+}
+
+.slideFromRight {
+  animation: slide-from-right 220ms ease-out;
+}
+
+.slideFromLeft {
+  animation: slide-from-left 220ms ease-out;
+}
+
+@keyframes slide-from-right {
+  from {
+    opacity: 0;
+    transform: translateX(48px);
+  }
+}
+
+@keyframes slide-from-left {
+  from {
+    opacity: 0;
+    transform: translateX(-48px);
+  }
+}
+
+/* Respect the phone's "reduce motion" accessibility setting */
+@media (prefers-reduced-motion: reduce) {
+  .slideFromRight,
+  .slideFromLeft {
+    animation: none;
+  }
+}

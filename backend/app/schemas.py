@@ -158,6 +158,35 @@ class LiftRecords(BaseModel):
     machine_groups: list[MachineRecords]
 
 
+# --- Calendar ---------------------------------------------------------------
+
+
+class CalendarSet(BaseModel):
+    id: int
+    machine_name: str | None
+    weight_value: float
+    weight_unit: WeightUnit
+    reps: int
+    approximate: bool
+    is_pr: bool = Field(
+        description="First set at this lift + machine + unit + weight, or more reps there than "
+        "any earlier set (replayed in date order)."
+    )
+
+
+class CalendarLift(BaseModel):
+    lift_id: int
+    lift_name: str
+    sets: list[CalendarSet]  # in the order they were entered
+
+
+class CalendarDay(BaseModel):
+    date: date
+    set_count: int
+    pr_count: int
+    lifts: list[CalendarLift]  # in the order they were first trained that day
+
+
 # --- Settings ---------------------------------------------------------------
 
 

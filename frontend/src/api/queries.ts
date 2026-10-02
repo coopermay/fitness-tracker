@@ -11,6 +11,7 @@
 import { useMutation, useQuery, useQueryClient, type QueryClient } from '@tanstack/react-query'
 import { apiDelete, apiGet, apiPatch, apiPost } from './client'
 import type {
+  CalendarDay,
   Gym,
   Lift,
   LiftListItem,
@@ -36,6 +37,7 @@ export const queryKeys = {
   machines: ['machines'] as const,
   gyms: ['gyms'] as const,
   settings: ['settings'] as const,
+  calendar: ['calendar'] as const,
 }
 
 // --- Queries -----------------------------------------------------------------
@@ -62,6 +64,14 @@ export function useLiftRecords(liftId: number) {
   return useQuery({
     queryKey: queryKeys.liftRecords(liftId),
     queryFn: () => apiGet<LiftRecords>(`/lifts/${liftId}/records`),
+  })
+}
+
+// Changes whenever a set is logged, so it uses the default staleTime.
+export function useCalendar() {
+  return useQuery({
+    queryKey: queryKeys.calendar,
+    queryFn: () => apiGet<CalendarDay[]>('/calendar'),
   })
 }
 
@@ -140,6 +150,7 @@ export function useUpdateLift() {
     onSuccess: (lift) => {
       void queryClient.invalidateQueries({ queryKey: queryKeys.lifts })
       void queryClient.invalidateQueries({ queryKey: queryKeys.liftRecords(lift.id) })
+      void queryClient.invalidateQueries({ queryKey: queryKeys.calendar })
     },
   })
 }
@@ -153,6 +164,7 @@ export function useUpdateMachine() {
       void queryClient.invalidateQueries({ queryKey: queryKeys.machines })
       // A machine's name appears in the records of every lift that used it.
       void queryClient.invalidateQueries({ queryKey: queryKeys.allLiftRecords })
+      void queryClient.invalidateQueries({ queryKey: queryKeys.calendar })
     },
   })
 }
@@ -176,6 +188,7 @@ function refreshAfterSetChange(queryClient: QueryClient, liftId: number) {
   return Promise.all([
     queryClient.invalidateQueries({ queryKey: queryKeys.liftRecords(liftId) }),
     queryClient.invalidateQueries({ queryKey: queryKeys.lifts }),
+    queryClient.invalidateQueries({ queryKey: queryKeys.calendar }),
   ])
 }
 
