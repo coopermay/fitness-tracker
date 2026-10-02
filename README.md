@@ -10,6 +10,8 @@ A personal gym lift tracker. For each lift on each machine it shows the most rep
 
 **Stack:** FastAPI, SQLModel, Alembic, PostgreSQL 16 · React, TypeScript, Vite, TanStack Query, React Router · Docker Compose
 
+**Full documentation:** the [project wiki](docs/README.md) covers the architecture (with diagrams), every database table, every API endpoint, every frontend page and component, deployment, backups and troubleshooting.
+
 ## Run it (Docker)
 
 Requires Docker.
