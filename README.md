@@ -109,6 +109,7 @@ All JSON under `/api`. See `http://localhost:8000/docs` for the full, interactiv
 - `GET/POST /gyms`
 - `GET/POST /sets`, `PATCH/DELETE /sets/{id}`
 - `GET/PATCH /settings`
+- `GET/PUT /split`: the weekly split (muscle groups per weekday, Monday = 0)
 - `GET /calendar`: every day with sets, newest first, with each set marked as a PR or not
 
 Creating a muscle group, lift, machine or gym with a name that already exists (ignoring case and surrounding spaces) returns the existing one instead of a duplicate, and restores it if it was archived. Nothing except sets is ever deleted: it's archived instead, which hides it from lists while keeping its history.

@@ -58,7 +58,7 @@ def engine():
 def session(engine):
     with engine.begin() as connection:
         connection.execute(
-            text("TRUNCATE sets, lifts, machines, muscle_groups, gyms RESTART IDENTITY CASCADE")
+            text("TRUNCATE split_days, sets, lifts, machines, muscle_groups, gyms RESTART IDENTITY CASCADE")
         )
         connection.execute(text("UPDATE settings SET default_unit = 'lbs'"))
     with Session(engine) as session:

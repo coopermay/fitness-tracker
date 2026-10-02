@@ -187,6 +187,20 @@ class CalendarDay(BaseModel):
     lifts: list[CalendarLift]  # in the order they were first trained that day
 
 
+# --- Weekly split -----------------------------------------------------------
+
+
+class SplitDayBody(BaseModel):
+    weekday: int = Field(ge=0, le=6, description="0 = Monday ... 6 = Sunday")
+    muscle_group_ids: list[int] = Field(description="Empty = rest day")
+
+
+class SplitBody(BaseModel):
+    """The whole week. Responses always list all 7 days, Monday first."""
+
+    days: list[SplitDayBody]
+
+
 # --- Settings ---------------------------------------------------------------
 
 

@@ -1,6 +1,6 @@
 from fastapi import APIRouter, FastAPI
 
-from app.routers import calendar, gyms, lifts, machines, muscle_groups, sets, settings
+from app.routers import calendar, gyms, lifts, machines, muscle_groups, sets, settings, split
 
 app = FastAPI(title="Lift Tracker API")
 
@@ -20,5 +20,6 @@ api.include_router(machines.router)
 api.include_router(sets.router)
 api.include_router(settings.router)
 api.include_router(calendar.router)
+api.include_router(split.router)
 
 app.include_router(api)

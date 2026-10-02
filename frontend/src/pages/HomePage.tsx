@@ -1,8 +1,9 @@
 import { Link } from 'react-router'
-import { useMuscleGroups } from '../api/queries'
+import { useMuscleGroups, useSplit } from '../api/queries'
 import { BodyFigure } from '../components/BodyFigure'
 import { QueryStatus } from '../components/QueryStatus'
 import { regionForMuscleGroup } from '../bodyRegions'
+import { currentWeekday } from '../dates'
 import styles from './HomePage.module.css'
 
 export function HomePage() {
@@ -10,10 +11,24 @@ export function HomePage() {
   // `data` is undefined and isPending is true; when the fetch finishes,
   // TanStack Query re-renders this component with the data filled in.
   const muscleGroups = useMuscleGroups()
+  const split = useSplit()
 
+  // Wait for the split too, so tiles don't jump when today's groups move up.
   if (muscleGroups.isPending || muscleGroups.isError) {
     return <QueryStatus isError={muscleGroups.isError} error={muscleGroups.error} />
   }
+  if (split.isPending || split.isError) {
+    return <QueryStatus isError={split.isError} error={split.error} />
+  }
+
+  // Today's muscle groups from the weekly split.
+  const todayWeekday = currentWeekday()
+  const todaysIds = new Set(split.data.days.find((day) => day.weekday === todayWeekday)?.muscle_group_ids)
+  // Today's groups first, everything else after, each keeping its usual order.
+  const ordered = [
+    ...muscleGroups.data.filter((group) => todaysIds.has(group.id)),
+    ...muscleGroups.data.filter((group) => !todaysIds.has(group.id)),
+  ]
 
   return (
     <>
@@ -22,9 +37,13 @@ export function HomePage() {
       {/* .map() turns each item into a piece of UI. React needs a unique
           `key` on each one to track which item is which between renders. */}
       <ul className={styles.grid}>
-        {muscleGroups.data.map((muscleGroup) => (
+        {ordered.map((muscleGroup) => (
           <li key={muscleGroup.id}>
-            <Link className={styles.tile} to={`/muscle-groups/${muscleGroup.id}`}>
+            <Link
+              className={todaysIds.has(muscleGroup.id) ? `${styles.tile} ${styles.today}` : styles.tile}
+              to={`/muscle-groups/${muscleGroup.id}`}
+            >
+              {todaysIds.has(muscleGroup.id) && <span className={styles.todayLabel}>Today</span>}
               <BodyFigure region={regionForMuscleGroup(muscleGroup.name)} />
               <span>{muscleGroup.name}</span>
             </Link>

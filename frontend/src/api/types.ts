@@ -143,3 +143,15 @@ export interface CalendarDay {
   pr_count: number
   lifts: CalendarLift[]
 }
+
+// --- GET/PUT /split ---
+
+export interface SplitDay {
+  weekday: number // 0 = Monday ... 6 = Sunday
+  muscle_group_ids: number[] // empty = rest day
+}
+
+// GET always returns all 7 days, Monday first.
+export interface Split {
+  days: SplitDay[]
+}

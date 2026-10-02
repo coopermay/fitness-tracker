@@ -113,3 +113,17 @@ class Settings(SQLModel, table=True):
         sa_type=weight_unit_type,
         sa_column_kwargs={"server_default": WeightUnit.lbs.value},
     )
+
+
+class SplitDay(SQLModel, table=True):
+    """One muscle group trained on one weekday of the user's weekly split.
+
+    weekday follows Python's date.weekday(): 0 = Monday ... 6 = Sunday.
+    A weekday with no rows is a rest day.
+    """
+
+    __tablename__ = "split_days"
+    __table_args__ = (CheckConstraint("weekday BETWEEN 0 AND 6", name="ck_split_days_weekday"),)
+
+    weekday: int = Field(primary_key=True)
+    muscle_group_id: int = Field(foreign_key="muscle_groups.id", primary_key=True)

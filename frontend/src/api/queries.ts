@@ -9,7 +9,7 @@
 // loaded they're never refetched automatically, only when we invalidate them.
 
 import { useMutation, useQuery, useQueryClient, type QueryClient } from '@tanstack/react-query'
-import { apiDelete, apiGet, apiPatch, apiPost } from './client'
+import { apiDelete, apiGet, apiPatch, apiPost, apiPut } from './client'
 import type {
   CalendarDay,
   Gym,
@@ -23,6 +23,7 @@ import type {
   SetCreated,
   SetFields,
   Settings,
+  Split,
   WorkoutSet,
 } from './types'
 
@@ -38,6 +39,7 @@ export const queryKeys = {
   gyms: ['gyms'] as const,
   settings: ['settings'] as const,
   calendar: ['calendar'] as const,
+  split: ['split'] as const,
 }
 
 // --- Queries -----------------------------------------------------------------
@@ -72,6 +74,15 @@ export function useCalendar() {
   return useQuery({
     queryKey: queryKeys.calendar,
     queryFn: () => apiGet<CalendarDay[]>('/calendar'),
+  })
+}
+
+// The weekly split rarely changes, so it's treated like metadata.
+export function useSplit() {
+  return useQuery({
+    queryKey: queryKeys.split,
+    queryFn: () => apiGet<Split>('/split'),
+    staleTime: Infinity,
   })
 }
 
@@ -176,6 +187,14 @@ export function useUpdateSettings() {
     // The response is the new settings, so put it straight into the cache
     // instead of refetching.
     onSuccess: (settings) => queryClient.setQueryData(queryKeys.settings, settings),
+  })
+}
+
+export function useUpdateSplit() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: (split: Split) => apiPut<Split>('/split', split),
+    onSuccess: (split) => queryClient.setQueryData(queryKeys.split, split),
   })
 }
 

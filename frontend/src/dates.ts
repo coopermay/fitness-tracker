@@ -24,3 +24,10 @@ export function startOfWeek(date: Date): Date {
   const daysSinceMonday = (date.getDay() + 6) % 7 // getDay(): Sunday = 0
   return addDays(date, -daysSinceMonday)
 }
+
+// Today's weekday with Monday = 0 ... Sunday = 6, matching the weekly split.
+// (JavaScript's getDay() counts from Sunday = 0.) Like todayIsoDate(), this
+// reads the clock, so a page open past midnight updates on its next re-render.
+export function currentWeekday(): number {
+  return (new Date().getDay() + 6) % 7
+}
