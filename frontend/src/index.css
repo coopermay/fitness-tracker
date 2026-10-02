@@ -7,6 +7,7 @@
   --surface-pressed: #eceef2;
   --border: #e3e4e8;
   --border-strong: #c9ccd3;
+  --figure: #c4c8cf; /* un-highlighted body parts on the home tiles */
   --accent: #1f6feb;
   --on-accent: #ffffff;
   --ok: #1a7f37;
@@ -33,6 +34,7 @@
     --surface-pressed: #262930;
     --border: #2c2e35;
     --border-strong: #3d4049;
+    --figure: #393c45;
     --accent: #4c8dff;
     --on-accent: #ffffff;
     --ok: #3fb950;

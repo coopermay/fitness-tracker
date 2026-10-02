@@ -10,13 +10,11 @@ interface AddByNameProps {
   // Called with the typed name. Returns a Promise so we can wait for the
   // save to finish (or fail) before closing the form.
   onAdd: (name: string) => Promise<unknown>
-  // `?` means optional: callers may leave it out.
-  subtle?: boolean
 }
 
 // A button that turns into a one-field form for adding something by name.
 // Used for "add muscle group" and "add lift".
-export function AddByName({ buttonLabel, placeholder, onAdd, subtle = false }: AddByNameProps) {
+export function AddByName({ buttonLabel, placeholder, onAdd }: AddByNameProps) {
   // Each useState call is one piece of state this component remembers
   // between re-renders. Changing it (via the setter) re-renders the component.
   const [isOpen, setIsOpen] = useState(false)
@@ -51,7 +49,7 @@ export function AddByName({ buttonLabel, placeholder, onAdd, subtle = false }: A
     return (
       <button
         type="button"
-        className={subtle ? styles.subtleButton : styles.button}
+        className={styles.button}
         onClick={() => setIsOpen(true)}
       >
         {buttonLabel}

@@ -1,6 +1,7 @@
 import { Link, useNavigate, useParams } from 'react-router'
 import { useCreateLift, useLifts, useMuscleGroups, useUpdateMuscleGroup } from '../api/queries'
 import { AddByName } from '../components/AddByName'
+import { BackLink } from '../components/BackLink'
 import { EditItem } from '../components/EditItem'
 import { QueryStatus } from '../components/QueryStatus'
 import { formatDate } from '../format'
@@ -30,9 +31,7 @@ export function MuscleGroupPage() {
 
   return (
     <>
-      <Link className={styles.back} to="/">
-        ‹ Muscle groups
-      </Link>
+      <BackLink to="/" label="Muscle groups" />
       <div className={styles.titleRow}>
         <h1 className={styles.title}>{muscleGroup.name}</h1>
         <EditItem

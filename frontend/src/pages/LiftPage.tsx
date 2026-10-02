@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { Link, useLocation, useNavigate, useParams } from 'react-router'
 import { ApiError } from '../api/client'
 import { useLiftRecords, useMuscleGroups, useUpdateLift } from '../api/queries'
+import { BackLink } from '../components/BackLink'
 import { EditItem } from '../components/EditItem'
 import { MachineCard } from '../components/MachineCard'
 import { QueryStatus } from '../components/QueryStatus'
@@ -42,9 +43,7 @@ export function LiftPage() {
 
   return (
     <>
-      <Link className={styles.back} to={`/muscle-groups/${lift.muscle_group_id}`}>
-        ‹ {muscleGroup?.name ?? 'Back'}
-      </Link>
+      <BackLink to={`/muscle-groups/${lift.muscle_group_id}`} label={muscleGroup?.name ?? 'Back'} />
       <div className={styles.titleRow}>
         <h1 className={styles.title}>
           {lift.name}

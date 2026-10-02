@@ -1,6 +1,7 @@
 .title {
   margin: 8px 0 16px;
   font-size: 1.5rem;
+  color: var(--accent);
 }
 
 .grid {
@@ -12,11 +13,14 @@
   list-style: none;
 }
 
+/* Body figure on top, name underneath */
 .tile {
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
-  min-height: 88px;
+  gap: 8px;
+  min-height: 132px;
   padding: 12px;
   border: 1px solid var(--border);
   border-radius: var(--radius);
@@ -30,8 +34,4 @@
 
 .tile:active {
   background: var(--surface-pressed);
-}
-
-.addRow {
-  margin-top: 24px;
 }

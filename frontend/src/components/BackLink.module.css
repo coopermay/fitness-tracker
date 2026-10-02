@@ -1,0 +1,20 @@
+/* A pill-shaped button. The outer padding keeps the tap target large while the
+   visible pill stays compact. */
+.back {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  min-height: 40px;
+  margin: 4px 0 8px;
+  padding: 0 14px 0 8px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: var(--surface);
+  color: var(--accent);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.back:active {
+  background: var(--surface-pressed);
+}

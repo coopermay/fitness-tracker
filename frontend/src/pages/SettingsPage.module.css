@@ -8,6 +8,12 @@
   font-size: 1rem;
 }
 
+/* Headings after the first section get space above them */
+.sectionLabel {
+  margin: 32px 0 12px;
+  font-size: 1rem;
+}
+
 .hint {
   margin: 0 0 12px;
   color: var(--text-muted);
@@ -45,4 +51,10 @@
 
 .error {
   color: var(--error);
+}
+
+.added {
+  margin: 8px 0 0;
+  color: var(--text-muted);
+  font-size: 0.9rem;
 }

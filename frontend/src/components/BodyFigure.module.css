@@ -1,0 +1,13 @@
+.figure {
+  display: block;
+  height: 96px;
+  width: auto;
+}
+
+.part {
+  fill: var(--figure);
+}
+
+.active {
+  fill: var(--accent);
+}

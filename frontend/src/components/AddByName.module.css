@@ -9,17 +9,6 @@
   font-weight: 600;
 }
 
-/* For rare actions, e.g. adding a muscle group */
-.subtleButton {
-  min-height: var(--tap-size);
-  padding: 0 4px;
-  border: none;
-  background: none;
-  color: var(--text-muted);
-  font: inherit;
-  font-size: 0.9rem;
-}
-
 .form {
   display: flex;
   flex-direction: column;

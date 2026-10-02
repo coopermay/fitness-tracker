@@ -1,7 +1,8 @@
 import { Link } from 'react-router'
-import { useCreateMuscleGroup, useMuscleGroups } from '../api/queries'
-import { AddByName } from '../components/AddByName'
+import { useMuscleGroups } from '../api/queries'
+import { BodyFigure } from '../components/BodyFigure'
 import { QueryStatus } from '../components/QueryStatus'
+import { regionForMuscleGroup } from '../bodyRegions'
 import styles from './HomePage.module.css'
 
 export function HomePage() {
@@ -9,7 +10,6 @@ export function HomePage() {
   // `data` is undefined and isPending is true; when the fetch finishes,
   // TanStack Query re-renders this component with the data filled in.
   const muscleGroups = useMuscleGroups()
-  const createMuscleGroup = useCreateMuscleGroup()
 
   if (muscleGroups.isPending || muscleGroups.isError) {
     return <QueryStatus isError={muscleGroups.isError} error={muscleGroups.error} />
@@ -17,7 +17,7 @@ export function HomePage() {
 
   return (
     <>
-      <h1 className={styles.title}>Muscle groups</h1>
+      <h1 className={styles.title}>Lift Tracker</h1>
 
       {/* .map() turns each item into a piece of UI. React needs a unique
           `key` on each one to track which item is which between renders. */}
@@ -25,20 +25,12 @@ export function HomePage() {
         {muscleGroups.data.map((muscleGroup) => (
           <li key={muscleGroup.id}>
             <Link className={styles.tile} to={`/muscle-groups/${muscleGroup.id}`}>
-              {muscleGroup.name}
+              <BodyFigure region={regionForMuscleGroup(muscleGroup.name)} />
+              <span>{muscleGroup.name}</span>
             </Link>
           </li>
         ))}
       </ul>
-
-      <div className={styles.addRow}>
-        <AddByName
-          subtle
-          buttonLabel="+ Add muscle group"
-          placeholder="Muscle group name"
-          onAdd={(name) => createMuscleGroup.mutateAsync(name)}
-        />
-      </div>
     </>
   )
 }
