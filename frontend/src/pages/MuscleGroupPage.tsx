@@ -1,6 +1,7 @@
-import { Link, useParams } from 'react-router'
-import { useCreateLift, useLifts, useMuscleGroups } from '../api/queries'
+import { Link, useNavigate, useParams } from 'react-router'
+import { useCreateLift, useLifts, useMuscleGroups, useUpdateMuscleGroup } from '../api/queries'
 import { AddByName } from '../components/AddByName'
+import { EditItem } from '../components/EditItem'
 import { QueryStatus } from '../components/QueryStatus'
 import { formatDate } from '../format'
 import { NotFoundPage } from './NotFoundPage'
@@ -16,6 +17,8 @@ export function MuscleGroupPage() {
   const muscleGroups = useMuscleGroups() // already cached from the home page
   const lifts = useLifts(muscleGroupId)
   const createLift = useCreateLift(muscleGroupId)
+  const updateMuscleGroup = useUpdateMuscleGroup()
+  const navigate = useNavigate()
 
   if (muscleGroups.isPending || muscleGroups.isError) {
     return <QueryStatus isError={muscleGroups.isError} error={muscleGroups.error} />
@@ -30,7 +33,21 @@ export function MuscleGroupPage() {
       <Link className={styles.back} to="/">
         ‹ Muscle groups
       </Link>
-      <h1 className={styles.title}>{muscleGroup.name}</h1>
+      <div className={styles.titleRow}>
+        <h1 className={styles.title}>{muscleGroup.name}</h1>
+        <EditItem
+          name={muscleGroup.name}
+          archived={muscleGroup.archived}
+          archiveNote="It disappears from the home screen; its sets stay in history."
+          onRename={(name) =>
+            updateMuscleGroup.mutateAsync({ id: muscleGroupId, changes: { name } })
+          }
+          onSetArchived={async (archived) => {
+            await updateMuscleGroup.mutateAsync({ id: muscleGroupId, changes: { archived } })
+            navigate('/')
+          }}
+        />
+      </div>
 
       {lifts.isPending || lifts.isError ? (
         <QueryStatus isError={lifts.isError} error={lifts.error} />

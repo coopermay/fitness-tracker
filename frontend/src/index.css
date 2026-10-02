@@ -14,6 +14,7 @@
 
   --radius: 12px;
   --tap-size: 48px; /* minimum height for anything tappable */
+  --tab-bar-height: 60px;
 
   font: 16px/1.5 system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
   color-scheme: light dark;
@@ -54,8 +55,9 @@ body {
 #root {
   max-width: 640px;
   margin: 0 auto;
+  /* Bottom padding leaves room for the fixed tab bar (and the home bar under it). */
   padding: max(8px, env(safe-area-inset-top)) max(16px, env(safe-area-inset-right))
-    max(32px, env(safe-area-inset-bottom)) max(16px, env(safe-area-inset-left));
+    calc(var(--tab-bar-height) + 32px + env(safe-area-inset-bottom)) max(16px, env(safe-area-inset-left));
 }
 
 a {

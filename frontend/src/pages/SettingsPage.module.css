@@ -1,0 +1,48 @@
+.title {
+  margin: 12px 0 20px;
+  font-size: 1.5rem;
+}
+
+.label {
+  margin: 0 0 4px;
+  font-size: 1rem;
+}
+
+.hint {
+  margin: 0 0 12px;
+  color: var(--text-muted);
+  font-size: 0.9rem;
+}
+
+.segmented {
+  display: flex;
+  overflow: hidden;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius);
+}
+
+.segment,
+.segmentActive {
+  flex: 1;
+  min-height: var(--tap-size);
+  border: none;
+  background: var(--surface);
+  color: var(--text);
+  font: inherit;
+}
+
+.segment + .segment,
+.segment + .segmentActive,
+.segmentActive + .segment {
+  border-left: 1px solid var(--border-strong);
+}
+
+.segmentActive {
+  background: var(--accent);
+  color: var(--on-accent);
+  font-weight: 600;
+}
+
+.error {
+  color: var(--error);
+}

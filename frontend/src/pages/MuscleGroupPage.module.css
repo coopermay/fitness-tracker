@@ -6,8 +6,22 @@
   text-decoration: none;
 }
 
-.title {
+/* Title and Edit side by side; the edit panel wraps onto its own line */
+.titleRow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  column-gap: 12px;
   margin: 0 0 16px;
+}
+
+.titleRow > form {
+  flex-basis: 100%;
+}
+
+.title {
+  margin: 0;
   font-size: 1.5rem;
 }
 

@@ -1,0 +1,79 @@
+.editButton {
+  min-height: var(--tap-size);
+  padding: 0 4px;
+  border: none;
+  background: none;
+  color: var(--text-muted);
+  font: inherit;
+  font-size: 0.9rem;
+}
+
+.panel {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 0 0 16px;
+  padding: 12px;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius);
+  background: var(--surface);
+}
+
+.label {
+  font-weight: 600;
+}
+
+.input {
+  min-height: var(--tap-size);
+  padding: 0 12px;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius);
+  background: var(--bg);
+  color: var(--text);
+  font: inherit;
+  font-size: 1rem; /* 16px+ stops iOS Safari zooming in on focus */
+}
+
+.actions {
+  display: flex;
+  gap: 8px;
+}
+
+.save,
+.cancel,
+.archive,
+.restore {
+  min-height: var(--tap-size);
+  border-radius: var(--radius);
+  font: inherit;
+  font-weight: 600;
+}
+
+.save,
+.cancel {
+  flex: 1;
+}
+
+.save {
+  border: none;
+  background: var(--accent);
+  color: var(--on-accent);
+}
+
+.cancel,
+.restore {
+  border: 1px solid var(--border-strong);
+  background: none;
+  color: var(--text);
+}
+
+.archive {
+  border: 1px solid var(--error);
+  background: none;
+  color: var(--error);
+}
+
+.error {
+  margin: 0;
+  color: var(--error);
+}

@@ -1,6 +1,8 @@
 import { useState } from 'react'
+import { useUpdateMachine } from '../api/queries'
 import type { MachineRecords, RecordRow } from '../api/types'
 import { formatDate, formatReps, formatWeight } from '../format'
+import { EditItem } from './EditItem'
 import { HistoryList } from './HistoryList'
 import styles from './MachineCard.module.css'
 
@@ -13,6 +15,8 @@ export function MachineCard({ group }: MachineCardProps) {
   // Each card on the page is its own instance with its own state, so
   // expanding one card doesn't expand the others.
   const [showHistory, setShowHistory] = useState(false)
+  const updateMachine = useUpdateMachine()
+  const machine = group.machine
 
   // `?.` ("optional chaining") reads .name only if machine isn't null;
   // `??` supplies a fallback when the left side is null or undefined.
@@ -28,6 +32,18 @@ export function MachineCard({ group }: MachineCardProps) {
         </h2>
         {group.last_performed_on && (
           <span className={styles.lastDate}>{formatDate(group.last_performed_on)}</span>
+        )}
+        {/* Machines are shared, so renaming here renames it for every lift. */}
+        {machine && (
+          <EditItem
+            name={machine.name}
+            archived={machine.archived}
+            archiveNote="It's removed from the machine list for every lift; existing sets still show."
+            onRename={(name) => updateMachine.mutateAsync({ id: machine.id, changes: { name } })}
+            onSetArchived={(archived) =>
+              updateMachine.mutateAsync({ id: machine.id, changes: { archived } })
+            }
+          />
         )}
       </header>
 

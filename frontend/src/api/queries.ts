@@ -16,6 +16,7 @@ import type {
   LiftListItem,
   LiftRecords,
   Machine,
+  MetadataUpdate,
   MuscleGroup,
   SetCreate,
   SetCreated,
@@ -30,6 +31,7 @@ export const queryKeys = {
   muscleGroups: ['muscle-groups'] as const,
   lifts: ['lifts'] as const,
   liftsForMuscleGroup: (muscleGroupId: number) => ['lifts', { muscleGroupId }] as const,
+  allLiftRecords: ['lift-records'] as const,
   liftRecords: (liftId: number) => ['lift-records', liftId] as const,
   machines: ['machines'] as const,
   gyms: ['gyms'] as const,
@@ -112,6 +114,56 @@ export function useCreateMachine() {
     mutationFn: ({ name, gymId }: { name: string; gymId: number }) =>
       apiPost<Machine>('/machines', { name, gym_id: gymId }),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: queryKeys.machines }),
+  })
+}
+
+// Rename and/or archive. These don't wait for the refetch (onSuccess returns
+// nothing), so a page can navigate away straight after archiving instead of
+// briefly showing "Not found" for the item that just disappeared from the list.
+
+export function useUpdateMuscleGroup() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: ({ id, changes }: { id: number; changes: MetadataUpdate }) =>
+      apiPatch<MuscleGroup>(`/muscle-groups/${id}`, changes),
+    onSuccess: () => {
+      void queryClient.invalidateQueries({ queryKey: queryKeys.muscleGroups })
+    },
+  })
+}
+
+export function useUpdateLift() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: ({ id, changes }: { id: number; changes: MetadataUpdate }) =>
+      apiPatch<Lift>(`/lifts/${id}`, changes),
+    onSuccess: (lift) => {
+      void queryClient.invalidateQueries({ queryKey: queryKeys.lifts })
+      void queryClient.invalidateQueries({ queryKey: queryKeys.liftRecords(lift.id) })
+    },
+  })
+}
+
+export function useUpdateMachine() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: ({ id, changes }: { id: number; changes: MetadataUpdate }) =>
+      apiPatch<Machine>(`/machines/${id}`, changes),
+    onSuccess: () => {
+      void queryClient.invalidateQueries({ queryKey: queryKeys.machines })
+      // A machine's name appears in the records of every lift that used it.
+      void queryClient.invalidateQueries({ queryKey: queryKeys.allLiftRecords })
+    },
+  })
+}
+
+export function useUpdateSettings() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: (changes: Settings) => apiPatch<Settings>('/settings', changes),
+    // The response is the new settings, so put it straight into the cache
+    // instead of refetching.
+    onSuccess: (settings) => queryClient.setQueryData(queryKeys.settings, settings),
   })
 }
 

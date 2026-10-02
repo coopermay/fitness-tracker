@@ -28,6 +28,12 @@ export interface LiftListItem extends Lift {
   last_performed_on: DateString | null
 }
 
+// PATCH body for muscle groups, lifts and machines. Omitted fields are unchanged.
+export interface MetadataUpdate {
+  name?: string
+  archived?: boolean
+}
+
 export interface Machine {
   id: number
   name: string

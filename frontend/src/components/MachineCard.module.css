@@ -7,13 +7,20 @@
 
 .header {
   display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: 12px;
+  flex-wrap: wrap;
+  align-items: center;
+  column-gap: 12px;
   margin-bottom: 8px;
 }
 
+/* The edit panel takes its own line under the machine name */
+.header > form {
+  flex-basis: 100%;
+  margin-top: 8px;
+}
+
 .title {
+  flex: 1;
   margin: 0;
   font-size: 1.1rem;
 }

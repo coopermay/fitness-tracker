@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react'
 import { Link, useLocation, useNavigate, useParams } from 'react-router'
 import { ApiError } from '../api/client'
-import { useLiftRecords, useMuscleGroups } from '../api/queries'
+import { useLiftRecords, useMuscleGroups, useUpdateLift } from '../api/queries'
+import { EditItem } from '../components/EditItem'
 import { MachineCard } from '../components/MachineCard'
 import { QueryStatus } from '../components/QueryStatus'
 import type { LiftPageState } from '../flash'
@@ -12,6 +13,7 @@ export function LiftPage() {
   const liftId = Number(useParams().liftId)
   const records = useLiftRecords(liftId)
   const muscleGroups = useMuscleGroups() // cached; used for the back link's label
+  const updateLift = useUpdateLift()
   const location = useLocation()
   const navigate = useNavigate()
 
@@ -43,7 +45,24 @@ export function LiftPage() {
       <Link className={styles.back} to={`/muscle-groups/${lift.muscle_group_id}`}>
         ‹ {muscleGroup?.name ?? 'Back'}
       </Link>
-      <h1 className={styles.title}>{lift.name}</h1>
+      <div className={styles.titleRow}>
+        <h1 className={styles.title}>
+          {lift.name}
+          {lift.archived && <span className={styles.archived}> (archived)</span>}
+        </h1>
+        <EditItem
+          name={lift.name}
+          archived={lift.archived}
+          archiveNote="It disappears from the muscle group; its sets stay in history."
+          onRename={(name) => updateLift.mutateAsync({ id: lift.id, changes: { name } })}
+          onSetArchived={async (archived) => {
+            await updateLift.mutateAsync({ id: lift.id, changes: { archived } })
+            if (archived) {
+              navigate(`/muscle-groups/${lift.muscle_group_id}`)
+            }
+          }}
+        />
+      </div>
 
       {flash && (
         <p className={flash.isRecord ? styles.flashRecord : styles.flash} role="status">

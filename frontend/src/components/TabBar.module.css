@@ -1,0 +1,44 @@
+/* Fixed to the bottom. The extra bottom padding keeps the tabs clear of the
+   iPhone home bar when the app runs from the home screen. */
+.bar {
+  position: fixed;
+  z-index: 20;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  padding-bottom: env(safe-area-inset-bottom);
+  border-top: 1px solid var(--border);
+  background: var(--surface);
+}
+
+.slots {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  max-width: 640px;
+  height: var(--tab-bar-height);
+  margin: 0 auto;
+}
+
+.tab,
+.tabActive {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  color: var(--text-muted);
+  text-decoration: none;
+}
+
+.tabActive {
+  color: var(--accent);
+}
+
+.label {
+  font-size: 0.7rem;
+  font-weight: 600;
+}
+
+.placeholder {
+  display: block;
+}
