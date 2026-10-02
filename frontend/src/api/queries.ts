@@ -13,6 +13,7 @@ import { apiDelete, apiGet, apiPatch, apiPost, apiPut } from './client'
 import type {
   CalendarDay,
   Gym,
+  Insights,
   Lift,
   LiftListItem,
   LiftRecords,
@@ -40,6 +41,7 @@ export const queryKeys = {
   settings: ['settings'] as const,
   calendar: ['calendar'] as const,
   split: ['split'] as const,
+  insights: ['insights'] as const,
 }
 
 // --- Queries -----------------------------------------------------------------
@@ -83,6 +85,15 @@ export function useSplit() {
     queryKey: queryKeys.split,
     queryFn: () => apiGet<Split>('/split'),
     staleTime: Infinity,
+  })
+}
+
+// Plateau / overdue flags. `today` comes from the phone, not the server's
+// clock, which may be in another timezone.
+export function useInsights(today: string) {
+  return useQuery({
+    queryKey: [...queryKeys.insights, today],
+    queryFn: () => apiGet<Insights>(`/insights?today=${today}`),
   })
 }
 
@@ -194,7 +205,10 @@ export function useUpdateSplit() {
   const queryClient = useQueryClient()
   return useMutation({
     mutationFn: (split: Split) => apiPut<Split>('/split', split),
-    onSuccess: (split) => queryClient.setQueryData(queryKeys.split, split),
+    onSuccess: (split) => {
+      queryClient.setQueryData(queryKeys.split, split)
+      void queryClient.invalidateQueries({ queryKey: queryKeys.insights }) // overdue depends on it
+    },
   })
 }
 
@@ -208,6 +222,7 @@ function refreshAfterSetChange(queryClient: QueryClient, liftId: number) {
     queryClient.invalidateQueries({ queryKey: queryKeys.liftRecords(liftId) }),
     queryClient.invalidateQueries({ queryKey: queryKeys.lifts }),
     queryClient.invalidateQueries({ queryKey: queryKeys.calendar }),
+    queryClient.invalidateQueries({ queryKey: queryKeys.insights }),
   ])
 }
 

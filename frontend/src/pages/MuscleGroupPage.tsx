@@ -1,10 +1,16 @@
 import { Link, useNavigate, useParams } from 'react-router'
-import { useCreateLift, useLifts, useMuscleGroups, useUpdateMuscleGroup } from '../api/queries'
+import {
+  useCreateLift,
+  useInsights,
+  useLifts,
+  useMuscleGroups,
+  useUpdateMuscleGroup,
+} from '../api/queries'
 import { AddByName } from '../components/AddByName'
 import { BackLink } from '../components/BackLink'
 import { EditItem } from '../components/EditItem'
 import { QueryStatus } from '../components/QueryStatus'
-import { formatDate } from '../format'
+import { formatDate, todayIsoDate } from '../format'
 import { NotFoundPage } from './NotFoundPage'
 import styles from './MuscleGroupPage.module.css'
 
@@ -19,6 +25,9 @@ export function MuscleGroupPage() {
   const lifts = useLifts(muscleGroupId)
   const createLift = useCreateLift(muscleGroupId)
   const updateMuscleGroup = useUpdateMuscleGroup()
+  // Badges are extras: the list shows without them while they load.
+  const insights = useInsights(todayIsoDate())
+  const plateaued = new Set(insights.data?.plateaued_lift_ids)
   const navigate = useNavigate()
 
   if (muscleGroups.isPending || muscleGroups.isError) {
@@ -55,7 +64,14 @@ export function MuscleGroupPage() {
           {lifts.data.map((lift) => (
             <li key={lift.id}>
               <Link className={styles.row} to={`/lifts/${lift.id}`}>
-                <span className={styles.liftName}>{lift.name}</span>
+                <span className={styles.liftName}>
+                  {lift.name}
+                  {plateaued.has(lift.id) && (
+                    <span className={styles.badge} title="No PR in the last 4 weeks">
+                      Plateau
+                    </span>
+                  )}
+                </span>
                 <span className={styles.lastDate}>
                   {lift.last_performed_on ? formatDate(lift.last_performed_on) : '—'}
                 </span>

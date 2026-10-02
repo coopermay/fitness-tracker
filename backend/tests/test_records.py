@@ -196,3 +196,32 @@ def test_new_record_flag(client, lift_id, machine_ids):
     assert log_set(client, lift_id, barbell, 185, 1, unit="kg")["is_new_record"] is True
     assert log_set(client, lift_id, None, 185, 1)["is_new_record"] is True
     assert log_set(client, lift_id, None, 185, 1)["is_new_record"] is False
+
+
+# --- Progress chart data -------------------------------------------------------
+
+
+def test_progress_has_one_point_per_day_oldest_first(client, lift_id, machine_ids):
+    barbell = machine_ids["Barbell"]
+    log_set(client, lift_id, barbell, 185, 5, performed_on="2026-09-25")  # 1RM 216
+    log_set(client, lift_id, barbell, 175, 6, performed_on="2026-09-25")  # 1RM 210
+    log_set(client, lift_id, barbell, 155, 10, performed_on="2026-09-01")  # 1RM 206.5
+    log_set(client, lift_id, barbell, 135, 16, performed_on=None)  # undated: not charted
+
+    [group] = get_records(client, lift_id)["machine_groups"]
+    progress = group["units"][0]["progress"]
+
+    assert [(p["date"], p["value"], p["weight_value"], p["reps"]) for p in progress] == [
+        ("2026-09-01", 206.5, 155, 10),
+        ("2026-09-25", 216.0, 185, 5),  # the day's best set, not its heaviest-reps set
+    ]
+
+
+def test_progress_for_plates_uses_heaviest_weight(client, lift_id, machine_ids):
+    machine = machine_ids["Hip thrust machine"]
+    log_set(client, lift_id, machine, 8, 10, unit="plates", performed_on="2026-09-23")
+    log_set(client, lift_id, machine, 9, 4, unit="plates", performed_on="2026-09-23")
+
+    [group] = get_records(client, lift_id)["machine_groups"]
+
+    assert [(p["value"], p["reps"]) for p in group["units"][0]["progress"]] == [(9, 4)]

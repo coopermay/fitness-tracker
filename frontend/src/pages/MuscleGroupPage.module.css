@@ -52,3 +52,15 @@
 .empty {
   color: var(--text-muted);
 }
+
+/* "Plateau": no PR on this lift in the last 4 weeks */
+.badge {
+  margin-left: 8px;
+  padding: 1px 8px;
+  border: 1px solid var(--warn);
+  border-radius: 999px;
+  color: var(--warn);
+  font-size: 0.7rem;
+  font-weight: 700;
+  vertical-align: middle;
+}

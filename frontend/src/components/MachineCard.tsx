@@ -4,6 +4,7 @@ import type { MachineRecords, RecordRow } from '../api/types'
 import { formatDate, formatReps, formatWeight } from '../format'
 import { EditItem } from './EditItem'
 import { HistoryList } from './HistoryList'
+import { ProgressChart } from './ProgressChart'
 import styles from './MachineCard.module.css'
 
 interface MachineCardProps {
@@ -55,6 +56,15 @@ export function MachineCard({ group }: MachineCardProps) {
               <RecordLine key={record.set_id} record={record} />
             ))}
           </ul>
+          {/* A line needs at least two sessions. The key resets the selected
+              point to the newest one whenever a session is added. */}
+          {unitRecords.progress.length >= 2 && (
+            <ProgressChart
+              key={unitRecords.progress.length}
+              points={unitRecords.progress}
+              unit={unitRecords.weight_unit}
+            />
+          )}
         </div>
       ))}
 

@@ -12,6 +12,7 @@ from app.schemas import (
     LiftRecords,
     MachineRead,
     MachineRecords,
+    ProgressPoint,
     RecordRow,
     SetRead,
     UnitRecords,
@@ -54,6 +55,38 @@ def best_set_per_weight(sets: list[WorkoutSet]) -> list[WorkoutSet]:
         ):
             best[workout_set.weight_value] = workout_set
     return sorted(best.values(), key=lambda s: s.weight_value, reverse=True)
+
+
+def chart_value(workout_set: WorkoutSet) -> float:
+    """What the progress chart plots: est. 1RM, or the weight itself for plates."""
+    estimate = estimated_one_rep_max(workout_set.weight_value, workout_set.reps, workout_set.weight_unit)
+    return estimate if estimate is not None else float(workout_set.weight_value)
+
+
+def progress_points(sets: list[WorkoutSet]) -> list[ProgressPoint]:
+    """One point per dated session (sets of a single unit), oldest first.
+
+    Each point is the day's best set by chart_value; on a tie the first one
+    found wins. Undated sets can't be placed on a timeline, so they're skipped.
+    """
+    best_by_date: dict[date, tuple[float, WorkoutSet]] = {}
+    for workout_set in sets:
+        if workout_set.performed_on is None:
+            continue
+        value = chart_value(workout_set)
+        current = best_by_date.get(workout_set.performed_on)
+        if current is None or value > current[0]:
+            best_by_date[workout_set.performed_on] = (value, workout_set)
+    return [
+        ProgressPoint(
+            date=day,
+            value=value,
+            weight_value=best.weight_value,
+            reps=best.reps,
+            approximate=best.approximate,
+        )
+        for day, (value, best) in sorted(best_by_date.items())
+    ]
 
 
 def to_record_row(workout_set: WorkoutSet) -> RecordRow:
@@ -99,6 +132,7 @@ def build_lift_records(
                 UnitRecords(
                     weight_unit=unit,
                     records=[to_record_row(s) for s in best_set_per_weight(unit_sets)],
+                    progress=progress_points(unit_sets),
                 )
                 for unit, unit_sets in sets_by_unit.items()
             ],

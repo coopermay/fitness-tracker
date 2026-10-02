@@ -18,6 +18,7 @@
   --accent-tint: #eaf1fe; /* light blue background for highlighted tiles */
   --on-accent: #ffffff;
   --ok: #1a7f37;
+  --warn: #9a6700; /* plateau / overdue badges */
   --error: #cf222e;
 
   --radius: 12px;
@@ -51,6 +52,7 @@
     --accent-tint: #18243a;
     --on-accent: #ffffff;
     --ok: #3fb950;
+    --warn: #d29922;
     --error: #f85149;
   }
 }
@@ -64,6 +66,17 @@ body {
   margin: 0;
   background: var(--bg);
   overflow-x: clip; /* pages sliding in briefly overhang the edge; don't let that scroll */
+}
+
+/* Hide scrollbars everywhere so it feels like a native app; scrolling still
+   works. The first rule is the standard one (Firefox, Chrome); the second
+   covers Safari and older Chrome. */
+* {
+  scrollbar-width: none;
+}
+
+*::-webkit-scrollbar {
+  display: none;
 }
 
 /* env(safe-area-inset-*) is the space taken by the notch / home bar when the

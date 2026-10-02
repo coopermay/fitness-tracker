@@ -1,0 +1,77 @@
+.chart {
+  margin: 8px 0 4px;
+}
+
+.caption {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 4px;
+  font-size: 0.85rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.metric {
+  color: var(--text-muted);
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  overflow: visible;
+}
+
+.guide {
+  stroke: var(--border);
+  stroke-dasharray: 3 4;
+}
+
+.yLabel,
+.xLabelStart,
+.xLabelEnd {
+  fill: var(--text-muted);
+  font-size: 10px;
+}
+
+/* SVG text anchoring: right-align y labels, and the end date */
+.yLabel {
+  text-anchor: end;
+  dominant-baseline: middle;
+}
+
+.xLabelEnd {
+  text-anchor: end;
+}
+
+.line {
+  fill: none;
+  stroke: var(--accent);
+  stroke-width: 2;
+  stroke-linejoin: round;
+}
+
+.pointGroup {
+  cursor: pointer;
+}
+
+.hitArea {
+  fill: transparent;
+}
+
+.point {
+  fill: var(--surface);
+  stroke: var(--accent);
+  stroke-width: 2;
+}
+
+.pointSelected {
+  fill: var(--accent);
+  stroke: var(--surface);
+  stroke-width: 2;
+}

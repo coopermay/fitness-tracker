@@ -1,9 +1,10 @@
 import { Link } from 'react-router'
-import { useMuscleGroups, useSplit } from '../api/queries'
+import { useInsights, useMuscleGroups, useSplit } from '../api/queries'
 import { BodyFigure } from '../components/BodyFigure'
 import { QueryStatus } from '../components/QueryStatus'
 import { regionForMuscleGroup } from '../bodyRegions'
 import { currentWeekday } from '../dates'
+import { todayIsoDate } from '../format'
 import styles from './HomePage.module.css'
 
 export function HomePage() {
@@ -12,6 +13,9 @@ export function HomePage() {
   // TanStack Query re-renders this component with the data filled in.
   const muscleGroups = useMuscleGroups()
   const split = useSplit()
+  // Badges are extras: tiles show without them while they load.
+  const insights = useInsights(todayIsoDate())
+  const overdue = new Set(insights.data?.overdue_muscle_group_ids)
 
   // Wait for the split too, so tiles don't jump when today's groups move up.
   if (muscleGroups.isPending || muscleGroups.isError) {
@@ -44,6 +48,11 @@ export function HomePage() {
               to={`/muscle-groups/${muscleGroup.id}`}
             >
               {todaysIds.has(muscleGroup.id) && <span className={styles.todayLabel}>Today</span>}
+              {overdue.has(muscleGroup.id) && (
+                <span className={styles.overdueLabel} title="Scheduled earlier this week, not trained yet">
+                  Overdue
+                </span>
+              )}
               <BodyFigure region={regionForMuscleGroup(muscleGroup.name)} />
               <span>{muscleGroup.name}</span>
             </Link>

@@ -141,9 +141,18 @@ class RecordRow(BaseModel):
     estimated_1rm: float | None = Field(description="Epley, rounded to 0.5. Null for plates.")
 
 
+class ProgressPoint(BaseModel):
+    date: date
+    value: float = Field(description="Best est. 1RM that day; for plates, the heaviest weight.")
+    weight_value: float  # the set that produced `value`
+    reps: int
+    approximate: bool
+
+
 class UnitRecords(BaseModel):
     weight_unit: WeightUnit
     records: list[RecordRow]
+    progress: list[ProgressPoint] = Field(description="One point per dated session, oldest first.")
 
 
 class MachineRecords(BaseModel):
@@ -199,6 +208,19 @@ class SplitBody(BaseModel):
     """The whole week. Responses always list all 7 days, Monday first."""
 
     days: list[SplitDayBody]
+
+
+# --- Insights ---------------------------------------------------------------
+
+
+class Insights(BaseModel):
+    plateaued_lift_ids: list[int] = Field(
+        description="Lifts done in the last 4 weeks with no PR in that time."
+    )
+    overdue_muscle_group_ids: list[int] = Field(
+        description="Muscle groups whose scheduled split days earlier this week outnumber "
+        "the days they've been trained this week."
+    )
 
 
 # --- Settings ---------------------------------------------------------------

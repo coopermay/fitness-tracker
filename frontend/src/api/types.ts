@@ -101,9 +101,19 @@ export interface RecordRow {
   estimated_1rm: number | null // null for plates
 }
 
+// One point on a progress chart: the day's best set.
+export interface ProgressPoint {
+  date: DateString
+  value: number // est. 1RM; for plates, the heaviest weight
+  weight_value: number
+  reps: number
+  approximate: boolean
+}
+
 export interface UnitRecords {
   weight_unit: WeightUnit
   records: RecordRow[] // heaviest first
+  progress: ProgressPoint[] // one per dated session, oldest first
 }
 
 export interface MachineRecords {
@@ -154,4 +164,11 @@ export interface SplitDay {
 // GET always returns all 7 days, Monday first.
 export interface Split {
   days: SplitDay[]
+}
+
+// --- GET /insights ---
+
+export interface Insights {
+  plateaued_lift_ids: number[] // trained in the last 4 weeks, no PR in that time
+  overdue_muscle_group_ids: number[] // behind on this week's split
 }
