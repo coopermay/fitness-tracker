@@ -374,16 +374,17 @@ The bottom navigation bar, fixed to the screen's bottom on every page.
 | Prop | Type | Meaning |
 | --- | --- | --- |
 | `lift` | `TodayLift` | One lift from `GET /today` |
+| `groupId` | `number` | The Today tab it's on, so logging returns to that tab |
 
 Renders an `<article>` card:
 - **Header:** the lift name (a link to the lift page), an amber **Plateau** pill if flagged, and **✓ Done** on the right once you've logged a set today (the card also gets an accent border).
-- The machine name, muted.
+- The machine name, muted. Every row below is for this machine.
 - A `<dl>` (description list) of rows, each a label and a value:
-  - **Today:** today's sets, if any.
-  - **Last:** the last session's date and sets.
-  - **Beat** or **Move up:** the target, in accent colour: "185 lbs × 8", or "60 lbs × 6+" when moving up.
-- "Not logged yet." when there's no history at all.
-- A full-width **Log set** button → `/lifts/:id/log?from=today`.
+  - **Today:** today's sets, if any, with PR badges.
+  - **Best:** your best set and its date: "175 lbs × 8 · Oct 2" (no PR badge).
+  - **Goal:** in accent colour, "175 lbs × 9", or "180 lbs × 6 · new weight" when moving up.
+- With no best: "Not logged yet.", or "First time on this machine." if you've logged on a new machine today.
+- A full-width **Log set** button → `/lifts/:id/log?from=today&group=:groupId`.
 
-Sets are shown compactly by the in-file `SetList`, "185 × 6 PR · 185 × 5 lbs", with the unit once at the end. Each set has `white-space: nowrap`, so one set never splits across lines. PR badges use the same fixed green as the calendar.
+Today's sets are shown compactly by the in-file `SetList`, "185 × 6 PR · 185 × 5 lbs", with the unit once at the end. Each set has `white-space: nowrap`, so one set never splits across lines. PR badges use the same fixed green as the calendar.
 

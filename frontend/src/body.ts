@@ -27,13 +27,13 @@ export function lbsToKg(lbs: number): number {
   return Math.round((lbs / LBS_PER_KG) * 100) / 100
 }
 
-// "5 ft 10 in" or "178 cm"
+// `5'10"` or "178 cm"
 export function formatHeight(cm: number, units: BodyUnits): string {
   if (units === 'metric') {
     return `${Math.round(cm)} cm`
   }
   const { feet, inches } = cmToFeetInches(cm)
-  return `${feet} ft ${inches} in`
+  return `${feet}'${inches}"`
 }
 
 // "180 lbs" or "81.6 kg"

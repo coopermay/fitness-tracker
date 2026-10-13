@@ -108,6 +108,9 @@ class Lift(MetadataBase, table=True):
     )
 
     muscle_group_id: int = Field(foreign_key="muscle_groups.id")
+    # The machine whose numbers count for relative strength on Insights, since
+    # numbers differ machine to machine. Null = automatic (the most-used one).
+    strength_machine_id: int | None = Field(default=None, foreign_key="machines.id")
 
 
 class Machine(MetadataBase, table=True):

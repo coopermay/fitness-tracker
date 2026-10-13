@@ -87,6 +87,7 @@ When you add, rename or delete a file, update this page.
 | `app/records.py` | Epley, `recency_key`, records, progress points, `previous_best_reps` | [Domain logic](../04-backend/domain-logic.md#recordspy) |
 | `app/calendar.py` | `find_pr_set_ids`, `build_calendar` | [Domain logic](../04-backend/domain-logic.md#calendarpy) |
 | `app/insights.py` | `plateaued_lift_ids` | [Domain logic](../04-backend/domain-logic.md#insightspy) |
+| `app/standards.py` | `STANDARDS`, `standard_for`, `grade`, `level_for_score` | [Domain logic](../04-backend/domain-logic.md#standardspy) |
 | `app/body.py` | `build_body_stats`, `bmr_mifflin_st_jeor`, `calorie_targets`, `protein_range`, `relative_strength`, `age_on` | [Domain logic](../04-backend/domain-logic.md#bodypy) |
 | `app/today.py` | `build_today`, `target_for`, `usual_lift_ids`, `weight_increment` | [Domain logic](../04-backend/domain-logic.md#todaypy) |
 
@@ -116,6 +117,7 @@ When you add, rename or delete a file, update this page.
 | `migrations/README` | Alembic's one-line placeholder | [Migrations](../03-database/migrations.md#files) |
 | `migrations/versions/0001_initial_schema.py` | All core tables, the enum, the settings row | [Migrations](../03-database/migrations.md#0001_initial_schemapy-revision-ba7a79739cdb) |
 | `migrations/versions/0002_split_days.py` | The `split_days` table | [Migrations](../03-database/migrations.md#0002_split_dayspy-revision-0002_split_days) |
+| `migrations/versions/0006_lift_strength_machine.py` | `lifts.strength_machine_id` + FK | [Migrations](../03-database/migrations.md#0006_lift_strength_machinepy-revision-0006_lift_strength_machine) |
 | `migrations/versions/0005_settings_body.py` | Body stats columns, enums and checks on `settings` | [Migrations](../03-database/migrations.md#0005_settings_bodypy-revision-0005_settings_body) |
 | `migrations/versions/0004_settings_rep_range.py` | `settings.rep_range_min` / `rep_range_max` + check | [Migrations](../03-database/migrations.md#0004_settings_rep_rangepy-revision-0004_settings_rep_range) |
 | `migrations/versions/0003_settings_theme.py` | `settings.theme_base` / `theme_accent` and their enums | [Migrations](../03-database/migrations.md#0003_settings_themepy-revision-0003_settings_theme) |
@@ -136,8 +138,8 @@ When you add, rename or delete a file, update this page.
 | `tests/test_records.py` | 19 | [Testing](../08-testing/testing.md#test_recordspy-19-epley-records-new-best-flag-progress) |
 | `tests/test_sets.py` | 7 | [Testing](../08-testing/testing.md#test_setspy-7-set-validation) |
 | `tests/test_settings.py` | 5 | [Testing](../08-testing/testing.md#test_settingspy-5) |
-| `tests/test_body.py` | 12 | [Testing](../08-testing/testing.md#test_bodypy-12) |
-| `tests/test_today.py` | 10 | [Testing](../08-testing/testing.md#test_todaypy-10) |
+| `tests/test_body.py` | 25 | [Testing](../08-testing/testing.md#test_bodypy-25) |
+| `tests/test_today.py` | 14 | [Testing](../08-testing/testing.md#test_todaypy-14) |
 | `tests/test_calendar.py` | 6 | [Testing](../08-testing/testing.md#test_calendarpy-6) |
 | `tests/test_split.py` | 5 | [Testing](../08-testing/testing.md#test_splitpy-5) |
 | `tests/test_insights.py` | 4 | [Testing](../08-testing/testing.md#test_insightspy-4) |

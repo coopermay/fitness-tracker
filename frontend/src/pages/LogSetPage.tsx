@@ -12,10 +12,15 @@ export function LogSetPage() {
   const liftId = Number(useParams().liftId)
   // useNavigate gives a function for changing pages from code (e.g. after saving).
   const navigate = useNavigate()
-  // ?from=today (the Today page's "Log set") sends you back there afterwards.
-  // useSearchParams reads the part of the URL after "?".
+  // ?from=today (the Today page's "Log set") sends you back there afterwards,
+  // to the same muscle group tab (&group=3). useSearchParams reads the part of
+  // the URL after "?".
   const [searchParams] = useSearchParams()
-  const returnTo = searchParams.get('from') === 'today' ? '/today' : `/lifts/${liftId}`
+  const group = searchParams.get('group')
+  const returnTo =
+    searchParams.get('from') === 'today'
+      ? `/today${group ? `?group=${group}` : ''}`
+      : `/lifts/${liftId}`
   const records = useLiftRecords(liftId)
   const settings = useSettings()
   const createSet = useCreateSet(liftId)

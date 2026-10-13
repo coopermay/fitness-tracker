@@ -4,8 +4,8 @@ import { QueryStatus } from '../components/QueryStatus'
 import { THEME_ACCENTS, THEME_BASES } from '../theme'
 import styles from './SettingsPage.module.css'
 
-// Settings → Theme: background and accent colour. Tapping saves right away,
-// and App's useTheme re-colours the whole app.
+// Settings → Theme: background and accent color. Tapping saves right away,
+// and App's useTheme re-colors the whole app.
 export function ThemePage() {
   const settings = useSettings()
   const updateSettings = useUpdateSettings()
@@ -50,7 +50,7 @@ export function ThemePage() {
 
       <h2 className={styles.sectionLabel}>Accent</h2>
       <p className={styles.hint}>Buttons, highlights, body figures and the calendar.</p>
-      <div className={styles.accents} role="group" aria-label="Accent colour">
+      <div className={styles.accents} role="group" aria-label="Accent color">
         {THEME_ACCENTS.map((value) => (
           <button
             key={value}

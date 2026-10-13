@@ -115,7 +115,7 @@ Only the fields you **send** are changed. For sets, nullable fields (`machine_id
 | PATCH | `/api/muscle-groups/{muscle_group_id}` | Rename / archive / unarchive | 200 | [metadata](metadata-endpoints.md#update-a-muscle-group) |
 | GET | `/api/lifts` | List lifts with last-performed date | 200 | [metadata](metadata-endpoints.md#list-lifts) |
 | POST | `/api/lifts` | Create (or find / unarchive) a lift | 201 / 200 | [metadata](metadata-endpoints.md#create-a-lift) |
-| PATCH | `/api/lifts/{lift_id}` | Rename / archive / unarchive | 200 | [metadata](metadata-endpoints.md#update-a-lift) |
+| PATCH | `/api/lifts/{lift_id}` | Rename / archive / unarchive / pick the relative-strength machine | 200 | [metadata](metadata-endpoints.md#update-a-lift) |
 | GET | `/api/lifts/{lift_id}/records` | Records, progress and history per machine | 200 | [records](records.md) |
 | GET | `/api/machines` | List machines | 200 | [metadata](metadata-endpoints.md#list-machines) |
 | POST | `/api/machines` | Create (or find / unarchive) a machine | 201 / 200 | [metadata](metadata-endpoints.md#create-a-machine) |
@@ -129,7 +129,7 @@ Only the fields you **send** are changed. For sets, nullable fields (`machine_id
 | PUT | `/api/split` | Replace the weekly split | 200 | [split](calendar-split-insights.md#replace-the-weekly-split) |
 | GET | `/api/insights` | Plateaued lifts | 200 | [insights](calendar-split-insights.md#insights) |
 | GET | `/api/today` | Today's groups, usual lifts, last session, targets | 200 | [today](today.md#get-today) |
-| GET | `/api/body` | Age, calories, protein, relative strength | 200 | [body](body.md#get-body-stats) |
+| GET | `/api/body` | Calories, protein, water, graded relative strength, strength score | 200 | [body](body.md#get-body-stats) |
 | GET | `/api/settings` | Read settings | 200 | [settings-and-health](settings-and-health.md#read-settings) |
 | PATCH | `/api/settings` | Change the default unit, theme, rep range or body stats | 200 | [settings-and-health](settings-and-health.md#update-settings) |
 

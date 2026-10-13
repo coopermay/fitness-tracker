@@ -30,6 +30,8 @@ export interface Lift {
   archived: boolean
   created_at: DateString
   muscle_group_id: number
+  // The machine that counts for relative strength on Insights; null = automatic.
+  strength_machine_id: number | null
 }
 
 // `extends` adds fields to an existing interface (like subclassing).
@@ -41,6 +43,11 @@ export interface LiftListItem extends Lift {
 export interface MetadataUpdate {
   name?: string
   archived?: boolean
+}
+
+// PATCH /lifts/{id} also takes the relative-strength machine (null = automatic).
+export interface LiftUpdate extends MetadataUpdate {
+  strength_machine_id?: number | null
 }
 
 export interface Machine {
@@ -204,12 +211,6 @@ export interface TodaySet {
   is_pr: boolean
 }
 
-export interface LastSession {
-  date: DateString
-  machine_name: string | null
-  sets: TodaySet[] // that day's sets on that machine + unit
-}
-
 export interface Target {
   weight_value: number
   weight_unit: WeightUnit
@@ -221,10 +222,11 @@ export interface TodayLift {
   id: number
   name: string
   plateaued: boolean
-  machine_id: number | null // the machine used most recently
+  machine_id: number | null // the machine used most recently, counting today
   machine_name: string | null
-  last_session: LastSession | null // the latest dated day before today
-  target: Target | null
+  best: TodaySet | null // best est. 1RM among 5+ rep sets before today, on that machine
+  best_date: DateString | null
+  target: Target | null // the goal, worked out from `best`
   sets_today: TodaySet[]
 }
 
@@ -251,16 +253,26 @@ export interface TodayResponse {
 export interface RelativeStrength {
   lift_id: number
   lift_name: string
+  machine_id: number | null
   machine_name: string | null
-  one_rep_max: number // best est. 1RM, in the lift's own unit
+  automatic: boolean // machine picked automatically (most-used), not on the lift page
+  weight_value: number // the best set on that machine
+  reps: number
+  one_rep_max: number // that set's est. 1RM, in its own unit
   weight_unit: WeightUnit
   ratio: number // one_rep_max / bodyweight
+  level: StrengthLevel | null // for lifts with a standard (needs sex)
+  score: number | null // 0-100 on the Beginner -> Elite scale
 }
+
+export type StrengthLevel = 'Beginner' | 'Novice' | 'Intermediate' | 'Advanced' | 'Elite'
 
 export interface BodyStats {
   age: number | null
   calories: { bmr: number; maintenance: number; cut: number; lean_bulk: number } | null
   protein: { min_g: number; max_g: number } | null
+  water: { daily_ml: number; training_day_ml: number } | null
+  strength_score: { score: number; level: StrengthLevel; graded_lifts: number } | null
   relative_strength: RelativeStrength[] // strongest first
   missing: ('sex' | 'birth_date' | 'height_cm' | 'weight_kg')[]
 }

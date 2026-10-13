@@ -1,8 +1,8 @@
-"""The Today page: today's split groups, your usual lifts, and what to beat.
+"""The Today page: today's split groups, your usual lifts, your best set and a goal.
 
-Target rule (double progression, the user's own method): keep a weight until
-you beat the top of the rep range (e.g. 9 reps with a 6-8 range), then move up
-one increment and aim for at least the bottom of the range.
+Goal rule (double progression, the user's own method), starting from your best
+set: add a rep until you beat the top of the rep range (e.g. 9 reps with a 6-8
+range), then move up one increment and aim for the bottom of the range.
 """
 
 from collections import defaultdict
@@ -12,9 +12,8 @@ from decimal import Decimal
 from app.calendar import find_pr_set_ids
 from app.insights import plateaued_lift_ids
 from app.models import Lift, Machine, MuscleGroup, SplitDay, WeightUnit, WorkoutSet
-from app.records import best_set_per_weight, recency_key
+from app.records import best_set, best_set_per_weight, recency_key
 from app.schemas import (
-    LastSession,
     NextTraining,
     Target,
     TodayGroup,
@@ -46,30 +45,22 @@ def weight_increment(sets: list[WorkoutSet], unit: WeightUnit) -> Decimal:
 
 
 def target_for(sets: list[WorkoutSet], rep_min: int, rep_max: int) -> Target | None:
-    """What to beat next time, from the sets before today (one machine + unit).
+    """Your goal, from the sets before today (one machine + unit).
 
-    The working weight is the heaviest weight from your most recent session.
-    Below the top of the range there: one more rep than your best. Past the
-    top of the range: the next weight up, aiming for one more rep than your
-    best there (if you've tried it) and at least `rep_min`.
+    Starts from your best set (see records.best_set). Within the rep range:
+    the same weight, one more rep. Past the top of the range: the next weight
+    up, aiming for one more rep than your best there (if you've tried it) and
+    at least `rep_min`.
     """
-    if not sets:
+    best = best_set(sets)
+    if best is None:
         return None
-    latest = max(sets, key=recency_key)
-    last_day = [s for s in sets if s.performed_on == latest.performed_on]
-    working_weight = max(s.weight_value for s in last_day)
+    unit = best.weight_unit
+    if best.reps <= rep_max:
+        return Target(weight_value=float(best.weight_value), weight_unit=unit, reps=best.reps + 1, move_up=False)
 
+    next_weight = best.weight_value + weight_increment(sets, unit)
     best_reps = {s.weight_value: s.reps for s in best_set_per_weight(sets)}
-    unit = latest.weight_unit
-    if best_reps[working_weight] <= rep_max:
-        return Target(
-            weight_value=float(working_weight),
-            weight_unit=unit,
-            reps=best_reps[working_weight] + 1,
-            move_up=False,
-        )
-
-    next_weight = working_weight + weight_increment(sets, unit)
     reps = max(rep_min, best_reps.get(next_weight, 0) + 1)
     return Target(weight_value=float(next_weight), weight_unit=unit, reps=reps, move_up=True)
 
@@ -119,23 +110,16 @@ def build_today_lift(
     sets_today = sorted((s for s in lift_sets if s.performed_on == today), key=lambda s: s.id)
     earlier = [s for s in lift_sets if s.performed_on is None or s.performed_on < today]
 
-    # Last session and target use the machine + unit you used most recently.
-    latest = max(earlier or sets_today, key=recency_key, default=None)
+    # Everything on the card refers to one machine + unit: the ones you used
+    # most recently, counting today, so switching machines today switches the
+    # card too. Best and goal come from the sets before today on it.
+    latest = max(lift_sets, key=recency_key, default=None)
     machine_id = latest.machine_id if latest else None
     machine = machines_by_id.get(machine_id) if machine_id is not None else None
     same_setup = [
         s for s in earlier if latest and s.machine_id == machine_id and s.weight_unit == latest.weight_unit
     ]
-
-    dated = [s for s in same_setup if s.performed_on is not None]
-    last_session = None
-    if dated:
-        last_date = max(s.performed_on for s in dated)
-        last_session = LastSession(
-            date=last_date,
-            machine_name=machine.name if machine else None,
-            sets=[to_today_set(s, pr_ids) for s in sorted(dated, key=lambda s: s.id) if s.performed_on == last_date],
-        )
+    best = best_set(same_setup)
 
     return TodayLift(
         id=lift.id,
@@ -143,7 +127,8 @@ def build_today_lift(
         plateaued=lift.id in plateaued,
         machine_id=machine_id,
         machine_name=machine.name if machine else None,
-        last_session=last_session,
+        best=to_today_set(best, pr_ids) if best else None,
+        best_date=best.performed_on if best else None,
         target=target_for(same_setup, rep_min, rep_max),
         sets_today=[to_today_set(s, pr_ids) for s in sets_today],
     )

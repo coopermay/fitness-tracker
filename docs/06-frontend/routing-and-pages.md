@@ -91,28 +91,29 @@ Numbers worked out from your body stats and your lifts. (Not to be confused with
 
 1. "Insights".
 2. **Setup prompt** (dashed card) while body stats are missing: "Add your sex, height… in Settings → Body stats to see everything here" (or "…your calories" when only the calorie inputs are missing), linking to `/settings/body`.
-3. **Your numbers:** a `<dl>` card with Age, Resting (BMR), **Maintenance**, Cut (−500), Lean bulk (+300) and **Protein** (highlighted in accent). Rows appear as their inputs allow; the section is hidden when there's nothing to show.
-4. **Relative strength:** lifts strongest first. Each row shows the name, machine and est. 1RM, with the ratio ("1.23×") on the right, and links to the lift page.
-5. A footnote naming the formulas and noting they're estimates (only with calories or protein shown).
+3. **Strength score card** (accent border and tint): the 0–100 score in large type, "Strength score · Intermediate", and how many lifts it's from. Shown once a lift is graded.
+4. **Your numbers:** a `<dl>` card with **Maintenance**, Cut (−500), Lean bulk (+300), **Protein**, and **Water** ("90 fl oz a day", with "105 fl oz on training days" as a smaller second line; litres on metric). `Stat` takes an optional `note` for that second line. (Age and resting calories were removed at the user's request.)
+5. **Relative strength:** lifts strongest first. Each row: the name; the machine, "(auto)" if picked automatically, and the best set ("Barbell (auto) · 185 lbs × 6"); on the right the ratio ("1.26×") and, for graded lifts, a level pill ("Intermediate"). Rows link to the lift page, where the machine can be changed. The hint explains this, and asks for sex when grades need it.
+6. A footnote naming the formulas and saying the standards are approximate and not age-adjusted.
 
 ---
 
 ## TodayPage
 
-**File:** [`pages/TodayPage.tsx`](../../frontend/src/pages/TodayPage.tsx) · **Route:** `/today` (tab 1) · **Styles:** `TodayPage.module.css`
+**File:** [`pages/TodayPage.tsx`](../../frontend/src/pages/TodayPage.tsx) · **Route:** `/today?group=:id` (tab 1) · **Styles:** `TodayPage.module.css`
 
-The gym screen: today's split groups, your usual lifts for each, what you did last time and what to beat. All data comes from one request, [`GET /today`](../05-api/today.md).
+The gym screen, one muscle group at a time: your usual lifts with your best set and the goal. All data comes from one request, [`GET /today`](../05-api/today.md).
 
 **Data:** `useToday(todayIsoDate())`.
 
 **Layout:**
-1. "Today", then the long date and today's group names ("Monday, Oct 12 · Biceps, Triceps").
-2. A flash banner when you come back from logging (the same `LiftPageState` mechanism as the lift page: copied into state once, then cleared from history).
-3. A summary line. Before anything is logged it reminds you of the range ("Target 6–8 reps; move up after 9."); afterwards it shows "2 lifts · 7 sets · 1 PRs today".
-4. One `GroupSection` per group: an uppercase heading with "*n* of *m* done", a [`TodayLiftCard`](components.md#todayliftcard) per usual lift, and a dashed **Show all (*k* more)** toggle that reveals `other_lifts` below them. If nothing in the group was trained in the last 6 weeks, it says so (and Show all lists the lifts).
+1. "Today". (No date or summary line: the user found them cluttering.)
+2. A flash banner when you come back from logging (the same `LiftPageState` mechanism as the lift page: copied into state once, then cleared from history, keeping `location.search` so the selected tab survives).
+3. **Muscle group tabs:** a pill per group in today's split, with "*n*/*m*" done (or ✓ when all your usual lifts are done). The row scrolls sideways if needed and is marked `data-no-swipe`, so scrolling it doesn't change pages ([`useSwipe`](utilities.md#useswipets)).
+4. The selected group's `GroupSection`: a [`TodayLiftCard`](components.md#todayliftcard) per usual lift, and a dashed **Show all (*k* more)** toggle for `other_lifts`. It says so if nothing in the group was trained in the last 6 weeks. `key={group.id}` resets Show all when switching tabs.
 5. **Rest day** (no groups): "Rest day", "Next up: Back, Biceps on Saturday, Oct 17" (or a link to set up the split), and a "Train anyway: browse muscle groups" link to Home.
 
-`GroupSection` keeps its own `showAll` state, so each group opens independently.
+**Which tab is selected:** kept in the URL as `?group=<id>` (`useSearchParams`; tapping a pill uses `replace`, so tabs don't pile up history). The page remounts when you come back from logging a set, and local state would reset, but the URL survives the round trip: each card's Log set link carries `&group=<id>`, and the log page returns to `/today?group=<id>`. Without a valid `group` (e.g. from the tab bar), `selectedGroup` picks the first group you haven't finished, else the first.
 
 ---
 
@@ -177,7 +178,7 @@ The main view: records per machine, progress charts, history, and the **Log set*
 | --- | --- |
 | `useLiftRecords(liftId)` | Everything on the page (see [records API](../05-api/records.md)) |
 | `useMuscleGroups()` | The back link's label (the muscle group's name, or "Back" while loading) |
-| `useUpdateLift()` | Rename/archive |
+| `useUpdateLift()` | Rename/archive, and the relative-strength machine |
 
 **Flash message handling:** the log and edit pages navigate here with `location.state = {flash: {text, isRecord}}`.
 ```ts
@@ -195,6 +196,7 @@ The lazy `useState` initialiser captures the message on the first render only. T
 4. The flash banner, if any.
 5. A big **Log set** link → `/lifts/:id/log`.
 6. "No sets logged yet." or one `MachineCard` per `machine_groups` entry (key = machine id or `'no-machine'`).
+7. **Relative strength uses [machine]**, only when two or more machines have lbs/kg sets: a `<select>` of "Automatic (most used)" plus those machines, bound to `lift.strength_machine_id` (empty = automatic). Changing it sends `PATCH /lifts/{id}` with `strength_machine_id`; while that's pending the select shows the value being saved (`updateLift.variables`). It decides which machine's numbers [Insights](#insightspage) uses for this lift.
 
 ---
 
@@ -218,7 +220,7 @@ The form for logging a new set. It's a thin wrapper around [`SetForm`](component
 
 `unitFollowsMachine` is **true**: picking another machine re-derives the unit.
 
-**Coming from Today:** the Today page links here with `?from=today`. `useSearchParams()` reads it, and `returnTo` becomes `/today` instead of `/lifts/:liftId`. It's used for both the redirect after saving and the form's Cancel (`cancelTo`). A URL parameter (rather than router state) survives a refresh.
+**Coming from Today:** the Today page links here with `?from=today&group=<id>`. `useSearchParams()` reads it, and `returnTo` becomes `/today?group=<id>` (back to the same muscle group tab) instead of `/lifts/:liftId`. It's used for both the redirect after saving and the form's Cancel (`cancelTo`). A URL parameter (rather than router state) survives a refresh.
 
 **On submit:** `createSet.mutateAsync({lift_id, ...fields})`. This waits for the cache refresh, so the page you return to is current when it appears. Then:
 ```ts
@@ -296,7 +298,7 @@ A GitHub-style activity heatmap turned vertical: one row per week (Sunday to Sat
 1. **Muscle groups.** A hint ("New muscle groups appear on the Home screen."), then `AddByName` ("+ Add muscle group"). After adding, it shows "“Name” is on the Home screen." because the new tile isn't visible from here.
 2. **Weekly split.** A hint, then an "Edit weekly split ›" row that opens [SplitPage](#splitpage).
 3. **Theme.** A hint, then a "Change theme ›" row that opens [ThemePage](#themepage).
-4. **Body stats.** Your saved height and weight as the hint ("5 ft 10 in · 180 lbs", via `formatHeight`/`formatBodyweight` from [`body.ts`](utilities.md#bodyts)), or a description if none, then an "Edit body stats ›" row that opens [BodyPage](#bodypage).
+4. **Body stats.** Your saved height and weight as the hint (`5'10" • 165 lbs`, via `formatHeight`/`formatBodyweight` from [`body.ts`](utilities.md#bodyts)), or a description if none, then an "Edit body stats ›" row that opens [BodyPage](#bodypage).
 5. **Default unit.** A segmented control (lbs / kg / plates). Tapping calls `updateSettings.mutate({default_unit})`. The update is optimistic (the cache changes before the server answers), so the selection moves instantly.
 6. **Target reps.** Two `<select>`s (1–20), "6 to 8 reps", saving `{rep_range_min}` / `{rep_range_max}` on change. Options that would cross the other end are disabled. The hint names the move-up point (max + 1). Errors from either control show "Couldn't save: …".
 

@@ -1,17 +1,44 @@
 .title {
-  margin: 8px 0 0;
+  margin: 8px 0 12px;
   font-size: 1.5rem;
 }
 
-.date {
-  margin: 0 0 12px;
-  color: var(--text-muted);
+/* One pill per muscle group; scrolls sideways if they don't fit */
+.tabs {
+  display: flex;
+  gap: 8px;
+  margin: 0 -16px;
+  padding: 0 16px 4px;
+  overflow-x: auto;
 }
 
-.summary {
-  margin: 0 0 8px;
-  color: var(--text-muted);
-  font-size: 0.9rem;
+.tab,
+.tabActive {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  gap: 6px;
+  min-height: var(--tap-size);
+  padding: 0 16px;
+  border: 1px solid var(--border-strong);
+  border-radius: 999px;
+  background: var(--surface);
+  color: var(--text);
+  font: inherit;
+  font-weight: 600;
+}
+
+.tabActive {
+  border-color: var(--accent);
+  background: var(--accent);
+  color: var(--on-accent);
+}
+
+/* "1/2", or a tick when the group is done */
+.tabCount {
+  font-size: 0.8rem;
+  font-weight: 600;
+  opacity: 0.75;
 }
 
 .flash,
@@ -33,25 +60,7 @@
 }
 
 .group {
-  margin-top: 20px;
-}
-
-.groupTitle {
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  margin: 0 0 10px;
-  font-size: 1rem;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-}
-
-.groupProgress {
-  color: var(--text-muted);
-  font-size: 0.8rem;
-  font-weight: 600;
-  letter-spacing: normal;
-  text-transform: none;
+  margin-top: 16px;
 }
 
 .cards {

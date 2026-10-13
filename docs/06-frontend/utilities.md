@@ -131,7 +131,7 @@ const handlers = useSwipe({ onSwipeLeft, onSwipeRight })
 | `onSwipeRight` | The finger moved left-to-right (go to the **previous** tab, or **back** on a nested page) |
 
 **How it decides:**
-- `onTouchStart` records the start position in a **ref** (`useRef`): it needs remembering, but changing it shouldn't re-render anything. It **ignores** multi-finger touches and touches that start inside an `input` or `textarea`, so dragging to move the text cursor doesn't change pages.
+- `onTouchStart` records the start position in a **ref** (`useRef`): it needs remembering, but changing it shouldn't re-render anything. It **ignores** multi-finger touches and touches that start inside an `input`, a `textarea`, or anything marked **`data-no-swipe`** (like the Today page's sideways-scrolling muscle tabs), so dragging there moves the cursor or scrolls the row instead of changing pages.
 - `onTouchEnd` computes `dx` and `dy`. It's a swipe only if `|dx| ≥ 60px` (`MIN_DISTANCE`) **and** `|dx| ≥ 2 × |dy|` (mostly sideways), so vertical scrolling never triggers it.
 
 Touch events only fire on touch screens. To try it on a Mac, use Chrome DevTools' device mode, which emulates touch.
@@ -186,7 +186,7 @@ The `localStorage` copy is only a cache for the first paint; the server's settin
 | `feetInchesToCm(feet, inches)` | Rounded to 0.1 cm (what the API stores) | `5, 10` → `177.8` |
 | `kgToLbs(kg)` | Rounded to 0.1 lb | `81.65` → `180` |
 | `lbsToKg(lbs)` | Rounded to 0.01 kg | `180` → `81.65` |
-| `formatHeight(cm, units)` | `"5 ft 10 in"` or `"178 cm"` | |
+| `formatHeight(cm, units)` | `5'10"` or `"178 cm"` | |
 | `formatBodyweight(kg, units)` | `"180 lbs"` or `"81.7 kg"` | |
 
 The rounding steps are chosen so imperial values round-trip: 180 lbs saves as 81.65 kg and shows as 180 lbs again.

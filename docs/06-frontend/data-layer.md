@@ -68,7 +68,7 @@ TypeScript descriptions of the JSON the API sends and receives. **They're checke
 | `ThemeAccent` | `ThemeAccent` | `'blue' \| 'green' \| … \| 'gold'` (8 colours) |
 | `DateString` | — | Alias for `string`: `"YYYY-MM-DD"` dates and ISO timestamps |
 | `MuscleGroup` | `MuscleGroupRead` | |
-| `Lift` | `LiftRead` | |
+| `Lift` | `LiftRead` | Includes `strength_machine_id` (`null` = automatic) |
 | `LiftListItem extends Lift` | `LiftListItem` | + `last_performed_on` |
 | `MetadataUpdate` | `MetadataUpdate` | `name?`, `archived?` |
 | `Machine` | `MachineRead` | |
@@ -78,9 +78,10 @@ TypeScript descriptions of the JSON the API sends and receives. **They're checke
 | `SetCreate extends SetFields` | `SetCreate` | + `lift_id` |
 | `Gym` | `GymRead` | |
 | `Settings` | `SettingsRead` / `SettingsUpdate` | `default_unit`, `theme_base`, `theme_accent`, `rep_range_min`, `rep_range_max`, and the body stats (`sex`, `birth_date`, `height_cm`, `weight_kg` nullable; `activity_level`, `body_units`). Updates send `Partial<Settings>`. |
-| `TodayResponse`, `TodayGroup`, `TodayLift`, `LastSession`, `Target`, `TodaySet` | the `Today*` schemas | See [Today](../05-api/today.md) |
+| `TodayResponse`, `TodayGroup`, `TodayLift`, `Target`, `TodaySet` | the `Today*` schemas | See [Today](../05-api/today.md) |
 | `Sex`, `ActivityLevel`, `BodyUnits` | the model enums | string-literal unions |
-| `BodyStats`, `RelativeStrength` | `BodyStats`, `RelativeStrength` (+ inline calorie/protein shapes) | See [Body stats](../05-api/body.md) |
+| `BodyStats`, `RelativeStrength`, `StrengthLevel` | `BodyStats`, `RelativeStrength` (+ inline calorie/protein/water/score shapes); `StrengthLevel` is the union of level names |
+| `LiftUpdate` | `LiftUpdate` | `MetadataUpdate` plus optional `strength_machine_id` (`null` = automatic) | See [Body stats](../05-api/body.md) |
 | `RecordRow` | `RecordRow` | |
 | `ProgressPoint` | `ProgressPoint` | |
 | `UnitRecords` | `UnitRecords` | |
@@ -148,7 +149,7 @@ Keeping keys in one object avoids typos and makes it obvious what can be invalid
 | `useCreateLift(muscleGroupId)` | `POST /lifts {name, muscle_group_id}` | invalidate `lifts` |
 | `useCreateMachine()` | `POST /machines {name, gym_id}` | invalidate `machines` |
 | `useUpdateMuscleGroup()` | `PATCH /muscle-groups/{id}` | invalidate `muscle-groups` (**not awaited**) |
-| `useUpdateLift()` | `PATCH /lifts/{id}` | invalidate `lifts`, `lift-records/{id}`, `calendar` (**not awaited**) |
+| `useUpdateLift()` | `PATCH /lifts/{id}` (a `LiftUpdate`: name, archived, `strength_machine_id`) | invalidate `lifts`, `lift-records/{id}`, `calendar`, `today`, `body` (**not awaited**) |
 | `useUpdateMachine()` | `PATCH /machines/{id}` | invalidate `machines`, **all** `lift-records`, `calendar` (**not awaited**) |
 | `useUpdateSettings()` | `PATCH /settings` with only the changed fields | **Optimistic:** `onMutate` merges the change into the cache immediately and returns the previous settings; `onError` puts them back; `onSuccess` writes the response (no refetch) |
 | `useUpdateSplit()` | `PUT /split` | `setQueryData(split, response)` + invalidate `insights` |

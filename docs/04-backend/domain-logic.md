@@ -1,16 +1,17 @@
 # Domain logic
 
-The business rules of Lift Tracker live in seven modules. Apart from two small exceptions (noted below), they're **plain functions**: they take lists of model objects, return schema objects, and know nothing about HTTP. That makes them easy to read, test and reuse.
+The business rules of Lift Tracker live in eight modules. Apart from two small exceptions (noted below), they're **plain functions**: they take lists of model objects, return schema objects, and know nothing about HTTP. That makes them easy to read, test and reuse.
 
 | Module | Rules it owns |
 | --- | --- |
 | [`names.py`](#namespy) | How names are cleaned and matched case-insensitively |
 | [`metadata.py`](#metadatapy) | Shared list / create / rename / archive behaviour for gyms, muscle groups, lifts, machines |
-| [`records.py`](#recordspy) | Records per weight, recency order, Epley est. 1RM, progress points, "new best" check |
+| [`records.py`](#recordspy) | Records per weight, recency order, Epley est. 1RM, the best set, progress points, "new best" check |
 | [`calendar.py`](#calendarpy) | Which sets were PRs (history replay), per-day activity |
 | [`insights.py`](#insightspy) | Plateaued lifts |
 | [`today.py`](#todaypy) | The Today page: usual lifts, last session, targets (double progression) |
-| [`body.py`](#bodypy) | Age, calorie targets, protein range, relative strength |
+| [`body.py`](#bodypy) | Age, calorie targets, protein and water, relative strength (which machine, which set), strength score |
+| [`standards.py`](#standardspy) | Strength standards: matching a lift to one, and grading a ratio |
 
 The vocabulary used here (record, PR, session, plateau…) is defined in the [Domain glossary](../01-overview/domain-glossary.md).
 
@@ -107,6 +108,9 @@ Sorting ascending goes oldest to newest. Undated sets sort before every dated se
 
 ### `best_set_per_weight(sets) -> list[set]`
 For sets of **one unit**, keeps one set per distinct `weight_value`: the one with the most reps, comparing `(reps, recency_key)` so **ties go to the more recent set**. Returns them sorted heaviest first. `Decimal` keys mean `185` and `185.00` are the same weight.
+
+### `best_set(sets) -> set | None`
+"Your best set", used by the Today page and relative strength. For sets of **one unit**: the highest est. 1RM among sets of at least `BEST_SET_MIN_REPS` (**5**) reps, ties to the most recent. Heavy singles and triples inflate est. 1RM, hence the floor. If no set has 5+ reps, all sets count. For **plates** (no 1RM): the heaviest weight, then the most reps.
 
 ### `chart_value(set) -> float`
 What the progress chart plots: `estimated_one_rep_max(...)`, or for plates the weight itself.
@@ -227,30 +231,31 @@ A lift you haven't done in the last 21 days is never plateaued. Example (today =
 The smallest gap between distinct weights in `sets` (one machine + unit), or `DEFAULT_INCREMENT[unit]` if there's only one weight. Machines and dumbbells go up in fixed steps, so your own history is the best guide.
 
 ### `target_for(sets, rep_min, rep_max) -> Target | None`
-Double progression, the user's own method. `sets` are the sets **before today** on one machine + unit.
+The **goal**: double progression, the user's own method, starting from the [best set](#best_setsets---set--none). `sets` are the sets **before today** on one machine + unit.
 
 ```mermaid
 flowchart TD
-    A["working weight = heaviest weight<br/>in the most recent session"] --> B{"best reps at it<br/>above rep_max?"}
-    B -- "no" --> C["target: working weight x best + 1"]
-    B -- "yes" --> D["next = working + weight_increment"]
-    D --> E["target: next x max of rep_min and best at next + 1<br/>move_up = true"]
+    A["best = best_set of the sets"] --> B{"best reps<br/>above rep_max?"}
+    B -- "no" --> C["goal: best weight x best reps + 1"]
+    B -- "yes" --> D["next = best weight + weight_increment"]
+    D --> E["goal: next x max of rep_min and best at next + 1<br/>move_up = true"]
 ```
 
 Examples with a 6–8 range:
 
-| History (same machine + unit) | Target |
-| --- | --- |
-| 185 × 6 (Sep 24), 185 × 7 + 175 × 8 (Sep 28) | 185 × **8** (working weight 185, best 7) |
-| 50 × 8, then 55 × **9** | **60** × 6, move up (9 > 8; step 5 from 50 → 55) |
-| 60 × 6 (old), then 55 × 9 | **60** × 7, move up (beat the old 60 × 6) |
-| 20 kg × 13, nothing else, range 8–12 | **22.5 kg** × 8 (default kg step) |
+| History (same machine + unit) | Best | Goal |
+| --- | --- | --- |
+| 185 × 6, 185 × 7, 175 × 8 | 185 × 7 (1RM 228) | 185 × **8** |
+| 225 × 2, 185 × 6 | 185 × 6 (the double is under 5 reps) | 185 × **7** |
+| 50 × 8, then 55 × **9** | 55 × 9 | **60** × 6, move up (9 > 8; step 5 from 50 → 55) |
+| 60 × 5 (old), then 55 × 10 | 55 × 10 (1RM 73.5 > 70) | **60** × 6, move up (beat the old 60 × 5) |
+| 20 kg × 13, nothing else, range 8–12 | 20 × 13 | **22.5 kg** × 8 (default kg step) |
 
 ### `usual_lift_ids(lifts, sets_by_lift, today) -> list[int]`
 Ranks the group's lifts by **distinct days trained** in the window, then the most recent of those days, then creation order, and returns the top 2. Lifts not trained in the window are never "usual".
 
 ### `build_today_lift(...) -> TodayLift`
-For one lift: today's sets, then the machine + unit of the most recent set before today. From those sets it builds `last_session` (the latest dated day) and `target_for(...)`.
+For one lift: today's sets, then the machine + unit of the **most recent set, counting today**. That keeps the whole card on one machine: if you switch machines today, the header, Best and Goal all switch too (this fixed a bug where Today showed one machine and Last/Beat another). Best (`best_set`) and the goal (`target_for`) come from that machine + unit's sets **before today**; the first time on a machine, both are `null`.
 
 ### `next_training_day(split_days, groups_by_id, today) -> NextTraining | None`
 Looks 1–7 days ahead for a weekday with visible groups in the split.
@@ -270,6 +275,7 @@ Today's split groups (non-archived, creation order). For each: the usual lifts p
 | `ACTIVITY_MULTIPLIERS` | sedentary 1.2, light 1.375, moderate 1.55, active 1.725, very active 1.9 |
 | `CUT_DEFICIT`, `LEAN_BULK_SURPLUS` | 500, 300 kcal |
 | `PROTEIN_G_PER_KG` | (1.6, 2.2) |
+| `WATER_ML_PER_KG`, `TRAINING_DAY_EXTRA_ML` | 35, 500 |
 
 | Function | Does |
 | --- | --- |
@@ -277,11 +283,30 @@ Today's split groups (non-archived, creation order). For each: the usual lifts p
 | `bmr_mifflin_st_jeor(weight_kg, height_cm, age, sex)` | `10w + 6.25h − 5a`, `+5` male / `−161` female |
 | `calorie_targets(bmr, activity)` | `CalorieTargets` (BMR, maintenance = BMR × multiplier, cut, lean bulk), each rounded to 10 |
 | `protein_range(weight_kg)` | `ProteinRange(min_g, max_g)`, rounded to whole grams |
+| `water_target(weight_kg)` | `WaterTarget(daily_ml, training_day_ml)`: 35 ml/kg rounded to 100, + 500 |
 | `bodyweight_in(unit, weight_kg)` | Bodyweight in a lift's unit (lbs or kg) |
-| `relative_strength(sets, lifts_by_id, machines_by_id, weight_kg)` | Per non-archived lift, the set with the best est. 1RM ÷ bodyweight (plates skipped), strongest first, ratio to 0.01 |
-| `build_body_stats(settings, today, sets, lifts_by_id, machines_by_id)` | The whole `BodyStats`. `missing` lists empty inputs; calories need all four, protein and relative strength only weight. |
+| `strength_machine(lift, lift_sets)` | `(machine_id, automatic)`: the lift's `strength_machine_id` if it has lbs/kg sets there, else the machine trained on the most days (ties: most recent). `None` without lbs/kg sets. |
+| `relative_strength(sets, lifts_by_id, machines_by_id, weight_kg, sex)` | One row per non-archived lift: on its strength machine, in the unit used most recently there, the `best_set` ÷ bodyweight; `level`/`score` from [`standards.py`](#standardspy) when the lift has a standard and `sex` is set. Strongest first. |
+| `strength_score(rows)` | `StrengthScore` from the average of the graded rows' scores, or `None` |
+| `build_body_stats(settings, today, sets, lifts_by_id, machines_by_id)` | The whole `BodyStats`. `missing` lists empty inputs; calories need all four; protein, water and relative strength only weight; grades and the score also need sex. |
 
-Worked example (80 kg, 180 cm, 29, male, moderate): BMR `800 + 1125 − 145 + 5 = 1785` → 1780; maintenance `1785 × 1.55 = 2766.75` → 2770; cut 2270; lean bulk 3070; protein 128–176 g.
+Worked example (80 kg, 180 cm, 29, male, moderate): BMR `800 + 1125 − 145 + 5 = 1785` → 1780; maintenance `1785 × 1.55 = 2766.75` → 2770; cut 2270; lean bulk 3070; protein 128–176 g; water 2800 ml (3300 on training days).
+
+---
+
+## standards.py
+
+**File:** [`backend/app/standards.py`](../../backend/app/standards.py) — strength standards for grading relative strength. The thresholds are listed in [Body stats → Strength standards](../05-api/body.md#strength-standards).
+
+| Name | What it is |
+| --- | --- |
+| `LEVELS` | `Beginner`, `Novice`, `Intermediate`, `Advanced`, `Elite` |
+| `STANDARDS` | `key → sex → [Novice, Intermediate, Advanced, Elite]` ratio thresholds, for 9 barbell/dumbbell lifts |
+| `standard_for(lift_name, machine_name)` | The key for a lift, or `None`. The machine name must contain "barbell" or "dumbbell"; then the first pattern whose include words appear in the lift name, and none of its exclude words (e.g. "Bench press" + "Barbell" → `barbell_bench`; "Incline bench" → none; "Hammer curl" + "Dumbbells" → `dumbbell_curl`). |
+| `grade(ratio, sex, key)` | `(level, score)`. The level is the number of thresholds reached. The score is 25 per level plus the fraction of the way to the next threshold (from 0 for Beginner), 100 at Elite: men's bench at 1.25× → Intermediate, 62.5. |
+| `level_for_score(score)` | The level for an overall score: 25 points per level |
+
+Machines are never graded, since their numbers depend on the machine.
 
 ---
 

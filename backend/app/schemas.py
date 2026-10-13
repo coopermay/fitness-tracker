@@ -43,6 +43,7 @@ class MuscleGroupRead(MetadataRead):
 
 class LiftRead(MetadataRead):
     muscle_group_id: int
+    strength_machine_id: int | None
 
 
 class LiftListItem(LiftRead):
@@ -76,6 +77,12 @@ class MetadataUpdate(BaseModel):
 
     name: Name | None = None
     archived: bool | None = None
+
+
+class LiftUpdate(MetadataUpdate):
+    """Also picks the machine used for relative strength; null means automatic."""
+
+    strength_machine_id: int | None = None
 
 
 # --- Sets -------------------------------------------------------------------
@@ -268,16 +275,10 @@ class TodaySet(BaseModel):
     is_pr: bool = Field(description="Same rule as the calendar: first at a weight, or more reps.")
 
 
-class LastSession(BaseModel):
-    date: date
-    machine_name: str | None
-    sets: list[TodaySet] = Field(description="That day's sets on that machine + unit, in entry order.")
-
-
 class Target(BaseModel):
     weight_value: float
     weight_unit: WeightUnit
-    reps: int = Field(description="Reps to reach: one more than your best, or the bottom of the range.")
+    reps: int = Field(description="One more than your best, or the bottom of the range after moving up.")
     move_up: bool = Field(description="True when this is a new, heavier weight.")
 
 
@@ -285,10 +286,13 @@ class TodayLift(BaseModel):
     id: int
     name: str
     plateaued: bool
-    machine_id: int | None = Field(description="The machine used most recently for this lift.")
+    machine_id: int | None = Field(description="The machine used most recently, counting today.")
     machine_name: str | None
-    last_session: LastSession | None = Field(description="The latest dated day before today.")
-    target: Target | None
+    best: TodaySet | None = Field(
+        description="Best est. 1RM among sets of 5+ reps before today, on that machine + unit."
+    )
+    best_date: date | None
+    target: Target | None = Field(description="The goal, worked out from `best`.")
     sets_today: list[TodaySet]
 
 
@@ -334,19 +338,38 @@ class ProteinRange(BaseModel):
     max_g: int = Field(description="2.2 g per kg (about 1 g/lb).")
 
 
+class WaterTarget(BaseModel):
+    daily_ml: int = Field(description="About 35 ml per kg of bodyweight, rounded to 100 ml.")
+    training_day_ml: int = Field(description="daily_ml + 500 ml on days you train.")
+
+
 class RelativeStrength(BaseModel):
     lift_id: int
     lift_name: str
+    machine_id: int | None
     machine_name: str | None
-    one_rep_max: float = Field(description="Best est. 1RM for this lift, in its own unit.")
+    automatic: bool = Field(description="True when the machine was picked automatically (most-used).")
+    weight_value: float = Field(description="The best set (see records.best_set) on that machine.")
+    reps: int
+    one_rep_max: float = Field(description="That set's est. 1RM, in its own unit.")
     weight_unit: WeightUnit
     ratio: float = Field(description="one_rep_max / bodyweight, rounded to 0.01.")
+    level: str | None = Field(description="Beginner ... Elite, for lifts with a standard (needs sex).")
+    score: float | None = Field(description="0-100 on the Beginner -> Elite scale.")
+
+
+class StrengthScore(BaseModel):
+    score: int = Field(description="Average score of the graded lifts, 0-100.")
+    level: str
+    graded_lifts: int
 
 
 class BodyStats(BaseModel):
     age: int | None
     calories: CalorieTargets | None = Field(description="Needs weight, height, birth date and sex.")
     protein: ProteinRange | None = Field(description="Needs weight.")
+    water: WaterTarget | None = Field(description="Needs weight.")
+    strength_score: StrengthScore | None = Field(description="Needs weight, sex and a graded lift.")
     relative_strength: list[RelativeStrength] = Field(
         description="Strongest first. Empty without a weight. Plates are left out."
     )

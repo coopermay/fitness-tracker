@@ -5,7 +5,7 @@ from app.db import SessionDep
 from app.metadata import create_or_restore, get_or_404, update_item
 from app.models import Lift, Machine, MuscleGroup, WorkoutSet
 from app.records import build_lift_records
-from app.schemas import LiftCreate, LiftListItem, LiftRead, LiftRecords, MetadataUpdate
+from app.schemas import LiftCreate, LiftListItem, LiftRead, LiftRecords, LiftUpdate
 
 router = APIRouter(prefix="/lifts", tags=["lifts"])
 
@@ -46,8 +46,13 @@ def create_lift(body: LiftCreate, session: SessionDep, response: Response):
 
 
 @router.patch("/{lift_id}", response_model=LiftRead)
-def update_lift(lift_id: int, body: MetadataUpdate, session: SessionDep):
+def update_lift(lift_id: int, body: LiftUpdate, session: SessionDep):
     lift = get_or_404(session, Lift, lift_id)
+    # model_fields_set tells "sent as null" (back to automatic) from "not sent".
+    if "strength_machine_id" in body.model_fields_set:
+        if body.strength_machine_id is not None:
+            get_or_404(session, Machine, body.strength_machine_id)
+        lift.strength_machine_id = body.strength_machine_id
     return update_item(session, lift, body, muscle_group_id=lift.muscle_group_id)
 
 

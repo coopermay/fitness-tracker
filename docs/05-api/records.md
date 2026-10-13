@@ -100,7 +100,8 @@ Bench (seed data), trimmed to two records and two history rows:
 {
   "lift": {
     "id": 1, "name": "Bench", "archived": false,
-    "created_at": "2026-10-01T02:23:48.475907Z", "muscle_group_id": 1
+    "created_at": "2026-10-01T02:23:48.475907Z", "muscle_group_id": 1,
+    "strength_machine_id": null
   },
   "machine_groups": [
     {

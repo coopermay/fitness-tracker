@@ -1,41 +1,41 @@
 import { useEffect, useState } from 'react'
-import { Link, useLocation, useNavigate } from 'react-router'
+import { Link, useLocation, useNavigate, useSearchParams } from 'react-router'
 import { useToday } from '../api/queries'
-import type { TodayGroup } from '../api/types'
+import type { TodayGroup, TodayResponse } from '../api/types'
 import { QueryStatus } from '../components/QueryStatus'
 import { TodayLiftCard } from '../components/TodayLiftCard'
 import type { LiftPageState } from '../flash'
 import { formatLongDate, todayIsoDate } from '../format'
 import styles from './TodayPage.module.css'
 
-// The gym screen: today's split groups, your usual lifts for each, what you
-// did last time and what to beat.
+// The gym screen: a tab per muscle group in today's split, with your usual
+// lifts for each, your best set and the goal.
 export function TodayPage() {
   const today = useToday(todayIsoDate())
   const location = useLocation()
   const navigate = useNavigate()
+  // The selected group is in the URL (?group=3), so it's still selected after
+  // logging a set and coming back here.
+  const [searchParams, setSearchParams] = useSearchParams()
 
   // "Log set" from here comes back with a message, like on the lift page:
   // keep it in state, then clear it from history so a refresh doesn't repeat it.
   const [flash] = useState(() => (location.state as LiftPageState | null)?.flash)
   useEffect(() => {
     if ((location.state as LiftPageState | null)?.flash) {
-      navigate(location.pathname, { replace: true, state: null })
+      navigate({ pathname: location.pathname, search: location.search }, { replace: true, state: null })
     }
-  }, [location.state, location.pathname, navigate])
+  }, [location.state, location.pathname, location.search, navigate])
 
   if (today.isPending || today.isError) {
     return <QueryStatus isError={today.isError} error={today.error} />
   }
   const data = today.data
+  const selected = selectedGroup(data, Number(searchParams.get('group')))
 
   return (
     <>
       <h1 className={styles.title}>Today</h1>
-      <p className={styles.date}>
-        {formatLongDate(data.date)}
-        {data.groups.length > 0 && ` · ${data.groups.map((group) => group.name).join(', ')}`}
-      </p>
 
       {flash && (
         <p className={flash.isRecord ? styles.flashRecord : styles.flash} role="status">
@@ -43,46 +43,72 @@ export function TodayPage() {
         </p>
       )}
 
-      {data.groups.length === 0 ? (
+      {selected === null ? (
         <RestDay next={data.next_training} />
       ) : (
         <>
-          <p className={styles.summary}>
-            {data.set_count === 0
-              ? `Target ${data.rep_range_min}–${data.rep_range_max} reps; move up after ${data.rep_range_max + 1}.`
-              : `${data.lifts_done} ${data.lifts_done === 1 ? 'lift' : 'lifts'} · ${data.set_count} sets · ${data.pr_count} PRs today`}
-          </p>
-          {data.groups.map((group) => (
-            <GroupSection key={group.id} group={group} />
-          ))}
+          <div className={styles.tabs} role="group" aria-label="Muscle groups" data-no-swipe>
+            {data.groups.map((group) => {
+              const { done, total } = progress(group)
+              const isSelected = group.id === selected.id
+              return (
+                <button
+                  key={group.id}
+                  type="button"
+                  className={isSelected ? styles.tabActive : styles.tab}
+                  aria-pressed={isSelected}
+                  // replace: switching tabs shouldn't pile up history entries
+                  onClick={() => setSearchParams({ group: String(group.id) }, { replace: true })}
+                >
+                  {group.name}
+                  {total > 0 && (
+                    <span className={styles.tabCount}>{done >= total ? '✓' : `${done}/${total}`}</span>
+                  )}
+                </button>
+              )
+            })}
+          </div>
+          {/* key: each group starts with "Show all" closed */}
+          <GroupSection key={selected.id} group={selected} />
         </>
       )}
     </>
   )
 }
 
+function progress(group: TodayGroup): { done: number; total: number } {
+  const done = group.lifts.filter((lift) => lift.sets_today.length > 0).length
+  return { done, total: group.lifts.length }
+}
+
+// The group in the URL if it's one of today's; otherwise the first one you
+// haven't finished (or the first). Null on a rest day.
+function selectedGroup(data: TodayResponse, requestedId: number): TodayGroup | null {
+  const requested = data.groups.find((group) => group.id === requestedId)
+  if (requested) {
+    return requested
+  }
+  const unfinished = data.groups.find((group) => {
+    const { done, total } = progress(group)
+    return done < total
+  })
+  return unfinished ?? data.groups[0] ?? null
+}
+
 function GroupSection({ group }: { group: TodayGroup }) {
   const [showAll, setShowAll] = useState(false)
-  const done = group.lifts.filter((lift) => lift.sets_today.length > 0).length
 
   return (
-    <section className={styles.group}>
-      <h2 className={styles.groupTitle}>
-        {group.name}
-        {group.lifts.length > 0 && (
-          <span className={styles.groupProgress}>
-            {done} of {group.lifts.length} done
-          </span>
-        )}
-      </h2>
+    <section className={styles.group} aria-label={group.name}>
       {group.lifts.length === 0 && (
         <p className={styles.empty}>Nothing logged here in the last 6 weeks.</p>
       )}
       <div className={styles.cards}>
         {group.lifts.map((lift) => (
-          <TodayLiftCard key={lift.id} lift={lift} />
+          <TodayLiftCard key={lift.id} lift={lift} groupId={group.id} />
         ))}
-        {showAll && group.other_lifts.map((lift) => <TodayLiftCard key={lift.id} lift={lift} />)}
+        {showAll &&
+          group.other_lifts.map((lift) => <TodayLiftCard key={lift.id} lift={lift} groupId={group.id} />)}
       </div>
       {group.other_lifts.length > 0 && (
         <button type="button" className={styles.showAll} onClick={() => setShowAll(!showAll)}>

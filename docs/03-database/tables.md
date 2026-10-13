@@ -60,7 +60,7 @@ Home shows muscle groups in **creation order** (`id`), except that today's split
 
 An exercise. Belongs to exactly one muscle group.
 
-**Model:** `Lift(MetadataBase, table=True)` with an extra `muscle_group_id: int`
+**Model:** `Lift(MetadataBase, table=True)` with extra `muscle_group_id: int` and `strength_machine_id: int | None`
 
 | Column | Type | Null | Default | Notes |
 | --- | --- | --- | --- | --- |
@@ -69,12 +69,14 @@ An exercise. Belongs to exactly one muscle group.
 | `archived` | `boolean` | no | `false` | |
 | `created_at` | `timestamptz` | no | `now()` | |
 | `muscle_group_id` | `integer` | no | — | → `muscle_groups.id` |
+| `strength_machine_id` | `integer` | yes | — | → `machines.id`. The machine that counts for relative strength on Insights; null = automatic (most-used). Added in `0006_lift_strength_machine`. |
 
 | Constraint / index | Definition |
 | --- | --- |
 | `lifts_pkey` | `PRIMARY KEY (id)` |
 | `lifts_muscle_group_id_fkey` | `FOREIGN KEY (muscle_group_id) REFERENCES muscle_groups(id)` |
 | `uq_lifts_muscle_group_name` | `UNIQUE INDEX ON lifts (muscle_group_id, lower(trim(name)))` |
+| `lifts_strength_machine_id_fkey` | `FOREIGN KEY (strength_machine_id) REFERENCES machines(id)` |
 
 **Referenced by:** `sets.lift_id`
 **Written by:** `POST/PATCH /api/lifts`, the seed script
@@ -215,7 +217,7 @@ Alembic's bookkeeping: a single row with the revision id the database is at.
 
 | Column | Type | Notes |
 | --- | --- | --- |
-| `version_num` | `varchar(32)` | Primary key. The current head is `0005_settings_body`. |
+| `version_num` | `varchar(32)` | Primary key. The current head is `0006_lift_strength_machine`. |
 
 Never edit it by hand except to recover from a broken migration. See [Migrations](migrations.md).
 

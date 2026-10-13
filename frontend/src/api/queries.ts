@@ -19,6 +19,7 @@ import type {
   LiftListItem,
   LiftRecords,
   Machine,
+  LiftUpdate,
   MetadataUpdate,
   MuscleGroup,
   SetCreate,
@@ -191,7 +192,7 @@ export function useUpdateMuscleGroup() {
 export function useUpdateLift() {
   const queryClient = useQueryClient()
   return useMutation({
-    mutationFn: ({ id, changes }: { id: number; changes: MetadataUpdate }) =>
+    mutationFn: ({ id, changes }: { id: number; changes: LiftUpdate }) =>
       apiPatch<Lift>(`/lifts/${id}`, changes),
     onSuccess: (lift) => {
       void queryClient.invalidateQueries({ queryKey: queryKeys.lifts })

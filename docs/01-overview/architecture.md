@@ -191,11 +191,12 @@ fitness-tracker/
 │   │   ├── calendar.py        Per-day activity and PR detection
 │   │   ├── insights.py        Plateau flags
 │   │   ├── today.py           Today page: usual lifts, targets
-│   │   ├── body.py            Calories, protein, relative strength
+│   │   ├── body.py            Calories, protein, water, relative strength
+│   │   ├── standards.py       Strength standards and grades
 │   │   └── routers/           One file per resource
 │   ├── migrations/            Alembic environment and versions
 │   ├── scripts/seed.py        Idempotent import of seed_data.json
-│   └── tests/                 pytest suite (84 tests)
+│   └── tests/                 pytest suite (101 tests)
 └── frontend/
     ├── package.json           npm scripts and dependencies
     ├── vite.config.ts         Dev server + /api proxy

@@ -186,6 +186,16 @@ A log of the significant choices made while building Lift Tracker: what was deci
 **Why:** The user wanted the calculations on their own tab, separate from the form. Insights is also where future analysis (the Progress ideas, maybe the AI coach) can live, instead of reserving an empty slot.
 **Consequences:** All five tab slots are used; a new tab means replacing one or widening the grid. The page route `/insights` and the API's `/api/insights` (plateau flags) share a name but are unrelated.
 
+## 37. Today: tabs per muscle group, Best and Goal
+**Decision:** The Today page shows one muscle group at a time, with pill tabs (kept in the URL as `?group=`). Each lift card shows **Best** (highest est. 1RM among 5+ rep sets) and a **Goal** from it, replacing "Last" and "Beat". The date and summary lines were removed. The whole card follows the machine you used most recently, counting today.
+**Why:** The user found arm and shoulder days too long to scroll, preferred the best set over the last session as the reference, and found the extra text unnecessary. Following today's machine fixed a bug where Today showed one machine and Last/Beat another (seen on hammer curls).
+**Consequences:** The goal no longer depends on what you did most recently, only on your best. Sets under 5 reps don't count as "best" unless there's nothing else. The muscle tab row needs `data-no-swipe` so scrolling it doesn't change pages.
+
+## 38. Relative strength on one chosen machine, graded against standards
+**Decision:** Each lift's relative strength uses **one machine**: the one picked on the lift page, or automatically the one trained on the most days. Barbell and dumbbell versions of common lifts get a level (Beginner → Elite) from approximate published standards by sex, and graded lifts average into a 0–100 strength score. Insights dropped age and resting calories, and added water and the score.
+**Why:** The user tracks machines precisely because numbers differ between them, so mixing machines (taking any machine's best) was misleading. They asked for grades "based on what they should be", and picked standards over ranking lifts against each other.
+**Consequences:** Machine lifts are never graded (no fair standard exists), so the score covers free weights only. The standards are approximate and not age-adjusted. Dumbbell standards assume weights are logged **per dumbbell**. Migration 0006 adds `lifts.strength_machine_id`.
+
 ---
 
 ### Template for new entries

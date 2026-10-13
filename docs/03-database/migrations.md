@@ -34,7 +34,7 @@ flowchart TD
 
 ```mermaid
 flowchart LR
-    base(("base<br/>empty")) --> m1["ba7a79739cdb<br/>0001_initial_schema"] --> m2["0002_split_days<br/>weekly split"] --> m3["0003_settings_theme<br/>theme settings"] --> m4["0004_settings_rep_range<br/>target rep range"] --> m5["0005_settings_body<br/>body stats"] --> head(("head"))
+    base(("base<br/>empty")) --> m1["ba7a79739cdb<br/>0001_initial_schema"] --> m2["0002_split_days<br/>weekly split"] --> m3["0003_settings_theme<br/>theme settings"] --> m4["0004_settings_rep_range<br/>target rep range"] --> m5["0005_settings_body<br/>body stats"] --> m6["0006_lift_strength_machine<br/>relative-strength machine"] --> head(("head"))
 ```
 
 ### `0001_initial_schema.py` (revision `ba7a79739cdb`)
@@ -89,6 +89,13 @@ Created on 2026-10-13, hand-written. `down_revision = '0004_settings_rep_range'`
 - checks `ck_settings_height` (50–275) and `ck_settings_weight` (20–400).
 
 **Downgrade** drops the checks, the six columns, then the three enum types.
+
+### `0006_lift_strength_machine.py` (revision `0006_lift_strength_machine`)
+Created on 2026-10-14, hand-written. `down_revision = '0005_settings_body'`.
+
+**Upgrade** adds the nullable `lifts.strength_machine_id` and the foreign key `lifts_strength_machine_id_fkey` → `machines.id` (named the way autogenerate would, so `alembic check` stays clean).
+
+**Downgrade** drops the foreign key, then the column.
 
 ---
 

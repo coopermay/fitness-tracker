@@ -20,7 +20,7 @@ Every metadata object has:
 | `archived` | boolean | |
 | `created_at` | string (ISO 8601 UTC) | |
 
-Lifts add `muscle_group_id`; machines add `gym_id`.
+Lifts add `muscle_group_id` and `strength_machine_id` (the machine used for relative strength; `null` = automatic); machines add `gym_id`.
 
 ### Shared PATCH body (`MetadataUpdate`)
 
@@ -151,6 +151,7 @@ Archiving a muscle group hides it from Home. Its lifts and sets are untouched.
     "archived": false,
     "created_at": "2026-10-01T02:23:48.475907Z",
     "muscle_group_id": 1,
+    "strength_machine_id": null,
     "last_performed_on": "2026-09-25"
   }
 ]
@@ -178,12 +179,12 @@ The same name in a **different** muscle group is a different lift (e.g. *Curl* u
 ### Update a lift
 `PATCH /api/lifts/{lift_id}`
 
-Body: [`MetadataUpdate`](#shared-patch-body-metadataupdate). Uniqueness is checked within the lift's muscle group. A lift **can't be moved** to another muscle group.
+Body: [`MetadataUpdate`](#shared-patch-body-metadataupdate), plus an optional `strength_machine_id`: the machine whose numbers count for [relative strength](body.md) on Insights. Send a machine id to pick it, or `null` to go back to automatic (the machine trained on the most days). Leaving it out changes nothing. Uniqueness is checked within the lift's muscle group. A lift **can't be moved** to another muscle group.
 
 | Status | When |
 | --- | --- |
 | 200 | Updated; returns the lift |
-| 404 | No lift with that id |
+| 404 | No lift with that id, or no machine with that `strength_machine_id` |
 | 409 | Another lift in the same muscle group already uses the name |
 | 422 | Blank or too-long name |
 

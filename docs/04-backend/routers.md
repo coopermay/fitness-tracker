@@ -54,7 +54,7 @@ There's no PATCH for gyms yet: multi-gym management is a future feature.
 | --- | --- | --- |
 | `list_lifts(session, muscle_group_id=None, include_archived=False)` | `GET /lifts` | Custom query (below) adding `last_performed_on` |
 | `create_lift(body: LiftCreate, session, response)` | `POST /lifts` | `get_or_404(MuscleGroup, body.muscle_group_id)`, then `create_or_restore(Lift, name, muscle_group_id=…)` |
-| `update_lift(lift_id, body, session)` | `PATCH /lifts/{id}` | `update_item(..., muscle_group_id=lift.muscle_group_id)` |
+| `update_lift(lift_id, body: LiftUpdate, session)` | `PATCH /lifts/{id}` | If `strength_machine_id` was **sent** (`body.model_fields_set`), checks the machine exists (404) unless it's `null`, and sets it. Then `update_item(..., muscle_group_id=lift.muscle_group_id)` for the name/archived part, which commits. |
 | `get_lift_records(lift_id, session)` | `GET /lifts/{id}/records` | Loads the lift, its sets, and the machines those sets reference, including archived ones, then `build_lift_records` |
 
 ### The `list_lifts` query

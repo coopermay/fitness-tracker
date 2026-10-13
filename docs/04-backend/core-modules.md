@@ -105,7 +105,7 @@ A factory returning a fresh `Field(...)` for `created_at`: `timestamptz`, `serve
 | --- | --- | --- | --- |
 | `Gym(MetadataBase)` | `gyms` | — | `Index("uq_gyms_name", text("lower(trim(name))"), unique=True)` |
 | `MuscleGroup(MetadataBase)` | `muscle_groups` | — | `uq_muscle_groups_name` on `lower(trim(name))` |
-| `Lift(MetadataBase)` | `lifts` | `muscle_group_id: int` (FK) | `uq_lifts_muscle_group_name` on `(muscle_group_id, lower(trim(name)))` |
+| `Lift(MetadataBase)` | `lifts` | `muscle_group_id: int` (FK), `strength_machine_id: int \| None` (FK to `machines`; null = automatic) | `uq_lifts_muscle_group_name` on `(muscle_group_id, lower(trim(name)))` |
 | `Machine(MetadataBase)` | `machines` | `gym_id: int` (FK) | `uq_machines_gym_name` on `(gym_id, lower(trim(name)))` |
 | `WorkoutSet(SQLModel)` | `sets` | see below | `ck_sets_reps_positive`, `ck_sets_weight_non_negative` |
 | `Settings(SQLModel)` | `settings` | `id: int = 1`, `default_unit: WeightUnit`, `theme_base: ThemeBase`, `theme_accent: ThemeAccent`, `rep_range_min: int = 6`, `rep_range_max: int = 8`, `sex: Sex \| None`, `birth_date: date \| None`, `height_cm: Decimal \| None` (5,1), `weight_kg: Decimal \| None` (5,2), `activity_level: ActivityLevel`, `body_units: BodyUnits` | `ck_settings_single_row` (`id = 1`), `ck_settings_rep_range` (`1 ≤ min ≤ max ≤ 50`), `ck_settings_height` (50–275), `ck_settings_weight` (20–400) |
@@ -153,14 +153,15 @@ Full column/constraint reference: [Tables](../03-database/tables.md).
 | `MetadataRead(ReadModel)` | `id`, `name`, `archived`, `created_at` | Base for read models |
 | `GymRead` | (same) | `GET/POST /gyms` responses |
 | `MuscleGroupRead` | (same) | `GET/POST/PATCH /muscle-groups` responses |
-| `LiftRead` | + `muscle_group_id` | `POST/PATCH /lifts` responses; `lift` in records |
+| `LiftRead` | + `muscle_group_id`, `strength_machine_id` | `POST/PATCH /lifts` responses; `lift` in records |
 | `LiftListItem(LiftRead)` | + `last_performed_on: date \| None` | `GET /lifts` items |
 | `MachineRead` | + `gym_id` | `GET/POST/PATCH /machines`; `machine` in records |
 | `GymCreate` | `name: Name` | `POST /gyms` body |
 | `MuscleGroupCreate` | `name: Name` | `POST /muscle-groups` body |
 | `LiftCreate` | `name: Name`, `muscle_group_id: int` | `POST /lifts` body |
 | `MachineCreate` | `name: Name`, `gym_id: int` | `POST /machines` body |
-| `MetadataUpdate` | `name: Name \| None = None`, `archived: bool \| None = None` | `PATCH` body for muscle groups, lifts, machines. Omitted (or null) fields are unchanged. |
+| `MetadataUpdate` | `name: Name \| None = None`, `archived: bool \| None = None` | `PATCH` body for muscle groups and machines. Omitted (or null) fields are unchanged. |
+| `LiftUpdate(MetadataUpdate)` | + `strength_machine_id: int \| None = None` | `PATCH /lifts` body. Here `null` **is** meaningful (back to automatic), so the router checks `model_fields_set` to tell "sent as null" from "not sent". |
 
 ### Set schemas
 
@@ -200,14 +201,15 @@ Full column/constraint reference: [Tables](../03-database/tables.md).
 | `Insights` | `plateaued_lift_ids: list[int]` |
 | `SettingsRead(ReadModel)` | `default_unit`, `theme_base`, `theme_accent`, `rep_range_min`, `rep_range_max`, `sex`, `birth_date`, `height_cm`, `weight_kg` (floats), `activity_level`, `body_units` |
 | `SettingsUpdate` | the same fields, all optional; rep counts `ge=1, le=50`; `sex`, `birth_date`, `height_cm` (50–275, 1 dp), `weight_kg` (20–400, 2 dp) may be `null` to clear, the rest not |
-| `BodyStats` | `age`, `calories: CalorieTargets \| None`, `protein: ProteinRange \| None`, `relative_strength: list[RelativeStrength]`, `missing: list[str]` |
+| `BodyStats` | `age`, `calories: CalorieTargets \| None`, `protein: ProteinRange \| None`, `water: WaterTarget \| None`, `strength_score: StrengthScore \| None`, `relative_strength: list[RelativeStrength]`, `missing: list[str]` |
+| `WaterTarget` | `daily_ml`, `training_day_ml` |
+| `StrengthScore` | `score: int` (0–100), `level`, `graded_lifts` |
 | `CalorieTargets` | `bmr`, `maintenance`, `cut`, `lean_bulk` (ints) |
 | `ProteinRange` | `min_g`, `max_g` |
-| `RelativeStrength` | `lift_id`, `lift_name`, `machine_name`, `one_rep_max`, `weight_unit`, `ratio` |
+| `RelativeStrength` | `lift_id`, `lift_name`, `machine_id`, `machine_name`, `automatic`, `weight_value`, `reps`, `one_rep_max`, `weight_unit`, `ratio`, `level: str \| None`, `score: float \| None` |
 | `TodayResponse` | `date`, `groups: list[TodayGroup]`, `next_training: NextTraining \| None`, `lifts_done`, `set_count`, `pr_count`, `rep_range_min`, `rep_range_max` |
 | `TodayGroup` | `id`, `name`, `lifts`, `other_lifts` (both `list[TodayLift]`) |
-| `TodayLift` | `id`, `name`, `plateaued`, `machine_id`, `machine_name`, `last_session: LastSession \| None`, `target: Target \| None`, `sets_today: list[TodaySet]` |
-| `LastSession` | `date`, `machine_name`, `sets: list[TodaySet]` |
+| `TodayLift` | `id`, `name`, `plateaued`, `machine_id`, `machine_name`, `best: TodaySet \| None`, `best_date: date \| None`, `target: Target \| None` (the goal), `sets_today: list[TodaySet]` |
 | `Target` | `weight_value: float`, `weight_unit`, `reps`, `move_up: bool` |
 | `TodaySet` | `id`, `weight_value: float`, `weight_unit`, `reps`, `approximate`, `is_pr` |
 | `NextTraining` | `date`, `muscle_groups: list[str]` |

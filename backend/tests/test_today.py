@@ -1,4 +1,4 @@
-"""GET /today: today's groups, usual lifts, last session and targets."""
+"""GET /today: today's groups, usual lifts, best set and goal."""
 
 import pytest
 
@@ -50,19 +50,37 @@ def only_lift(data, name):
     return next(l for g in data["groups"] for l in g["lifts"] + g["other_lifts"] if l["name"] == name)
 
 
-# --- Targets ---
+# --- Best set and goal ---
 
 
-def test_below_the_top_of_the_range_aim_for_one_more_rep(client, setup):
+def test_best_is_the_highest_1rm_and_the_goal_adds_a_rep(client, setup):
     set_split(client, {THURSDAY: [setup["chest"]]})
     log(client, setup["bench"], setup["barbell"], 185, 6, "2026-09-24")
-    log(client, setup["bench"], setup["barbell"], 185, 7, "2026-09-28")
-    log(client, setup["bench"], setup["barbell"], 175, 8, "2026-09-28")  # lighter back-off set
+    log(client, setup["bench"], setup["barbell"], 185, 7, "2026-09-28")  # 1RM 228: the best
+    log(client, setup["bench"], setup["barbell"], 175, 8, "2026-09-28")  # 1RM 221.5
 
     bench = only_lift(get_today(client), "Bench")
+    assert (bench["best"]["weight_value"], bench["best"]["reps"], bench["best_date"]) == (185, 7, "2026-09-28")
     assert bench["target"] == {"weight_value": 185, "weight_unit": "lbs", "reps": 8, "move_up": False}
-    assert bench["last_session"]["date"] == "2026-09-28"
-    assert [s["reps"] for s in bench["last_session"]["sets"]] == [7, 8]
+
+
+def test_best_ignores_sets_under_5_reps(client, setup):
+    set_split(client, {THURSDAY: [setup["chest"]]})
+    log(client, setup["bench"], setup["barbell"], 225, 2, "2026-09-20")  # 1RM 240, but only 2 reps
+    log(client, setup["bench"], setup["barbell"], 185, 6, "2026-09-28")
+
+    bench = only_lift(get_today(client), "Bench")
+    assert (bench["best"]["weight_value"], bench["best"]["reps"]) == (185, 6)
+    assert bench["target"]["reps"] == 7
+
+
+def test_with_no_5_rep_sets_best_falls_back_to_any(client, setup):
+    set_split(client, {THURSDAY: [setup["chest"]]})
+    log(client, setup["bench"], setup["barbell"], 225, 2, "2026-09-20")
+    log(client, setup["bench"], setup["barbell"], 205, 3, "2026-09-28")
+
+    bench = only_lift(get_today(client), "Bench")
+    assert (bench["best"]["weight_value"], bench["best"]["reps"]) == (225, 2)
 
 
 def test_past_the_top_of_the_range_move_up_one_increment(client, setup):
@@ -77,11 +95,13 @@ def test_past_the_top_of_the_range_move_up_one_increment(client, setup):
 
 def test_moving_up_to_a_weight_already_tried_aims_to_beat_it(client, setup):
     set_split(client, {THURSDAY: [setup["chest"]]})
-    log(client, setup["fly"], setup["cable"], 60, 6, "2026-09-01")
-    log(client, setup["fly"], setup["cable"], 55, 9, "2026-09-28")
+    log(client, setup["fly"], setup["cable"], 60, 5, "2026-09-01")  # 1RM 70
+    log(client, setup["fly"], setup["cable"], 55, 10, "2026-09-28")  # 1RM 73.5: the best, past 8
 
     fly = only_lift(get_today(client), "Fly")
-    assert fly["target"] == {"weight_value": 60, "weight_unit": "lbs", "reps": 7, "move_up": True}
+    assert fly["target"] == {"weight_value": 60, "weight_unit": "lbs", "reps": 6, "move_up": True}
+    log(client, setup["fly"], setup["cable"], 60, 7, "2026-09-02")  # 1RM 74: now the best, so add a rep
+    assert only_lift(get_today(client), "Fly")["target"]["reps"] == 8
 
 
 def test_increment_defaults_by_unit_and_range_comes_from_settings(client, setup):
@@ -92,6 +112,29 @@ def test_increment_defaults_by_unit_and_range_comes_from_settings(client, setup)
     data = get_today(client)
     assert (data["rep_range_min"], data["rep_range_max"]) == (8, 12)
     assert only_lift(data, "Fly")["target"] == {"weight_value": 22.5, "weight_unit": "kg", "reps": 8, "move_up": True}
+
+
+def test_switching_machines_today_switches_the_whole_card(client, setup):
+    """The hammer curl bug: best/goal and the machine name must agree."""
+    set_split(client, {THURSDAY: [setup["chest"]]})
+    log(client, setup["bench"], setup["cable"], 100, 8, "2026-09-20")
+    log(client, setup["bench"], setup["barbell"], 135, 8, "2026-09-10")
+    log(client, setup["bench"], setup["barbell"], 140, 6, TODAY)  # back on the barbell today
+
+    bench = only_lift(get_today(client), "Bench")
+    assert bench["machine_name"] == "Barbell"
+    assert (bench["best"]["weight_value"], bench["target"]["weight_value"]) == (135, 135)
+    assert [s["weight_value"] for s in bench["sets_today"]] == [140]
+
+
+def test_first_time_on_a_machine_has_no_best_yet(client, setup):
+    set_split(client, {THURSDAY: [setup["chest"]]})
+    log(client, setup["bench"], setup["cable"], 100, 8, "2026-09-20")
+    log(client, setup["bench"], setup["barbell"], 135, 8, TODAY)
+
+    bench = only_lift(get_today(client), "Bench")
+    assert bench["machine_name"] == "Barbell"
+    assert (bench["best"], bench["target"]) == (None, None)
 
 
 def test_uses_the_machine_used_most_recently(client, setup):

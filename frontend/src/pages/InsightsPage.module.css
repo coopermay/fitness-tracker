@@ -14,6 +14,35 @@
   font-size: 0.9rem;
 }
 
+/* The overall strength score: a big number with its level beside it */
+.score {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-top: 4px;
+  padding: 14px 16px;
+  border: 1px solid var(--accent);
+  border-radius: var(--radius);
+  background: var(--accent-tint);
+}
+
+.scoreNumber {
+  color: var(--accent);
+  font-size: 2.25rem;
+  font-weight: 800;
+  line-height: 1;
+}
+
+.scoreText {
+  display: flex;
+  flex-direction: column;
+}
+
+.muted {
+  color: var(--text-muted);
+  font-size: 0.85rem;
+}
+
 /* Shown until body stats are entered */
 .setup {
   margin: 0;
@@ -62,6 +91,12 @@
   text-align: right;
 }
 
+.statNote {
+  display: block;
+  color: var(--text-muted);
+  font-size: 0.8rem;
+}
+
 .statValueStrong {
   color: var(--accent);
   font-weight: 700;
@@ -106,6 +141,24 @@
   color: var(--text-muted);
   font-size: 0.85rem;
   font-weight: normal;
+}
+
+.ratioColumn {
+  display: flex;
+  flex-shrink: 0;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 2px;
+}
+
+/* Beginner ... Elite */
+.level {
+  padding: 0 8px;
+  border: 1px solid var(--accent);
+  border-radius: 999px;
+  color: var(--accent);
+  font-size: 0.7rem;
+  font-weight: 700;
 }
 
 .ratio {

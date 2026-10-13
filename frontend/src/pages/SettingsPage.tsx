@@ -56,13 +56,13 @@ export function SettingsPage() {
       <SettingsLink to="/settings/split" label="Edit weekly split" />
 
       <h2 className={styles.sectionLabel}>Theme</h2>
-      <p className={styles.hint}>Background and accent colours.</p>
+      <p className={styles.hint}>Background and accent colors.</p>
       <SettingsLink to="/settings/theme" label="Change theme" />
 
       <h2 className={styles.sectionLabel}>Body stats</h2>
       <p className={styles.hint}>
         {bodySummary.length > 0
-          ? bodySummary.join(' · ')
+          ? bodySummary.join(' • ')
           : 'Age, height and weight, for calories, protein and relative strength.'}
       </p>
       <SettingsLink to="/settings/body" label="Edit body stats" />

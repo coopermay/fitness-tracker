@@ -18,8 +18,10 @@ export function useSwipe({ onSwipeLeft, onSwipeRight }: SwipeOptions) {
 
   function onTouchStart(event: TouchEvent) {
     const target = event.target as HTMLElement
-    // Dragging inside a text box should move the cursor, not change pages.
-    if (event.touches.length !== 1 || target.closest('input, textarea')) {
+    // Dragging inside a text box should move the cursor, and dragging a
+    // sideways-scrolling row (marked data-no-swipe) should scroll it, not
+    // change pages.
+    if (event.touches.length !== 1 || target.closest('input, textarea, [data-no-swipe]')) {
       start.current = null
       return
     }

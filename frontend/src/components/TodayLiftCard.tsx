@@ -6,13 +6,14 @@ import styles from './TodayLiftCard.module.css'
 
 interface TodayLiftCardProps {
   lift: TodayLift
+  groupId: number // so logging a set returns to this group's tab
 }
 
-// One lift on the Today page: what you did last time, what to beat, and
-// anything you've already logged today.
-export function TodayLiftCard({ lift }: TodayLiftCardProps) {
+// One lift on the Today page: your best set, the goal, and anything you've
+// already logged today. All of it is for the machine shown under the name.
+export function TodayLiftCard({ lift, groupId }: TodayLiftCardProps) {
   const done = lift.sets_today.length > 0
-  const { last_session: last, target } = lift
+  const { best, target } = lift
 
   return (
     <article className={done ? `${styles.card} ${styles.done}` : styles.card}>
@@ -35,24 +36,27 @@ export function TodayLiftCard({ lift }: TodayLiftCardProps) {
             <SetList sets={lift.sets_today} />
           </Row>
         )}
-        {last && (
-          <Row label="Last">
-            <span className={styles.muted}>{formatDate(last.date)} · </span>
-            <SetList sets={last.sets} />
+        {best && (
+          <Row label="Best">
+            {formatWeight(best.weight_value, best.weight_unit)} ×{' '}
+            {formatReps(best.reps, best.approximate)}
+            {lift.best_date && <span className={styles.muted}> · {formatDate(lift.best_date)}</span>}
           </Row>
         )}
         {target && (
-          <Row label={target.move_up ? 'Move up' : 'Beat'}>
+          <Row label="Goal">
             <strong className={styles.target}>
               {formatWeight(target.weight_value, target.weight_unit)} × {target.reps}
-              {target.move_up && '+'}
             </strong>
+            {target.move_up && <span className={styles.muted}> · new weight</span>}
           </Row>
         )}
       </dl>
-      {!last && !target && !done && <p className={styles.muted}>Not logged yet.</p>}
+      {!best && (
+        <p className={styles.muted}>{done ? 'First time on this machine.' : 'Not logged yet.'}</p>
+      )}
 
-      <Link className={styles.logButton} to={`/lifts/${lift.id}/log?from=today`}>
+      <Link className={styles.logButton} to={`/lifts/${lift.id}/log?from=today&group=${groupId}`}>
         Log set
       </Link>
     </article>

@@ -32,6 +32,7 @@ erDiagram
         boolean archived "default false"
         timestamptz created_at "default now()"
         int muscle_group_id FK "required"
+        int strength_machine_id FK "nullable, relative strength"
     }
     MACHINES {
         int id PK

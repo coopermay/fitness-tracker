@@ -1,6 +1,6 @@
 # Testing
 
-How Lift Tracker is tested: the backend's automated pytest suite (84 tests), what each test covers, how to write new ones, and the manual checks used for the frontend.
+How Lift Tracker is tested: the backend's automated pytest suite (101 tests), what each test covers, how to write new ones, and the manual checks used for the frontend.
 
 ---
 
@@ -29,7 +29,7 @@ uv run pytest -k "plateau"                       # tests whose name matches
 uv run pytest -x                                 # stop at the first failure
 ```
 
-Expected output ends with `84 passed, 1 warning`. The warning is a harmless Starlette deprecation notice about `httpx`.
+Expected output ends with `101 passed, 1 warning`. The warning is a harmless Starlette deprecation notice about `httpx`.
 
 ---
 
@@ -130,7 +130,7 @@ Because tables are truncated **before** each test (not after), the last test's d
 | `test_rep_range_can_change_one_end_at_a_time` | `{rep_range_max: 10}`, then `{rep_range_min: 8}` |
 | `test_rep_range_min_cannot_pass_max` | min 9 with max 8 → 422; 0 and 51 → 422; nothing changes |
 
-### `test_body.py` (12)
+### `test_body.py` (25)
 Uses `TODAY = "2026-10-01"` and a profile of male, born 1996-10-02 (29 on that day), 180 cm, 80 kg.
 
 | Test | Checks |
@@ -140,19 +140,29 @@ Uses `TODAY = "2026-10-01"` and a profile of male, born 1996-10-02 (29 on that d
 | `test_calorie_targets_round_to_10` | 1780, 2760, 2260, 3060 at moderate |
 | `test_body_fields_save_and_clear` | PATCH saves the fields; `weight_kg: null` clears only that one |
 | `test_invalid_body_values_are_rejected` (×5) | Height 30, weight 500, a future birth date, sex "other", `activity_level: null` → 422 |
-| `test_nothing_entered_yet` | All empty, all four fields `missing` |
-| `test_full_profile` | Age 29, calories 1780/2770/2270/3070, protein 128–176 |
-| `test_relative_strength_uses_best_1rm_in_each_lifts_unit` | Best set per lift, kg vs lbs bodyweight, plates left out, strongest first |
+| `test_nothing_entered_yet` | All empty (incl. water and score), all four fields `missing` |
+| `test_full_profile` | Calories 1780/2770/2270/3070, protein 128–176, water 2800/3300 |
+| `test_relative_strength_uses_best_1rm_in_each_lifts_unit` | Best set per lift, kg vs lbs bodyweight, plates left out, no grades without sex or a Barbell machine |
+| `test_automatic_uses_the_machine_trained_on_most_days` | Smith (3 days) beats a heavier Barbell (1 day); machines aren't graded |
+| `test_picking_a_machine_on_the_lift` | PATCH `strength_machine_id` → Barbell, 1.26× Intermediate, score 63; `null` → back to automatic |
+| `test_picking_an_unknown_machine_is_404` | Unknown machine id → 404 |
+| `test_standard_for` (×8) | Name + machine matching, including exclusions (incline, Smith, leg curl, Romanian, no machine) |
+| `test_grade_levels_and_scores` | Beginner 16.7, Intermediate 62.5, Elite 100, the women's table, `level_for_score` |
+| `test_water_target` | 2800 ml, 3300 on training days |
 
-### `test_today.py` (10)
+### `test_today.py` (14)
 Uses `TODAY = "2026-10-01"` (a Thursday), Chest (Bench, Fly, Dips) and Back (Row), and Cable/Barbell machines.
 
 | Test | Checks |
 | --- | --- |
-| `test_below_the_top_of_the_range_aim_for_one_more_rep` | Best 7 at 185 → 185 × 8; the last session lists that day's sets |
+| `test_best_is_the_highest_1rm_and_the_goal_adds_a_rep` | 185 × 7 beats 185 × 6 and 175 × 8 by 1RM; goal 185 × 8 |
+| `test_best_ignores_sets_under_5_reps` | A 225 × 2 double doesn't count; best 185 × 6, goal 7 reps |
+| `test_with_no_5_rep_sets_best_falls_back_to_any` | Only doubles/triples → the best of those |
 | `test_past_the_top_of_the_range_move_up_one_increment` | 55 × 9 with a 50 → 55 history → 60 × 6, `move_up` |
-| `test_moving_up_to_a_weight_already_tried_aims_to_beat_it` | Old 60 × 6 → 60 × 7 |
+| `test_moving_up_to_a_weight_already_tried_aims_to_beat_it` | Old 60 × 5 → 60 × 6; after 60 × 7 becomes the best → 60 × 8 |
 | `test_increment_defaults_by_unit_and_range_comes_from_settings` | Range 8–12, one kg weight → 22.5 kg × 8 |
+| `test_switching_machines_today_switches_the_whole_card` | The hammer curl bug: Barbell today → header, best and goal all on Barbell |
+| `test_first_time_on_a_machine_has_no_best_yet` | A new machine today → no best, no goal |
 | `test_uses_the_machine_used_most_recently` | Barbell (most recent) beats an older cable history |
 | `test_usual_lifts_are_the_two_done_on_the_most_days` | Top 2 by days; a tie goes to creation order; the rest in `other_lifts` |
 | `test_more_days_beats_more_recent` | Frequency first; lifts outside the 6 weeks aren't usual |
@@ -222,8 +232,8 @@ There are no automated UI tests. After UI changes, run `npm run build && npm run
 9. **Swipe back:** on a lift page swipe right → muscle group, again → Home (each slides in from the left); same on Weekly split → Settings. The log/edit set forms don't swipe.
 10. **Themes:** in Settings → Change theme, try each background and a few accents (buttons, Home tiles, calendar, chart); on System, toggle macOS/iOS dark mode; reload and check there's no flash of the old colours.
 11. **Narrow screen:** 320px and 390px in DevTools' device mode.
-12. **Today:** today's groups with 2 lifts each, last session and target; Log set → save → back on Today with the banner, ✓ Done and "1 of 2 done"; Cancel returns to Today; Show all; change Target reps in Settings and the targets update; on a rest day, the next training day shows.
-13. **Body stats + Insights:** Insights first shows the setup prompt; enter sex, date of birth, height and weight in ft/lbs, Save, follow the link to Insights and check Your numbers and relative strength; switch to cm/kg and the values convert; the Settings row shows "5 ft 10 in · 180 lbs".
+12. **Today:** a tab per muscle group (with n/m done), 2 lifts each with Best and Goal; switching tabs keeps your place after logging; Log set → save → back on Today with the banner, ✓ Done and "1 of 2 done"; Cancel returns to Today; Show all; change Target reps in Settings and the targets update; on a rest day, the next training day shows.
+13. **Body stats + Insights:** Insights first shows the setup prompt; enter sex, date of birth, height and weight in ft/lbs, Save, follow the link to Insights and check the strength score, Your numbers (water, no age/BMR) and graded relative strength; on a lift with two machines, change "Relative strength uses" and see Insights follow; switch to cm/kg and the values convert; the Settings row shows `5'10" • 165 lbs`.
 
 ---
 

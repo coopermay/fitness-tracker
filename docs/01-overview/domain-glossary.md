@@ -122,8 +122,8 @@ Which muscle groups you plan to train on each weekday. Each weekday can have any
 ### Today page terms
 - **Usual lifts:** per muscle group, the (up to) 2 lifts trained on the most days in the last 6 weeks. The user trains two lifts per group.
 - **Target rep range:** a setting, 6–8 by default. Aim to finish sets in it.
-- **Working weight:** the heaviest weight in a lift's most recent session (on its most recent machine + unit).
-- **Target:** what to beat next. Within the range: one more rep at the working weight. Past the top (e.g. 9 with 6–8): **move up** to the next weight, aiming for at least the bottom of the range. This is "double progression".
+- **Best set:** the set with the highest est. 1RM among sets of **5+ reps** (all sets if none has 5), on one machine + unit. Plates: heaviest, then most reps. Shown as "Best" on Today, and used for relative strength.
+- **Goal:** what to aim for next, from the best set. Within the range: one more rep. Past the top (e.g. 9 with 6–8): **move up** to the next weight, for at least the bottom of the range. This is "double progression".
 - **Increment:** the step to the next weight: the smallest gap between weights you've used on that machine + unit (else 5 lbs / 2.5 kg / 1 plate).
 
 ### Body stats terms
@@ -131,7 +131,11 @@ Which muscle groups you plan to train on each weekday. Each weekday can have any
 - **BMR:** resting calories per day (Mifflin-St Jeor formula).
 - **Maintenance (TDEE):** BMR × an activity multiplier; the calories that keep your weight steady. **Cut** is 500 below it, **lean bulk** 300 above.
 - **Protein range:** 1.6–2.2 g per kg of bodyweight a day.
-- **Relative strength:** a lift's best est. 1RM ÷ bodyweight (e.g. "1.23×"). Bodyweight is converted to the lift's unit; plates are left out.
+- **Water target:** about 35 ml per kg of bodyweight a day, plus 0.5 L on training days.
+- **Relative strength:** the best set's est. 1RM ÷ bodyweight (e.g. "1.23×"), on **one machine per lift**, because numbers aren't comparable between machines. Bodyweight is converted to the lift's unit; plates are left out.
+- **Strength machine:** the machine that counts for a lift's relative strength. Picked on the lift page, or **automatic**: the machine trained on the most days.
+- **Level / grade:** Beginner, Novice, Intermediate, Advanced or Elite, from approximate published bodyweight-ratio standards (by sex). Only barbell and dumbbell versions of common lifts are graded; machines aren't.
+- **Strength score:** 0–100, the average of the graded lifts' scores (25 points per level, interpolated).
 
 ### Plateau
 A lift is **plateaued** if it has at least one set dated in the **last 21 days** (3 weeks, today included) and **none** of those sets is a PR (calendar rule above). Plateaued lifts get an amber **Plateau** pill on their row in the muscle group's lift list. Lifts you haven't trained in the last 21 days are never plateaued. This is the app's only alert.

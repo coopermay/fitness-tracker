@@ -2,7 +2,7 @@
 
 **Code:** [`routers/today.py`](../../backend/app/routers/today.py), logic in [`today.py`](../../backend/app/today.py) (see [Domain logic → today.py](../04-backend/domain-logic.md#todaypy))
 
-Everything the **Today** tab shows, in one request: today's split groups, your usual lifts in each, what you did last time, what to beat, and what you've logged so far today.
+Everything the **Today** tab shows, in one request: today's split groups, your usual lifts in each, your best set, the goal, and what you've logged so far today.
 
 ---
 
@@ -40,23 +40,26 @@ Everything the **Today** tab shows, in one request: today's split groups, your u
 | --- | --- | --- |
 | `id`, `name` | | The lift |
 | `plateaued` | bool | Same as [insights](calendar-split-insights.md#insights) |
-| `machine_id`, `machine_name` | int \| null, string \| null | The machine of your **most recent** set before today (or today's, if there's nothing earlier) |
-| `last_session` | `{date, machine_name, sets: TodaySet[]}` \| null | The latest **dated** day before today on that machine + unit, with all its sets in entry order |
-| `target` | `{weight_value, weight_unit, reps, move_up}` \| null | What to beat (rule below); `null` with no history before today |
+| `machine_id`, `machine_name` | int \| null, string \| null | The machine of your **most recent** set, **counting today**. Everything else on the card is for this machine + that set's unit, so switching machines today switches the whole card. |
+| `best` | `TodaySet` \| null | Your **best set** before today on that machine + unit (rule below); `null` the first time on a machine |
+| `best_date` | date \| null | When `best` was done |
+| `target` | `{weight_value, weight_unit, reps, move_up}` \| null | The **goal**, worked out from `best` (rule below) |
 | `sets_today` | `TodaySet[]` | Sets dated today, in entry order |
 
 **`TodaySet`:** `{id, weight_value, weight_unit, reps, approximate, is_pr}`, where `is_pr` uses the [calendar's PR rule](calendar-split-insights.md#calendar).
 
-### The target rule
+### Best set and goal
 
-Double progression, using the sets **before today** on the lift's most recent machine + unit:
+Both use the sets **before today** on the card's machine + unit.
 
-1. The **working weight** is the heaviest weight in your most recent session.
-2. If your best reps there are **within** the range (≤ `rep_range_max`): beat it by one rep. `move_up: false`.
-3. If you've gone **past** the range (> `rep_range_max`, e.g. 9 with 6–8): the next weight up, aiming for one more rep than your best there if you've tried it, and at least `rep_range_min`. `move_up: true`.
-4. The **next weight** is the working weight plus the smallest gap between weights you've used on that machine + unit (so a 5 lb cable stack gives 5). With only one weight in your history, it's 5 lbs / 2.5 kg / 1 plate.
+**Best set** ([`records.best_set`](../04-backend/domain-logic.md#best_setsets---set--none)): the highest **estimated 1RM** among sets of **5+ reps** (ties: the most recent). Heavy low-rep sets inflate est. 1RM, hence the 5-rep floor. If no set has 5+ reps, every set counts. For plates (no 1RM): the heaviest weight, then the most reps.
 
-The target is computed from sets before today, so it doesn't move while you're logging.
+**Goal**, double progression from the best set:
+1. Best reps **within** the range (≤ `rep_range_max`): the same weight, **one more rep**. `move_up: false`.
+2. **Past** the range (> `rep_range_max`, e.g. 9 with 6–8): the **next weight up**, aiming for one more rep than your best there if you've tried it, and at least `rep_range_min` (6 by default). `move_up: true`.
+3. The **next weight** adds the smallest gap between weights you've used on that machine + unit (a 5 lb cable stack gives 5). With only one weight in your history, it's 5 lbs / 2.5 kg / 1 plate.
+
+Both come from sets before today, so they don't move while you're logging.
 
 ```bash
 curl -s "localhost:8000/api/today?today=2026-10-01"
@@ -69,8 +72,8 @@ curl -s "localhost:8000/api/today?today=2026-10-01"
     "lifts": [{
       "id": 2, "name": "Fly", "plateaued": false,
       "machine_id": 2, "machine_name": "Cable",
-      "last_session": {"date": "2026-09-28", "machine_name": "Cable",
-                       "sets": [{"id": 9, "weight_value": 55, "weight_unit": "lbs", "reps": 9, "approximate": false, "is_pr": true}]},
+      "best": {"id": 9, "weight_value": 55, "weight_unit": "lbs", "reps": 9, "approximate": false, "is_pr": true},
+      "best_date": "2026-09-28",
       "target": {"weight_value": 60, "weight_unit": "lbs", "reps": 6, "move_up": true},
       "sets_today": []
     }],

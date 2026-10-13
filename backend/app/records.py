@@ -57,6 +57,26 @@ def best_set_per_weight(sets: list[WorkoutSet]) -> list[WorkoutSet]:
     return sorted(best.values(), key=lambda s: s.weight_value, reverse=True)
 
 
+BEST_SET_MIN_REPS = 5  # heavy singles and triples inflate est. 1RM, so prefer 5+
+
+
+def best_set(sets: list[WorkoutSet]) -> WorkoutSet | None:
+    """Your best set: the highest est. 1RM among sets of 5+ reps (ties: most recent).
+
+    Falls back to every set if none has 5+ reps. Plates have no 1RM, so for
+    them it's the heaviest weight, then the most reps. Expects a single unit.
+    """
+    if not sets:
+        return None
+    pool = [s for s in sets if s.reps >= BEST_SET_MIN_REPS] or sets
+    if pool[0].weight_unit == WeightUnit.plates:
+        return max(pool, key=lambda s: (s.weight_value, s.reps, recency_key(s)))
+    return max(
+        pool,
+        key=lambda s: (estimated_one_rep_max(s.weight_value, s.reps, s.weight_unit), recency_key(s)),
+    )
+
+
 def chart_value(workout_set: WorkoutSet) -> float:
     """What the progress chart plots: est. 1RM, or the weight itself for plates."""
     estimate = estimated_one_rep_max(workout_set.weight_value, workout_set.reps, workout_set.weight_unit)
