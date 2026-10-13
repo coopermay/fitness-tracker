@@ -19,10 +19,10 @@ export function addDays(date: Date, days: number): Date {
   return result
 }
 
-// The Monday on or before `date`.
+// The Sunday on or before `date` (the calendar's weeks start on Sunday).
 export function startOfWeek(date: Date): Date {
-  const daysSinceMonday = (date.getDay() + 6) % 7 // getDay(): Sunday = 0
-  return addDays(date, -daysSinceMonday)
+  const daysSinceSunday = date.getDay() // getDay(): Sunday = 0
+  return addDays(date, -daysSinceSunday)
 }
 
 // Today's weekday with Monday = 0 ... Sunday = 6, matching the weekly split.

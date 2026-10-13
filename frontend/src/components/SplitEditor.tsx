@@ -3,7 +3,10 @@ import { useUpdateSplit } from '../api/queries'
 import type { MuscleGroup, Split } from '../api/types'
 import styles from './SplitEditor.module.css'
 
+// Indexed by the split's weekday numbers (Monday = 0, as the API stores them).
 const WEEKDAY_NAMES = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
+// The order the days are listed in: Sunday first, like the calendar.
+const DISPLAY_ORDER = [6, 0, 1, 2, 3, 4, 5]
 
 interface SplitEditorProps {
   split: Split // as saved on the server
@@ -68,7 +71,8 @@ export function SplitEditor({ split, muscleGroups }: SplitEditorProps) {
   return (
     <div>
       <ul className={styles.days}>
-        {WEEKDAY_NAMES.map((name, weekday) => {
+        {DISPLAY_ORDER.map((weekday) => {
+          const name = WEEKDAY_NAMES[weekday]
           const isOpen = openDay === weekday
           return (
             <li key={name} className={styles.day}>

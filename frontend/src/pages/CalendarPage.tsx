@@ -7,10 +7,10 @@ import { QueryStatus } from '../components/QueryStatus'
 import { formatDate, todayIsoDate } from '../format'
 import styles from './CalendarPage.module.css'
 
-const WEEKDAY_LETTERS = ['M', 'T', 'W', 'T', 'F', 'S', 'S']
+const WEEKDAY_LETTERS = ['S', 'M', 'T', 'W', 'T', 'F', 'S']
 
 // Like GitHub's contribution graph, turned sideways for a phone: one row per
-// week (newest at the top), Monday to Sunday across. Brighter = more sets.
+// week (newest at the top), Sunday to Saturday across. Brighter = more sets.
 export function CalendarPage() {
   const calendar = useCalendar()
   const [selectedDate, setSelectedDate] = useState<string | null>(null)

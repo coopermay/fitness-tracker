@@ -122,7 +122,7 @@ A log of the significant choices made while building Lift Tracker: what was deci
 **Consequences:** The app needs a network connection to the server. Android's full "Install app" prompt needs HTTPS (e.g. via `tailscale serve`).
 
 ## 24. Calendar: sets per day, newest week at the top
-**Decision:** It's a GitHub-style heatmap turned vertical: one row per week, Monday to Sunday across, newest at the top. Colour = sets logged that day. PRs are shown only in the tap details.
+**Decision:** It's a GitHub-style heatmap turned vertical: one row per week, Sunday to Saturday across, newest at the top. Colour = sets logged that day. PRs are shown only in the tap details. The weekly split in Settings is also listed Sunday first, but the API keeps numbering weekdays Monday = 0 (Python's `date.weekday()`), so only the display changed.
 **Why:** It's readable on a phone and opens on the current week. "Sets logged" mirrors GitHub's contribution count.
 **Consequences:** The scale is relative to your busiest day. The range starts at your first logged week, with a minimum of 12 weeks.
 

@@ -210,7 +210,7 @@ Edit or delete an existing set. It's reached by tapping a row in a machine card'
 
 **File:** [`pages/CalendarPage.tsx`](../../frontend/src/pages/CalendarPage.tsx) · **Route:** `/calendar` (tab 1) · **Styles:** `CalendarPage.module.css`
 
-A GitHub-style activity heatmap turned vertical: one row per week (Monday to Sunday), newest week at the top.
+A GitHub-style activity heatmap turned vertical: one row per week (Sunday to Saturday), newest week at the top.
 
 **Data:** `useCalendar()`. **Local state:** `selectedDate: string | null`.
 
@@ -225,8 +225,8 @@ A GitHub-style activity heatmap turned vertical: one row per week (Monday to Sun
 
 **Rendering:**
 1. Heading "Calendar" and a summary: "*N* sets · *M* PRs on *D* days".
-2. A CSS grid with 8 columns: month label + Mon…Sun.
-   - A header row: an empty corner, then the letters `M T W T F S S`.
+2. A CSS grid with 8 columns: month label + Sun…Sat.
+   - A header row: an empty corner, then the letters `S M T W T F S`.
    - Per week, a `<Fragment key={week.days[0]}>` with the month label cell and 7 cells. Days after today are empty `<span>`s. Other days are a `DaySquare` button.
 3. A "Less ▢▢▢▢▢ More" legend.
 4. When a day is selected: a 50vh spacer (so every week can still scroll above the panel) and `<DayDetails>` for that date.

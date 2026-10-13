@@ -329,7 +329,7 @@ The weekly split editor on the Settings page.
 **Behaviour:**
 - `toDraft(split)` converts the server shape into the draft shape.
 - `hasChanges = JSON.stringify(draft) !== JSON.stringify(toDraft(split))`. **Save split** is enabled only when there are changes.
-- **Day rows:** "Monday · Chest, Triceps ⌄" (or "Rest"). Tapping opens/closes that day's chips.
+- **Day rows:** "Monday · Chest, Triceps ⌄" (or "Rest"), listed **Sunday first** (`DISPLAY_ORDER = [6, 0, 1, …, 5]`) to match the calendar. Only the display order changes: the draft and the API still use Monday = 0. Tapping a row opens/closes that day's chips.
 - **Chips:** one per muscle group, `aria-pressed` when selected (filled accent). Tapping toggles it in the draft.
 - **Save:** `useUpdateSplit().mutateAsync({days: draft.map((ids, weekday) => ({weekday, muscle_group_ids: ids}))})` (always all 7 days), then closes the open day and shows "Split saved.".
 - The summary only names **visible** groups, so ids of archived groups in the saved split are silently ignored.

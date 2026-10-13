@@ -6,7 +6,7 @@ import { addDays, parseIsoDate, startOfWeek, toIsoDate } from './dates'
 const MIN_WEEKS = 12
 
 export interface CalendarWeek {
-  // Seven "YYYY-MM-DD" dates, Monday to Sunday; null for days after today.
+  // Seven "YYYY-MM-DD" dates, Sunday to Saturday; null for days after today.
   days: (string | null)[]
   // Shown at the left of the row where a month first appears (reading down).
   monthLabel: string | null
@@ -22,9 +22,9 @@ export function buildWeeks(todayIso: string, earliestIso: string | null): Calend
   const weeks: CalendarWeek[] = []
   let previousMonth: number | null = null
   for (let i = 0; i < weekCount; i++) {
-    const monday = addDays(thisWeek, -7 * i)
+    const sunday = addDays(thisWeek, -7 * i)
     const days = Array.from({ length: 7 }, (_, offset) => {
-      const day = addDays(monday, offset)
+      const day = addDays(sunday, offset)
       return day > today ? null : toIsoDate(day)
     })
 

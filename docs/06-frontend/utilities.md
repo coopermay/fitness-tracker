@@ -42,10 +42,10 @@ Small, mostly pure helper modules at the top of [`frontend/src/`](../../frontend
 | `parseIsoDate(iso)` | `"YYYY-MM-DD"` → local-midnight `Date` | `"2026-09-25"` → Sep 25 00:00 local |
 | `toIsoDate(date)` | `Date` → `"YYYY-MM-DD"` (local) | |
 | `addDays(date, n)` | New `Date` n days later (negative = earlier). Uses `setDate`, so daylight-saving changes are handled. | `addDays(sep25, 7)` → Oct 2 |
-| `startOfWeek(date)` | The Monday on or before `date` | Thu Oct 1 → Mon Sep 28 |
+| `startOfWeek(date)` | The Sunday on or before `date` (calendar weeks start on Sunday) | Thu Oct 1 → Sun Sep 27 |
 | `currentWeekday()` | Today as **Monday = 0 … Sunday = 6**, matching the split | Thursday → `3` |
 
-JavaScript's `getDay()` counts from **Sunday = 0**. The conversion `(getDay() + 6) % 7` shifts it so Monday is 0. `currentWeekday()` lives here (rather than being written as `new Date()` inside `HomePage`) because the linter's `react(purity)` rule flags clock reads written directly in render.
+JavaScript's `getDay()` counts from **Sunday = 0**, so `startOfWeek` just goes back `getDay()` days. The split numbers days differently (Monday = 0, as the API stores them), so `currentWeekday()` converts with `(getDay() + 6) % 7`. `currentWeekday()` lives here (rather than being written as `new Date()` inside `HomePage`) because the linter's `react(purity)` rule flags clock reads written directly in render.
 
 ---
 
@@ -56,7 +56,7 @@ JavaScript's `getDay()` counts from **Sunday = 0**. The conversion `(getDay() + 
 ### `interface CalendarWeek`
 | Field | Type | Meaning |
 | --- | --- | --- |
-| `days` | `(string \| null)[]` | 7 ISO dates, Monday to Sunday; `null` for days after today |
+| `days` | `(string \| null)[]` | 7 ISO dates, Sunday to Saturday; `null` for days after today |
 | `monthLabel` | `string \| null` | e.g. `"Sep"` on the first row (reading down) where that month appears, else `null` |
 
 ### `buildWeeks(todayIso, earliestIso) → CalendarWeek[]`
