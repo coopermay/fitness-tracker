@@ -196,6 +196,7 @@ When you add, rename or delete a file, update this page.
 | `pages/CalendarPage.tsx` + `.module.css` | `/calendar` | [Pages](../06-frontend/routing-and-pages.md#calendarpage) |
 | `pages/SettingsPage.tsx` + `.module.css` | `/settings` | [Pages](../06-frontend/routing-and-pages.md#settingspage) |
 | `pages/SplitPage.tsx` | `/settings/split` | [Pages](../06-frontend/routing-and-pages.md#splitpage) |
+| `pages/ThemePage.tsx` | `/settings/theme` | [Pages](../06-frontend/routing-and-pages.md#themepage) |
 | `pages/NotFoundPage.tsx` | `*` | [Pages](../06-frontend/routing-and-pages.md#notfoundpage) |
 
 ### frontend/src/components/

@@ -65,6 +65,6 @@ curl -s -X PATCH localhost:8000/api/settings -H 'Content-Type: application/json'
 # {"default_unit": "lbs", "theme_base": "system", "theme_accent": "teal"}
 ```
 
-**UI:** Settings → *Default unit* and *Theme*. Tapping saves immediately. The frontend updates its cache optimistically before the response arrives, then writes the response in (`setQueryData`) rather than refetching.
+**UI:** Settings → *Default unit*, and Settings → *Change theme*. Tapping saves immediately. The frontend updates its cache optimistically before the response arrives, then writes the response in (`setQueryData`) rather than refetching.
 
 > Adding another setting means adding a column to the `settings` table (with a migration), a field to `SettingsRead`/`SettingsUpdate` in `schemas.py`, and to `Settings` in `frontend/src/api/types.ts`. Give the new `SettingsUpdate` field a default of `None` so it stays optional; the router applies only the fields sent (`exclude_unset`).

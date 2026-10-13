@@ -156,10 +156,10 @@ A log of the significant choices made while building Lift Tracker: what was deci
 **Why:** The user asked to swipe out of pages like a native app. Going to the back link's target rather than `history.back()` means a deep link or a fresh app launch still goes to the logical parent. Tying it to `BackLink` keeps one source of truth for "where back goes". Leaving the forms out means a half-filled set can't be lost by an accidental swipe.
 **Consequences:** Every new nested page gets swipe-back for free by using `BackLink`. In mobile Safari (not the installed app), the browser's own edge-swipe can also go back through history; started away from the screen edge, the app's swipe is used.
 
-## 31. The weekly split has its own page
-**Decision:** Settings shows an "Edit weekly split ›" row that opens `/settings/split`, instead of the 7-day editor inline.
+## 31. The weekly split and theme have their own pages
+**Decision:** Settings shows "Edit weekly split ›" and "Change theme ›" rows that open `/settings/split` and `/settings/theme`, instead of the editors inline. Settings is ordered muscle groups, weekly split, theme, default unit (the user's order).
 **Why:** The user asked for it. It keeps Settings short as it grows.
-**Consequences:** The route is nested under `/settings`, so the Settings tab stays highlighted there.
+**Consequences:** The routes are nested under `/settings`, so the Settings tab stays highlighted there. Both pages have a `BackLink`, so swiping right returns to Settings.
 
 ## 32. One alert: lifts with no PR in 3 weeks
 **Decision:** The only alert is the **Plateau** pill on a lift's row: the lift was trained in the last 21 days and none of those sets was a PR. The OVERDUE label on Home tiles (muscle groups behind on the weekly split) was removed.
@@ -169,7 +169,7 @@ A log of the significant choices made while building Lift Tracker: what was deci
 ## 33. Themes: a background base plus an accent, saved on the server
 **Decision:** Settings offers a base (System, Light, Dark, Black, Navy) and one of 8 accents, stored as `settings.theme_base` / `theme_accent`. CSS token blocks keyed by `data-base`/`data-accent` on `<html>` do the colouring; the calendar scale and tile tint are derived from the accent with `color-mix()`. The last theme is cached in `localStorage` only so `index.html` can apply it before the first paint.
 **Why:** The user chose presets + accent over free colour pickers (every combination stays readable) and kept "System" as the default. Saving on the server means the theme follows you across devices now, and can become per-user when logins are added.
-**Consequences:** New bases/accents need an enum migration plus CSS (see [Styling](../06-frontend/styling.md#accents)). `color-mix()` needs a 2023-or-newer browser (Safari 16.2+, Chrome 111+). The web manifest and icon keep the default blue.
+**Consequences:** On today's Home tiles the figure's grey is overridden with a stronger mix of `--text-muted`, because the plain `--figure` blended into the accent tint. New bases/accents need an enum migration plus CSS (see [Styling](../06-frontend/styling.md#accents)). `color-mix()` needs a 2023-or-newer browser (Safari 16.2+, Chrome 111+). The web manifest and icon keep the default blue.
 
 ---
 

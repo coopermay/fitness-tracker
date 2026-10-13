@@ -175,7 +175,7 @@ Uses `TODAY = "2026-10-01"`, so the 3-week window is Sep 11 – Oct 1, with Benc
 
 There are no automated UI tests. After UI changes, run `npm run build && npm run lint`, then click through the affected screens. A full smoke test:
 
-1. **Home:** 8 tiles with body figures, all visible on a phone screen. Today's split groups are first with TODAY. No OVERDUE labels.
+1. **Home:** 8 tiles with body figures, all visible on a phone screen. Today's split groups are first with TODAY, and their figures are clearly visible on the tint. No OVERDUE labels.
 2. **Muscle group:** lifts with last dates. "+ Add lift" with an existing name in another case doesn't duplicate. Edit → rename → archive (confirm) → back home.
 3. **Lift:** machine cards, records `185 lbs × 5 · Sep 25`, 1RM on the right (none for plates), approximate `7~`, chart with tappable points, History opens.
 4. **Log set:**
@@ -185,10 +185,10 @@ There are no automated UI tests. After UI changes, run `npm run build && npm run
    - refreshing doesn't show the banner again.
 5. **Edit set:** change reps → "Set updated". Delete → confirm → "Set deleted", with no "Not found" flash.
 6. **Calendar:** grid, today outlined, tap a day → details with PR badges and lift links; tap again or ✕ to close.
-7. **Settings:** the default unit switches instantly; Edit weekly split → change a day → Save split → Home reflects it; add a muscle group.
+7. **Settings:** order is muscle groups, split, theme, default unit; the default unit switches instantly; Edit weekly split → change a day → Save split → Home reflects it; add a muscle group.
 8. **Tabs:** tap each tab (it slides in); swipe left/right on Home/Calendar/Settings.
 9. **Swipe back:** on a lift page swipe right → muscle group, again → Home (each slides in from the left); same on Weekly split → Settings. The log/edit set forms don't swipe.
-10. **Themes:** in Settings try each background and a few accents (buttons, Home tiles, calendar, chart); on System, toggle macOS/iOS dark mode; reload and check there's no flash of the old colours.
+10. **Themes:** in Settings → Change theme, try each background and a few accents (buttons, Home tiles, calendar, chart); on System, toggle macOS/iOS dark mode; reload and check there's no flash of the old colours.
 11. **Narrow screen:** 320px and 390px in DevTools' device mode.
 
 ---

@@ -72,13 +72,6 @@
   color: var(--text-muted);
 }
 
-.subLabel {
-  margin: 12px 0 8px;
-  color: var(--text-muted);
-  font-size: 0.85rem;
-  font-weight: 600;
-}
-
 /* Theme: background choices, each with a small preview */
 .bases {
   display: grid;

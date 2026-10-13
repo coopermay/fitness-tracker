@@ -37,10 +37,13 @@
   background: var(--surface-pressed);
 }
 
-/* Part of today's split: a light blue tint and border */
+/* Part of today's split: a light accent tint and border. The figure's
+   un-highlighted parts get more contrast here, since the default --figure
+   grey blends into the tint. */
 .today {
   border-color: var(--accent);
   background: var(--accent-tint);
+  --figure: color-mix(in srgb, var(--text-muted) 60%, var(--accent-tint));
 }
 
 .todayLabel {

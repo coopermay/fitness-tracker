@@ -42,7 +42,7 @@
   --heat-0: #ebedf0;
   --accent: var(--accent-l);
   --on-accent: var(--on-accent-l);
-  --accent-tint: color-mix(in srgb, var(--accent) 10%, var(--surface)); /* highlighted tiles */
+  --accent-tint: color-mix(in srgb, var(--accent) 8%, var(--surface)); /* highlighted tiles */
   --ok: #1a7f37;
   --warn: #9a6700; /* plateau badge */
   --error: #cf222e;
@@ -57,7 +57,7 @@
   --text-muted: #9a9ea6;
   --accent: var(--accent-d);
   --on-accent: var(--on-accent-d);
-  --accent-tint: color-mix(in srgb, var(--accent) 16%, var(--surface));
+  --accent-tint: color-mix(in srgb, var(--accent) 11%, var(--surface));
   --ok: #3fb950;
   --warn: #d29922;
   --error: #f85149;

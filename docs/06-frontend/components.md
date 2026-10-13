@@ -5,7 +5,7 @@ Every reusable component in [`frontend/src/components/`](../../frontend/src/comp
 | Component | Purpose | Used by |
 | --- | --- | --- |
 | [AddByName](#addbyname) | Button that becomes a one-field "add by name" form | MuscleGroupPage, SettingsPage |
-| [BackLink](#backlink) | "‹ Previous page" pill; also sets the swipe-back target | MuscleGroupPage, LiftPage, SplitPage |
+| [BackLink](#backlink) | "‹ Previous page" pill; also sets the swipe-back target | MuscleGroupPage, LiftPage, SplitPage, ThemePage |
 | [BodyFigure](#bodyfigure) | SVG person with one body part highlighted | HomePage |
 | [DayDetails](#daydetails) | Calendar day panel above the tab bar | CalendarPage |
 | [EditItem](#edititem) | "Edit" → rename / archive / unarchive panel | MuscleGroupPage, LiftPage, MachineCard |

@@ -47,8 +47,9 @@ flowchart TD
 | `/lifts/:liftId/log` | `LogSetPage` | `useLiftRecords`, `useSettings` (+ create set) | — | Home |
 | `/lifts/:liftId/sets/:setId` | `EditSetPage` | `useLiftRecords`, `useSettings` (+ update/delete set) | — | Home |
 | `/calendar` | `CalendarPage` | `useCalendar` | Tab (index 1) | Calendar |
-| `/settings` | `SettingsPage` | `useSettings` (+ settings incl. theme, create group) | Tab (index 2) | Settings |
+| `/settings` | `SettingsPage` | `useSettings` (+ default unit, create group) | Tab (index 2) | Settings |
 | `/settings/split` | `SplitPage` | `useSplit`, `useMuscleGroups` (+ split) | Right → Settings | Settings |
+| `/settings/theme` | `ThemePage` | `useSettings` (+ theme) | Right → Settings | Settings |
 | `*` | `NotFoundPage` | — | — | Home |
 
 ### Navigation flow
@@ -68,10 +69,12 @@ flowchart LR
     Cal <-->|swipe or tab| Set["Settings /settings"]
     Set -->|Edit weekly split| Split["Weekly split"]
     Split -->|back link or swipe right| Set
+    Set -->|Change theme| Theme["Theme"]
+    Theme -->|back link or swipe right| Set
 ```
 
 - **Tabs** (Home, Calendar, Settings) are reached from the bottom bar or by swiping left/right on a tab page.
-- **Drill-down pages** (muscle group → lift, Settings → weekly split) use the **back link** at the top, and **swiping right** does the same thing. When installed as an app there's no browser back button, so every non-tab page has a back link or a Cancel button. The set forms only have Cancel and don't swipe, so a half-filled form can't be lost by accident.
+- **Drill-down pages** (muscle group → lift, Settings → weekly split / theme) use the **back link** at the top, and **swiping right** does the same thing. When installed as an app there's no browser back button, so every non-tab page has a back link or a Cancel button. The set forms only have Cancel and don't swipe, so a half-filled form can't be lost by accident.
 - **Forms navigate with `replace: true`**, so the phone's back button after saving goes to the muscle group, not back into the form.
 
 ---
@@ -89,6 +92,7 @@ flowchart TD
     App --> CalendarPage
     App --> SettingsPage
     App --> SplitPage
+    App --> ThemePage
     App --> NotFoundPage
 
     HomePage --> BodyFigure
@@ -115,6 +119,7 @@ flowchart TD
     SettingsPage --> AddByName2["AddByName (muscle group)"]
     SplitPage --> BackLink2["BackLink"]
     SplitPage --> SplitEditor
+    ThemePage --> BackLink3["BackLink"]
 ```
 
 ---

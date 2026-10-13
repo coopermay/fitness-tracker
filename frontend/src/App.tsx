@@ -11,6 +11,7 @@ import { MuscleGroupPage } from './pages/MuscleGroupPage'
 import { NotFoundPage } from './pages/NotFoundPage'
 import { SettingsPage } from './pages/SettingsPage'
 import { SplitPage } from './pages/SplitPage'
+import { ThemePage } from './pages/ThemePage'
 import { SwipeBackContext } from './swipeBack'
 import { useTheme } from './theme'
 import { slideStateFor, tabIndex, TAB_PATHS, type SlideState } from './tabs'
@@ -74,6 +75,7 @@ function App() {
             <Route path="/calendar" element={<CalendarPage />} />
             <Route path="/settings" element={<SettingsPage />} />
             <Route path="/settings/split" element={<SplitPage />} />
+            <Route path="/settings/theme" element={<ThemePage />} />
             <Route path="*" element={<NotFoundPage />} />
           </Routes>
         </div>

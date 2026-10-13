@@ -3,7 +3,7 @@
 How URLs map to screens (`App.tsx`), and a detailed reference for every page component in [`frontend/src/pages/`](../../frontend/src/pages/). Pages fetch data with hooks from the [data layer](data-layer.md) and assemble [components](components.md).
 
 - [`main.tsx`](#maintsx) · [`App.tsx`](#apptsx)
-- Pages: [Home](#homepage) · [Muscle group](#musclegrouppage) · [Lift](#liftpage) · [Log set](#logsetpage) · [Edit set](#editsetpage) · [Calendar](#calendarpage) · [Settings](#settingspage) · [Weekly split](#splitpage) · [Not found](#notfoundpage)
+- Pages: [Home](#homepage) · [Muscle group](#musclegrouppage) · [Lift](#liftpage) · [Log set](#logsetpage) · [Edit set](#editsetpage) · [Calendar](#calendarpage) · [Settings](#settingspage) · [Weekly split](#splitpage) · [Theme](#themepage) · [Not found](#notfoundpage)
 - [`FormPage.module.css`](#formpagemodulecss)
 
 ---
@@ -43,6 +43,7 @@ The route table, the theme, swiping (between tabs, and back out of nested pages)
 <Route path="/calendar" element={<CalendarPage />} />
 <Route path="/settings" element={<SettingsPage />} />
 <Route path="/settings/split" element={<SplitPage />} />
+<Route path="/settings/theme" element={<ThemePage />} />
 <Route path="*" element={<NotFoundPage />} />
 ```
 
@@ -251,11 +252,13 @@ A GitHub-style activity heatmap turned vertical: one row per week (Sunday to Sat
 
 **Data:** `useSettings()` (blocks), `useUpdateSettings()`, `useCreateMuscleGroup()`.
 
-**Sections:**
-1. **Default unit.** A segmented control (lbs / kg / plates). Tapping calls `updateSettings.mutate({default_unit})`. The update is optimistic (the cache changes before the server answers), so the selection moves instantly.
-2. **Theme.** *Background*: 5 buttons from `THEME_BASES`, each with a preview whose spans carry `data-base` (System shows a light and a dark half) and a dot in the current accent. *Accent*: 8 buttons from `THEME_ACCENTS`, each with a swatch carrying `data-accent`. Tapping saves `{theme_base}` or `{theme_accent}`; `App.tsx`'s `useTheme` re-colours the whole app straight away. Errors from either section show "Couldn't save: …" under the theme pickers.
-3. **Weekly split.** A hint, then an "Edit weekly split ›" row (`.linkRow`, a `Link` to `/settings/split`). The editor itself is on [SplitPage](#splitpage).
-4. **Muscle groups.** A hint ("New muscle groups appear on the Home screen."), then `AddByName` ("+ Add muscle group"). After adding, it shows "“Name” is on the Home screen." because the new tile isn't visible from here.
+**Sections**, in this order:
+1. **Muscle groups.** A hint ("New muscle groups appear on the Home screen."), then `AddByName` ("+ Add muscle group"). After adding, it shows "“Name” is on the Home screen." because the new tile isn't visible from here.
+2. **Weekly split.** A hint, then an "Edit weekly split ›" row that opens [SplitPage](#splitpage).
+3. **Theme.** A hint, then a "Change theme ›" row that opens [ThemePage](#themepage).
+4. **Default unit.** A segmented control (lbs / kg / plates). Tapping calls `updateSettings.mutate({default_unit})`. The update is optimistic (the cache changes before the server answers), so the selection moves instantly. Errors show "Couldn't save: …".
+
+The two rows use `SettingsLink` (in the same file): a `Link` styled `.linkRow` with a chevron.
 
 There's no back link: Settings is a tab, reached from the tab bar.
 
@@ -270,6 +273,20 @@ There's no back link: Settings is a tab, reached from the tab bar.
 A `BackLink` "‹ Settings" → `/settings` (so swiping right also goes back), the heading "Weekly split", a hint, then `<SplitEditor split={…} muscleGroups={…} />` once both queries have loaded (`QueryStatus` until then). The Settings tab stays highlighted, because the path starts with `/settings`.
 
 Leaving the page throws away unsaved changes in the editor's draft, just like any other page's local state.
+
+---
+
+## ThemePage
+
+**File:** [`pages/ThemePage.tsx`](../../frontend/src/pages/ThemePage.tsx) · **Route:** `/settings/theme` · **Styles:** reuses `SettingsPage.module.css`
+
+**Data:** `useSettings()` (blocks), `useUpdateSettings()`.
+
+A `BackLink` "‹ Settings" → `/settings` (swipe right works too) and the heading "Theme", then:
+1. **Background.** 5 buttons from `THEME_BASES`, each with a preview whose spans carry `data-base` (System shows a light and a dark half) and a dot in the current accent.
+2. **Accent.** 8 buttons from `THEME_ACCENTS`, each with a swatch carrying `data-accent`.
+
+Tapping saves `{theme_base}` or `{theme_accent}` immediately (optimistic), and `App.tsx`'s `useTheme` re-colours the whole app straight away. Errors show "Couldn't save: …". The Settings tab stays highlighted.
 
 ---
 
