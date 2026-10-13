@@ -1,6 +1,7 @@
 from fastapi import APIRouter, FastAPI
 
 from app.routers import (
+    body,
     calendar,
     gyms,
     insights,
@@ -34,5 +35,6 @@ api.include_router(calendar.router)
 api.include_router(split.router)
 api.include_router(insights.router)
 api.include_router(today.router)
+api.include_router(body.router)
 
 app.include_router(api)

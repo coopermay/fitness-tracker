@@ -84,7 +84,7 @@ Members `lbs`, `kg`, `plates`. As a `StrEnum` it compares equal to its string va
 ### `weight_unit_type`
 `SAEnum(WeightUnit, name="weight_unit")`. One shared SQLAlchemy enum type so both `sets.weight_unit` and `settings.default_unit` use the same Postgres type named `weight_unit`.
 
-`ThemeBase` (`system`, `light`, `dark`, `black`, `navy`) and `ThemeAccent` (`blue`, `green`, `purple`, `orange`, `red`, `pink`, `teal`, `gold`) are `StrEnum`s stored as Postgres enums `theme_base` and `theme_accent`.
+`ThemeBase` (`system`, `light`, `dark`, `black`, `navy`) and `ThemeAccent` (`blue`, `green`, `purple`, `orange`, `red`, `pink`, `teal`, `gold`) are `StrEnum`s stored as Postgres enums `theme_base` and `theme_accent`. Likewise `Sex` (`male`, `female`), `ActivityLevel` (`sedentary` … `very_active`) and `BodyUnits` (`imperial`, `metric`), stored as enums `sex`, `activity_level` and `body_units`.
 
 ### `created_at_field()`
 A factory returning a fresh `Field(...)` for `created_at`: `timestamptz`, `server_default=func.now()`, `nullable=False`, Python default `None` (the database fills it in). It's a function rather than a shared constant so each table gets its own column object.
@@ -108,7 +108,7 @@ A factory returning a fresh `Field(...)` for `created_at`: `timestamptz`, `serve
 | `Lift(MetadataBase)` | `lifts` | `muscle_group_id: int` (FK) | `uq_lifts_muscle_group_name` on `(muscle_group_id, lower(trim(name)))` |
 | `Machine(MetadataBase)` | `machines` | `gym_id: int` (FK) | `uq_machines_gym_name` on `(gym_id, lower(trim(name)))` |
 | `WorkoutSet(SQLModel)` | `sets` | see below | `ck_sets_reps_positive`, `ck_sets_weight_non_negative` |
-| `Settings(SQLModel)` | `settings` | `id: int = 1`, `default_unit: WeightUnit`, `theme_base: ThemeBase`, `theme_accent: ThemeAccent`, `rep_range_min: int = 6`, `rep_range_max: int = 8` | `ck_settings_single_row` (`id = 1`), `ck_settings_rep_range` (`1 ≤ min ≤ max ≤ 50`) |
+| `Settings(SQLModel)` | `settings` | `id: int = 1`, `default_unit: WeightUnit`, `theme_base: ThemeBase`, `theme_accent: ThemeAccent`, `rep_range_min: int = 6`, `rep_range_max: int = 8`, `sex: Sex \| None`, `birth_date: date \| None`, `height_cm: Decimal \| None` (5,1), `weight_kg: Decimal \| None` (5,2), `activity_level: ActivityLevel`, `body_units: BodyUnits` | `ck_settings_single_row` (`id = 1`), `ck_settings_rep_range` (`1 ≤ min ≤ max ≤ 50`), `ck_settings_height` (50–275), `ck_settings_weight` (20–400) |
 | `SplitDay(SQLModel)` | `split_days` | `weekday: int` (PK), `muscle_group_id: int` (PK, FK) | `ck_split_days_weekday` (`0..6`) |
 
 ### `WorkoutSet` fields
@@ -198,8 +198,12 @@ Full column/constraint reference: [Tables](../03-database/tables.md).
 | `SplitDayBody` | `weekday: int (0..6)`, `muscle_group_ids: list[int]` |
 | `SplitBody` | `days: list[SplitDayBody]`, used for both the `PUT /split` body and the `GET`/`PUT` response |
 | `Insights` | `plateaued_lift_ids: list[int]` |
-| `SettingsRead(ReadModel)` | `default_unit`, `theme_base`, `theme_accent`, `rep_range_min`, `rep_range_max` |
-| `SettingsUpdate` | the same five, all optional (`= None`) and not nullable; rep counts `ge=1, le=50` |
+| `SettingsRead(ReadModel)` | `default_unit`, `theme_base`, `theme_accent`, `rep_range_min`, `rep_range_max`, `sex`, `birth_date`, `height_cm`, `weight_kg` (floats), `activity_level`, `body_units` |
+| `SettingsUpdate` | the same fields, all optional; rep counts `ge=1, le=50`; `sex`, `birth_date`, `height_cm` (50–275, 1 dp), `weight_kg` (20–400, 2 dp) may be `null` to clear, the rest not |
+| `BodyStats` | `age`, `calories: CalorieTargets \| None`, `protein: ProteinRange \| None`, `relative_strength: list[RelativeStrength]`, `missing: list[str]` |
+| `CalorieTargets` | `bmr`, `maintenance`, `cut`, `lean_bulk` (ints) |
+| `ProteinRange` | `min_g`, `max_g` |
+| `RelativeStrength` | `lift_id`, `lift_name`, `machine_name`, `one_rep_max`, `weight_unit`, `ratio` |
 | `TodayResponse` | `date`, `groups: list[TodayGroup]`, `next_training: NextTraining \| None`, `lifts_done`, `set_count`, `pr_count`, `rep_range_min`, `rep_range_max` |
 | `TodayGroup` | `id`, `name`, `lifts`, `other_lifts` (both `list[TodayLift]`) |
 | `TodayLift` | `id`, `name`, `plateaued`, `machine_id`, `machine_name`, `last_session: LastSession \| None`, `target: Target \| None`, `sets_today: list[TodaySet]` |

@@ -34,7 +34,7 @@ flowchart TD
 
 ```mermaid
 flowchart LR
-    base(("base<br/>empty")) --> m1["ba7a79739cdb<br/>0001_initial_schema"] --> m2["0002_split_days<br/>weekly split"] --> m3["0003_settings_theme<br/>theme settings"] --> m4["0004_settings_rep_range<br/>target rep range"] --> head(("head"))
+    base(("base<br/>empty")) --> m1["ba7a79739cdb<br/>0001_initial_schema"] --> m2["0002_split_days<br/>weekly split"] --> m3["0003_settings_theme<br/>theme settings"] --> m4["0004_settings_rep_range<br/>target rep range"] --> m5["0005_settings_body<br/>body stats"] --> head(("head"))
 ```
 
 ### `0001_initial_schema.py` (revision `ba7a79739cdb`)
@@ -79,6 +79,16 @@ Created on 2026-10-13, hand-written. `down_revision = '0003_settings_theme'`.
 **Upgrade** adds `settings.rep_range_min` (default `6`) and `settings.rep_range_max` (default `8`), both `integer NOT NULL` (the server defaults fill in the existing row), then the check `ck_settings_rep_range`: `rep_range_min >= 1 AND rep_range_min <= rep_range_max AND rep_range_max <= 50`.
 
 **Downgrade** drops the check, then both columns.
+
+### `0005_settings_body.py` (revision `0005_settings_body`)
+Created on 2026-10-13, hand-written. `down_revision = '0004_settings_rep_range'`.
+
+**Upgrade:** creates the enum types `sex`, `activity_level` and `body_units` explicitly (`create_type=False` + `.create()`, as in 0003), then adds to `settings`:
+- nullable `sex`, `birth_date` (date), `height_cm` (numeric 5,1), `weight_kg` (numeric 5,2),
+- `activity_level` (default `'moderate'`) and `body_units` (default `'imperial'`), not null,
+- checks `ck_settings_height` (50–275) and `ck_settings_weight` (20–400).
+
+**Downgrade** drops the checks, the six columns, then the three enum types.
 
 ---
 

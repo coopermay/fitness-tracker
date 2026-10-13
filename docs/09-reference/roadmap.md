@@ -12,6 +12,8 @@ Roughly ordered by how much they'd help at the gym.
 | --- | --- | --- |
 | **"Last time" in the log form** | When a machine is picked, show your last session and target on it, like the Today cards | The data is in the records response (`history`); the target rule is in `today.py` |
 | **Targets on the lift page** | Show the Today-style target on each machine card | Reuse `target_for` from `today.py` |
+| **Progress tab** | The far-left slot until the AI coach: weekly sets per muscle group (8-week bars), this week vs last, recent PRs, biggest est. 1RM gains/stalls | One aggregation endpoint; PR flags and progress points already exist |
+| **Bodyweight log** | Turn the single body-stats weight into dated weigh-ins with a trend chart | A `weigh_ins` table; Body stats would use the latest |
 | **Weekly volume** | Hard sets per muscle group per week, shown next to the split or on the calendar | A new aggregation endpoint (sets per group per ISO week) |
 | **Rest timer** | Starts automatically after saving a set | Frontend only; vibrate/notify when done |
 | **PR dots on the calendar** | Mark PR days on the grid itself, not just in the tap details | `pr_count` is already in the response |
@@ -22,7 +24,7 @@ Roughly ordered by how much they'd help at the gym.
 | **Charts beyond est. 1RM** | Volume per session, per-weight rep trends | Extend `ProgressPoint` or add a new series |
 
 ### AI assistant plan
-On hold for now, but planned for the far-left tab slot. The user wants to **self-host an open model** to learn about it.
+**Pinned.** Planned for the far-left tab slot. The user wanted to **self-host an open model**, but a test with Llama on the homelab (October 2026) wasn't usable, so this waits for better hardware or a switch to a hosted model API. The tool-calling design below works either way (Ollama's API is OpenAI-compatible).
 
 - **Don't fine-tune on the data. Use tool calling.** The model calls functions backed by the existing logic (`today.py` targets, records, calendar, insights), so answers come from real numbers. Fine-tuning teaches style, not facts, and the data changes every workout.
 - **Other documents** (training articles, notes): RAG, with embeddings stored in this Postgres database via the **pgvector** extension.

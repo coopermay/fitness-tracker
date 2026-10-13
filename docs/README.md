@@ -40,17 +40,18 @@ This wiki covers the whole project: how it's put together, every database table,
 ### 4. Backend
 - [Backend overview](04-backend/README.md): module map, layering rules, how a request flows through FastAPI
 - [Core modules](04-backend/core-modules.md): `main.py`, `db.py`, `models.py`, `schemas.py`
-- [Domain logic](04-backend/domain-logic.md): names, metadata, records, calendar, insights and Today algorithms
+- [Domain logic](04-backend/domain-logic.md): names, metadata, records, calendar, insights, Today and body-stats algorithms
 - [Routers](04-backend/routers.md): every router file
 - [Configuration](04-backend/configuration.md): `pyproject.toml`, `uv.lock`, `alembic.ini`, environment
 
 ### 5. API reference
-- [API overview](05-api/README.md): conventions, status codes, errors, and an index of all 24 endpoints
+- [API overview](05-api/README.md): conventions, status codes, errors, and an index of all 25 endpoints
 - [Gyms, muscle groups, lifts, machines](05-api/metadata-endpoints.md)
 - [Sets](05-api/sets.md)
 - [Lift records](05-api/records.md)
 - [Calendar, weekly split, insights](05-api/calendar-split-insights.md)
 - [Today](05-api/today.md)
+- [Body stats](05-api/body.md)
 - [Settings and health](05-api/settings-and-health.md)
 
 ### 6. Frontend
@@ -58,7 +59,7 @@ This wiki covers the whole project: how it's put together, every database table,
 - [Routing and pages](06-frontend/routing-and-pages.md): every page
 - [Components](06-frontend/components.md): every shared component
 - [Data layer](06-frontend/data-layer.md): API client, TypeScript types, TanStack Query hooks, cache invalidation
-- [Utilities](06-frontend/utilities.md): formatting, dates, calendar maths, swipe hook, body regions
+- [Utilities](06-frontend/utilities.md): formatting, dates, calendar maths, swipe hook, body regions, height/weight units
 - [Styling](06-frontend/styling.md): design tokens, themes, CSS modules, mobile rules
 - [PWA and assets](06-frontend/pwa-and-assets.md): manifest, icons, installing on a phone
 - [Build and tooling](06-frontend/build-and-tooling.md): Vite, TypeScript, oxlint, npm scripts

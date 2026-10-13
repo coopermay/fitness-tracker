@@ -11,6 +11,7 @@
 import { useMutation, useQuery, useQueryClient, type QueryClient } from '@tanstack/react-query'
 import { apiDelete, apiGet, apiPatch, apiPost, apiPut } from './client'
 import type {
+  BodyStats,
   CalendarDay,
   Gym,
   Insights,
@@ -44,6 +45,7 @@ export const queryKeys = {
   split: ['split'] as const,
   insights: ['insights'] as const,
   today: ['today'] as const,
+  body: ['body'] as const,
 }
 
 // --- Queries -----------------------------------------------------------------
@@ -104,6 +106,14 @@ export function useToday(today: string) {
   return useQuery({
     queryKey: [...queryKeys.today, today],
     queryFn: () => apiGet<TodayResponse>(`/today?today=${today}`),
+  })
+}
+
+// Calculations from body stats (Settings -> Body stats). `today` is for the age.
+export function useBody(today: string) {
+  return useQuery({
+    queryKey: [...queryKeys.body, today],
+    queryFn: () => apiGet<BodyStats>(`/body?today=${today}`),
   })
 }
 
@@ -188,6 +198,7 @@ export function useUpdateLift() {
       void queryClient.invalidateQueries({ queryKey: queryKeys.liftRecords(lift.id) })
       void queryClient.invalidateQueries({ queryKey: queryKeys.calendar })
       void queryClient.invalidateQueries({ queryKey: queryKeys.today })
+      void queryClient.invalidateQueries({ queryKey: queryKeys.body })
     },
   })
 }
@@ -203,6 +214,7 @@ export function useUpdateMachine() {
       void queryClient.invalidateQueries({ queryKey: queryKeys.allLiftRecords })
       void queryClient.invalidateQueries({ queryKey: queryKeys.calendar })
       void queryClient.invalidateQueries({ queryKey: queryKeys.today })
+      void queryClient.invalidateQueries({ queryKey: queryKeys.body })
     },
   })
 }
@@ -232,6 +244,7 @@ export function useUpdateSettings() {
       if ('rep_range_min' in changes || 'rep_range_max' in changes) {
         void queryClient.invalidateQueries({ queryKey: queryKeys.today })
       }
+      void queryClient.invalidateQueries({ queryKey: queryKeys.body }) // cheap; only fetched on its page
     },
   })
 }
@@ -259,6 +272,7 @@ function refreshAfterSetChange(queryClient: QueryClient, liftId: number) {
     queryClient.invalidateQueries({ queryKey: queryKeys.calendar }),
     queryClient.invalidateQueries({ queryKey: queryKeys.insights }),
     queryClient.invalidateQueries({ queryKey: queryKeys.today }),
+    queryClient.invalidateQueries({ queryKey: queryKeys.body }), // relative strength
   ])
 }
 

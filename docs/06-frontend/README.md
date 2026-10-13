@@ -51,6 +51,7 @@ flowchart TD
 | `/settings` | `SettingsPage` | `useSettings` (+ default unit, create group) | Tab (index 3) | Settings |
 | `/settings/split` | `SplitPage` | `useSplit`, `useMuscleGroups` (+ split) | Right → Settings | Settings |
 | `/settings/theme` | `ThemePage` | `useSettings` (+ theme) | Right → Settings | Settings |
+| `/settings/body` | `BodyPage` | `useSettings`, `useBody` (+ settings) | Right → Settings | Settings |
 | `*` | `NotFoundPage` | — | — | Home |
 
 ### Navigation flow
@@ -75,10 +76,12 @@ flowchart LR
     Split -->|back link or swipe right| Set
     Set -->|Change theme| Theme["Theme"]
     Theme -->|back link or swipe right| Set
+    Set -->|Edit body stats| Body["Body stats"]
+    Body -->|back link or swipe right| Set
 ```
 
 - **Tabs** (Today, Home, Calendar, Settings) are reached from the bottom bar or by swiping left/right on a tab page.
-- **Drill-down pages** (muscle group → lift, Settings → weekly split / theme) use the **back link** at the top, and **swiping right** does the same thing. When installed as an app there's no browser back button, so every non-tab page has a back link or a Cancel button. The set forms only have Cancel and don't swipe, so a half-filled form can't be lost by accident.
+- **Drill-down pages** (muscle group → lift, Settings → weekly split / theme / body stats) use the **back link** at the top, and **swiping right** does the same thing. When installed as an app there's no browser back button, so every non-tab page has a back link or a Cancel button. The set forms only have Cancel and don't swipe, so a half-filled form can't be lost by accident.
 - **Forms navigate with `replace: true`**, so the phone's back button after saving goes to the muscle group, not back into the form.
 
 ---
@@ -99,6 +102,7 @@ flowchart TD
     App --> SettingsPage
     App --> SplitPage
     App --> ThemePage
+    App --> BodyPage
     App --> NotFoundPage
 
     HomePage --> BodyFigure
@@ -126,6 +130,7 @@ flowchart TD
     SplitPage --> BackLink2["BackLink"]
     SplitPage --> SplitEditor
     ThemePage --> BackLink3["BackLink"]
+    BodyPage --> BackLink4["BackLink"]
 ```
 
 ---
@@ -145,7 +150,7 @@ frontend/src/
 ├── pages/                One component (+ .module.css) per route
 ├── components/           Shared UI (+ .module.css each)
 └── *.ts                  Pure helpers (format, dates, calendar, records,
-                          flash, tabs, bodyRegions), the useSwipe and
+                          flash, tabs, bodyRegions, body), the useSwipe and
                           useTheme hooks, SwipeBackContext
 ```
 

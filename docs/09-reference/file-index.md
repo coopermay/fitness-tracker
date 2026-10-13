@@ -42,6 +42,7 @@ When you add, rename or delete a file, update this page.
 | `docs/05-api/records.md` | Lift records |
 | `docs/05-api/calendar-split-insights.md` | Calendar, split, insights |
 | `docs/05-api/today.md` | `GET /today` |
+| `docs/05-api/body.md` | `GET /body` |
 | `docs/05-api/settings-and-health.md` | Settings, health |
 | `docs/06-frontend/README.md` | Frontend architecture, routes, component tree |
 | `docs/06-frontend/routing-and-pages.md` | `main.tsx`, `App.tsx`, every page |
@@ -86,6 +87,7 @@ When you add, rename or delete a file, update this page.
 | `app/records.py` | Epley, `recency_key`, records, progress points, `previous_best_reps` | [Domain logic](../04-backend/domain-logic.md#recordspy) |
 | `app/calendar.py` | `find_pr_set_ids`, `build_calendar` | [Domain logic](../04-backend/domain-logic.md#calendarpy) |
 | `app/insights.py` | `plateaued_lift_ids` | [Domain logic](../04-backend/domain-logic.md#insightspy) |
+| `app/body.py` | `build_body_stats`, `bmr_mifflin_st_jeor`, `calorie_targets`, `protein_range`, `relative_strength`, `age_on` | [Domain logic](../04-backend/domain-logic.md#bodypy) |
 | `app/today.py` | `build_today`, `target_for`, `usual_lift_ids`, `weight_increment` | [Domain logic](../04-backend/domain-logic.md#todaypy) |
 
 ### backend/app/routers/
@@ -102,6 +104,7 @@ When you add, rename or delete a file, update this page.
 | `routers/calendar.py` | `GET /calendar` | [Routers](../04-backend/routers.md#calendarpy), [API](../05-api/calendar-split-insights.md#calendar) |
 | `routers/split.py` | `GET/PUT /split` | [Routers](../04-backend/routers.md#splitpy), [API](../05-api/calendar-split-insights.md#weekly-split) |
 | `routers/insights.py` | `GET /insights` | [Routers](../04-backend/routers.md#insightspy), [API](../05-api/calendar-split-insights.md#insights) |
+| `routers/body.py` | `GET /body` | [Routers](../04-backend/routers.md#bodypy), [API](../05-api/body.md) |
 | `routers/today.py` | `GET /today` | [Routers](../04-backend/routers.md#todaypy), [API](../05-api/today.md) |
 
 ### backend/migrations/
@@ -113,6 +116,7 @@ When you add, rename or delete a file, update this page.
 | `migrations/README` | Alembic's one-line placeholder | [Migrations](../03-database/migrations.md#files) |
 | `migrations/versions/0001_initial_schema.py` | All core tables, the enum, the settings row | [Migrations](../03-database/migrations.md#0001_initial_schemapy-revision-ba7a79739cdb) |
 | `migrations/versions/0002_split_days.py` | The `split_days` table | [Migrations](../03-database/migrations.md#0002_split_dayspy-revision-0002_split_days) |
+| `migrations/versions/0005_settings_body.py` | Body stats columns, enums and checks on `settings` | [Migrations](../03-database/migrations.md#0005_settings_bodypy-revision-0005_settings_body) |
 | `migrations/versions/0004_settings_rep_range.py` | `settings.rep_range_min` / `rep_range_max` + check | [Migrations](../03-database/migrations.md#0004_settings_rep_rangepy-revision-0004_settings_rep_range) |
 | `migrations/versions/0003_settings_theme.py` | `settings.theme_base` / `theme_accent` and their enums | [Migrations](../03-database/migrations.md#0003_settings_themepy-revision-0003_settings_theme) |
 
@@ -132,6 +136,7 @@ When you add, rename or delete a file, update this page.
 | `tests/test_records.py` | 19 | [Testing](../08-testing/testing.md#test_recordspy-19-epley-records-new-best-flag-progress) |
 | `tests/test_sets.py` | 7 | [Testing](../08-testing/testing.md#test_setspy-7-set-validation) |
 | `tests/test_settings.py` | 5 | [Testing](../08-testing/testing.md#test_settingspy-5) |
+| `tests/test_body.py` | 12 | [Testing](../08-testing/testing.md#test_bodypy-12) |
 | `tests/test_today.py` | 10 | [Testing](../08-testing/testing.md#test_todaypy-10) |
 | `tests/test_calendar.py` | 6 | [Testing](../08-testing/testing.md#test_calendarpy-6) |
 | `tests/test_split.py` | 5 | [Testing](../08-testing/testing.md#test_splitpy-5) |
@@ -184,6 +189,7 @@ When you add, rename or delete a file, update this page.
 | `src/flash.ts` | Flash message types | [Utilities](../06-frontend/utilities.md#flashts) |
 | `src/tabs.ts` | Tab order and slide direction | [Utilities](../06-frontend/utilities.md#tabsts) |
 | `src/useSwipe.ts` | Swipe-detection custom hook | [Utilities](../06-frontend/utilities.md#useswipets) |
+| `src/body.ts` | Height/weight unit conversions and formatting | [Utilities](../06-frontend/utilities.md#bodyts) |
 | `src/theme.ts` | Theme choices + `useTheme` (applies the theme to `<html>`) | [Utilities](../06-frontend/utilities.md#themets) |
 | `src/swipeBack.ts` | `SwipeBackContext`: where swiping right goes | [Utilities](../06-frontend/utilities.md#swipebackts) |
 | `src/bodyRegions.ts` | Muscle group name → body region | [Utilities](../06-frontend/utilities.md#bodyregionsts) |
@@ -202,6 +208,7 @@ When you add, rename or delete a file, update this page.
 | `pages/SettingsPage.tsx` + `.module.css` | `/settings` | [Pages](../06-frontend/routing-and-pages.md#settingspage) |
 | `pages/SplitPage.tsx` | `/settings/split` | [Pages](../06-frontend/routing-and-pages.md#splitpage) |
 | `pages/TodayPage.tsx` + `.module.css` | `/today` | [Pages](../06-frontend/routing-and-pages.md#todaypage) |
+| `pages/BodyPage.tsx` + `.module.css` | `/settings/body` | [Pages](../06-frontend/routing-and-pages.md#bodypage) |
 | `pages/ThemePage.tsx` | `/settings/theme` | [Pages](../06-frontend/routing-and-pages.md#themepage) |
 | `pages/NotFoundPage.tsx` | `*` | [Pages](../06-frontend/routing-and-pages.md#notfoundpage) |
 

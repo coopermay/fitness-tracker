@@ -34,6 +34,30 @@ class ThemeBase(StrEnum):
     navy = "navy"
 
 
+class Sex(StrEnum):
+    """Only used by the calorie formula, which differs by sex."""
+
+    male = "male"
+    female = "female"
+
+
+class ActivityLevel(StrEnum):
+    """How active you are outside the gym too; multiplies resting calories."""
+
+    sedentary = "sedentary"
+    light = "light"
+    moderate = "moderate"
+    active = "active"
+    very_active = "very_active"
+
+
+class BodyUnits(StrEnum):
+    """How height and bodyweight are shown and entered. Stored in metric."""
+
+    imperial = "imperial"
+    metric = "metric"
+
+
 class ThemeAccent(StrEnum):
     blue = "blue"
     green = "green"
@@ -132,6 +156,8 @@ class Settings(SQLModel, table=True):
             "rep_range_min >= 1 AND rep_range_min <= rep_range_max AND rep_range_max <= 50",
             name="ck_settings_rep_range",
         ),
+        CheckConstraint("height_cm BETWEEN 50 AND 275", name="ck_settings_height"),
+        CheckConstraint("weight_kg BETWEEN 20 AND 400", name="ck_settings_weight"),
     )
 
     id: int = Field(default=1, primary_key=True)
@@ -154,6 +180,22 @@ class Settings(SQLModel, table=True):
     # these, and move up a weight once you beat the top of the range.
     rep_range_min: int = Field(default=6, sa_column_kwargs={"server_default": text("6")})
     rep_range_max: int = Field(default=8, sa_column_kwargs={"server_default": text("8")})
+    # Body stats (Settings -> Body stats). Optional; calculations that need a
+    # missing value are left out.
+    sex: Sex | None = Field(default=None, sa_type=SAEnum(Sex, name="sex"))
+    birth_date: date | None = None
+    height_cm: Decimal | None = Field(default=None, sa_type=Numeric(5, 1))
+    weight_kg: Decimal | None = Field(default=None, sa_type=Numeric(5, 2))
+    activity_level: ActivityLevel = Field(
+        default=ActivityLevel.moderate,
+        sa_type=SAEnum(ActivityLevel, name="activity_level"),
+        sa_column_kwargs={"server_default": ActivityLevel.moderate.value},
+    )
+    body_units: BodyUnits = Field(
+        default=BodyUnits.imperial,
+        sa_type=SAEnum(BodyUnits, name="body_units"),
+        sa_column_kwargs={"server_default": BodyUnits.imperial.value},
+    )
 
 
 class SplitDay(SQLModel, table=True):

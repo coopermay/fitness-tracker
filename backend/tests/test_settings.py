@@ -1,4 +1,4 @@
-"""GET/PATCH /settings: default unit, theme and rep range."""
+"""GET/PATCH /settings: default unit, theme, rep range and body stats."""
 
 DEFAULTS = {
     "default_unit": "lbs",
@@ -6,6 +6,12 @@ DEFAULTS = {
     "theme_accent": "blue",
     "rep_range_min": 6,
     "rep_range_max": 8,
+    "sex": None,
+    "birth_date": None,
+    "height_cm": None,
+    "weight_kg": None,
+    "activity_level": "moderate",
+    "body_units": "imperial",
 }
 
 

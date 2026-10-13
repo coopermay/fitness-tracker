@@ -1,3 +1,5 @@
+from datetime import date
+
 from fastapi import APIRouter, HTTPException
 
 from app.db import SessionDep
@@ -25,6 +27,9 @@ def update_settings(body: SettingsUpdate, session: SessionDep):
     rep_max = changes.get("rep_range_max", settings.rep_range_max)
     if rep_min > rep_max:
         raise HTTPException(status_code=422, detail="rep_range_min can't be above rep_range_max")
+    birth_date = changes.get("birth_date")
+    if birth_date is not None and not date(1900, 1, 1) <= birth_date <= date.today():
+        raise HTTPException(status_code=422, detail="birth_date must be between 1900 and today")
 
     for field, value in changes.items():
         setattr(settings, field, value)

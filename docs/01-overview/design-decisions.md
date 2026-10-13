@@ -176,6 +176,11 @@ A log of the significant choices made while building Lift Tracker: what was deci
 **Why:** It's the screen used mid-workout on gym Wi-Fi, so one request beats one per lift. The rule and the "2 per group" choice are how the user actually trains; "same 2 lifts most sessions" made frequency the right ranking. The rep range is a setting because it differs between people and programs.
 **Consequences:** Progressive-overload suggestions, once out of scope, now exist for Today only. The target ignores today's sets so it doesn't shift while you log. A lift trained on several machines is targeted on the most recent one only. `USUAL_LIFTS_PER_GROUP` (2) is a constant, not a setting.
 
+## 35. Body stats in Settings, with calculations on the server
+**Decision:** Settings → Body stats stores sex, date of birth, height, weight (a single current value) and activity level in the settings row, in metric, with an imperial/metric display switch. `GET /body` returns age, Mifflin-St Jeor calorie targets, a protein range and relative strength per lift.
+**Why:** The user asked for it as a Settings page, picked those three calculations and a single weight (not a log), and wanted a units switch. **Date of birth instead of age**, so the age stays right after a birthday. Calculations live in Python so they're unit-tested like the rest of the domain logic.
+**Consequences:** The body fields will move to a per-user row with the rest of the settings. Relative strength converts **bodyweight** into each lift's unit, so records stay unconverted. There's no weight history yet; a log with a trend could be added later (roadmap).
+
 ---
 
 ### Template for new entries

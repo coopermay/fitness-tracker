@@ -9,6 +9,11 @@ export type WeightUnit = 'lbs' | 'kg' | 'plates'
 export type ThemeBase = 'system' | 'light' | 'dark' | 'black' | 'navy'
 export type ThemeAccent = 'blue' | 'green' | 'purple' | 'orange' | 'red' | 'pink' | 'teal' | 'gold'
 
+export type Sex = 'male' | 'female'
+export type ActivityLevel = 'sedentary' | 'light' | 'moderate' | 'active' | 'very_active'
+// How height and bodyweight are shown; they're always stored in cm and kg.
+export type BodyUnits = 'imperial' | 'metric'
+
 // Dates arrive as strings: "2026-09-25" for dates, ISO timestamps for created_at.
 export type DateString = string
 
@@ -95,6 +100,13 @@ export interface Settings {
   // Target rep range on the Today page; move up a weight past the top.
   rep_range_min: number
   rep_range_max: number
+  // Body stats; null until entered.
+  sex: Sex | null
+  birth_date: DateString | null
+  height_cm: number | null
+  weight_kg: number | null
+  activity_level: ActivityLevel
+  body_units: BodyUnits
 }
 
 // --- GET /lifts/{id}/records ---
@@ -232,4 +244,23 @@ export interface TodayResponse {
   pr_count: number
   rep_range_min: number
   rep_range_max: number
+}
+
+// --- GET /body ---
+
+export interface RelativeStrength {
+  lift_id: number
+  lift_name: string
+  machine_name: string | null
+  one_rep_max: number // best est. 1RM, in the lift's own unit
+  weight_unit: WeightUnit
+  ratio: number // one_rep_max / bodyweight
+}
+
+export interface BodyStats {
+  age: number | null
+  calories: { bmr: number; maintenance: number; cut: number; lean_bulk: number } | null
+  protein: { min_g: number; max_g: number } | null
+  relative_strength: RelativeStrength[] // strongest first
+  missing: ('sex' | 'birth_date' | 'height_cm' | 'weight_kg')[]
 }

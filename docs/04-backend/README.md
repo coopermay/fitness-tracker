@@ -34,6 +34,7 @@ flowchart TD
         r_split["split.py"]
         r_ins["insights.py"]
         r_today["today.py"]
+        r_body["body.py"]
     end
 
     subgraph domain["Domain logic"]
@@ -43,6 +44,7 @@ flowchart TD
         calendar["calendar.py<br/>PR replay, per-day activity"]
         insights["insights.py<br/>plateau"]
         today["today.py<br/>usual lifts, targets"]
+        bodystats["body.py<br/>calories, protein, relative strength"]
     end
 
     db["db.py<br/>engine, SessionDep"]
@@ -57,6 +59,8 @@ flowchart TD
     r_cal --> calendar
     r_ins --> insights
     r_today --> today
+    r_body --> bodystats
+    bodystats --> records
     today --> calendar & insights & records
     routers --> db & schemas & models
 

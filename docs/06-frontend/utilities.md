@@ -13,6 +13,7 @@ Small, mostly pure helper modules at the top of [`frontend/src/`](../../frontend
 | [`useSwipe.ts`](#useswipets) | `useSwipe` |
 | [`swipeBack.ts`](#swipebackts) | `SwipeBackContext` |
 | [`theme.ts`](#themets) | `THEME_BASES`, `THEME_ACCENTS`, `useTheme` |
+| [`body.ts`](#bodyts) | `cmToFeetInches`, `feetInchesToCm`, `kgToLbs`, `lbsToKg`, `formatHeight`, `formatBodyweight` |
 | [`bodyRegions.ts`](#bodyregionsts) | `BodyRegion`, `regionForMuscleGroup` |
 
 > **Why build dates from parts?** `new Date("2026-09-25")` treats the string as **UTC** midnight, which in US timezones is the evening of Sep 24. Every helper here splits `"YYYY-MM-DD"` into numbers and calls `new Date(year, month - 1, day)`, which is local midnight.
@@ -172,6 +173,23 @@ The default value (outside any provider) does nothing. That keeps `BackLink` usa
 2. on **System** only, listens for the phone switching light/dark and re-applies. The cleanup removes the listener.
 
 The `localStorage` copy is only a cache for the first paint; the server's settings are the source of truth. The inline script in `index.html` reads the same key and does the same `system` resolution, so **keep the two in sync**.
+
+---
+
+## body.ts
+
+**File:** [`frontend/src/body.ts`](../../frontend/src/body.ts) — height and bodyweight conversions. The API stores metric; these convert for the imperial display.
+
+| Function | Does | Example |
+| --- | --- | --- |
+| `cmToFeetInches(cm)` | Rounds to the nearest whole inch | `177.8` → `{feet: 5, inches: 10}` |
+| `feetInchesToCm(feet, inches)` | Rounded to 0.1 cm (what the API stores) | `5, 10` → `177.8` |
+| `kgToLbs(kg)` | Rounded to 0.1 lb | `81.65` → `180` |
+| `lbsToKg(lbs)` | Rounded to 0.01 kg | `180` → `81.65` |
+| `formatHeight(cm, units)` | `"5 ft 10 in"` or `"178 cm"` | |
+| `formatBodyweight(kg, units)` | `"180 lbs"` or `"81.7 kg"` | |
+
+The rounding steps are chosen so imperial values round-trip: 180 lbs saves as 81.65 kg and shows as 180 lbs again.
 
 ---
 

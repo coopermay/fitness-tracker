@@ -1,6 +1,6 @@
 # Testing
 
-How Lift Tracker is tested: the backend's automated pytest suite (72 tests), what each test covers, how to write new ones, and the manual checks used for the frontend.
+How Lift Tracker is tested: the backend's automated pytest suite (84 tests), what each test covers, how to write new ones, and the manual checks used for the frontend.
 
 ---
 
@@ -29,7 +29,7 @@ uv run pytest -k "plateau"                       # tests whose name matches
 uv run pytest -x                                 # stop at the first failure
 ```
 
-Expected output ends with `72 passed, 1 warning`. The warning is a harmless Starlette deprecation notice about `httpx`.
+Expected output ends with `84 passed, 1 warning`. The warning is a harmless Starlette deprecation notice about `httpx`.
 
 ---
 
@@ -43,7 +43,7 @@ flowchart TD
     B --> C["create lifts_test DB if missing<br/>(connects to 'postgres' with AUTOCOMMIT)"]
     C --> D["alembic downgrade base<br/>alembic upgrade head<br/>(against lifts_test)"]
     D --> E["for each test"]
-    E --> F["session fixture:<br/>TRUNCATE split_days, sets, lifts, machines,<br/>muscle_groups, gyms RESTART IDENTITY CASCADE<br/>+ reset settings to lbs, system, blue, 6-8"]
+    E --> F["session fixture:<br/>TRUNCATE split_days, sets, lifts, machines,<br/>muscle_groups, gyms RESTART IDENTITY CASCADE<br/>+ reset settings to defaults<br/>(lbs, system, blue, 6-8, no body stats)"]
     F --> G["client fixture:<br/>override get_session → test session<br/>TestClient(app)"]
     G --> H["test runs real HTTP requests"]
     H --> E
@@ -130,6 +130,20 @@ Because tables are truncated **before** each test (not after), the last test's d
 | `test_rep_range_can_change_one_end_at_a_time` | `{rep_range_max: 10}`, then `{rep_range_min: 8}` |
 | `test_rep_range_min_cannot_pass_max` | min 9 with max 8 → 422; 0 and 51 → 422; nothing changes |
 
+### `test_body.py` (12)
+Uses `TODAY = "2026-10-01"` and a profile of male, born 1996-10-02 (29 on that day), 180 cm, 80 kg.
+
+| Test | Checks |
+| --- | --- |
+| `test_age_counts_the_birthday_only_once_it_has_happened` | 29 the day before, 30 on the day |
+| `test_mifflin_st_jeor` | 1780 male, 1614 female for 80 kg / 180 cm / 30 |
+| `test_calorie_targets_round_to_10` | 1780, 2760, 2260, 3060 at moderate |
+| `test_body_fields_save_and_clear` | PATCH saves the fields; `weight_kg: null` clears only that one |
+| `test_invalid_body_values_are_rejected` (×5) | Height 30, weight 500, a future birth date, sex "other", `activity_level: null` → 422 |
+| `test_nothing_entered_yet` | All empty, all four fields `missing` |
+| `test_full_profile` | Age 29, calories 1780/2770/2270/3070, protein 128–176 |
+| `test_relative_strength_uses_best_1rm_in_each_lifts_unit` | Best set per lift, kg vs lbs bodyweight, plates left out, strongest first |
+
 ### `test_today.py` (10)
 Uses `TODAY = "2026-10-01"` (a Thursday), Chest (Bench, Fly, Dips) and Back (Row), and Cable/Barbell machines.
 
@@ -209,6 +223,7 @@ There are no automated UI tests. After UI changes, run `npm run build && npm run
 10. **Themes:** in Settings → Change theme, try each background and a few accents (buttons, Home tiles, calendar, chart); on System, toggle macOS/iOS dark mode; reload and check there's no flash of the old colours.
 11. **Narrow screen:** 320px and 390px in DevTools' device mode.
 12. **Today:** today's groups with 2 lifts each, last session and target; Log set → save → back on Today with the banner, ✓ Done and "1 of 2 done"; Cancel returns to Today; Show all; change Target reps in Settings and the targets update; on a rest day, the next training day shows.
+13. **Body stats:** enter sex, date of birth, height and weight in ft/lbs, Save, check Your numbers and relative strength; switch to cm/kg and the values convert; the Settings row shows "5 ft 10 in · 180 lbs".
 
 ---
 

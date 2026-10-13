@@ -1,6 +1,6 @@
 # Domain logic
 
-The business rules of Lift Tracker live in six modules. Apart from two small exceptions (noted below), they're **plain functions**: they take lists of model objects, return schema objects, and know nothing about HTTP. That makes them easy to read, test and reuse.
+The business rules of Lift Tracker live in seven modules. Apart from two small exceptions (noted below), they're **plain functions**: they take lists of model objects, return schema objects, and know nothing about HTTP. That makes them easy to read, test and reuse.
 
 | Module | Rules it owns |
 | --- | --- |
@@ -10,6 +10,7 @@ The business rules of Lift Tracker live in six modules. Apart from two small exc
 | [`calendar.py`](#calendarpy) | Which sets were PRs (history replay), per-day activity |
 | [`insights.py`](#insightspy) | Plateaued lifts |
 | [`today.py`](#todaypy) | The Today page: usual lifts, last session, targets (double progression) |
+| [`body.py`](#bodypy) | Age, calorie targets, protein range, relative strength |
 
 The vocabulary used here (record, PR, session, plateau…) is defined in the [Domain glossary](../01-overview/domain-glossary.md).
 
@@ -256,6 +257,31 @@ Looks 1–7 days ahead for a weekday with visible groups in the split.
 
 ### `build_today(today, sets, lifts, muscle_groups, machines_by_id, split_days, rep_min, rep_max) -> TodayResponse`
 Today's split groups (non-archived, creation order). For each: the usual lifts plus anything else done today, then the rest as `other_lifts` (most recently done first). Also the day's totals, using `find_pr_set_ids` for PRs and `plateaued_lift_ids` for the pills.
+
+---
+
+## body.py
+
+**File:** [`backend/app/body.py`](../../backend/app/body.py) — everything behind [`GET /body`](../05-api/body.md). Body stats are stored in metric; lifts keep their own unit.
+
+| Constant | Value |
+| --- | --- |
+| `LBS_PER_KG` | `Decimal("2.20462262")` |
+| `ACTIVITY_MULTIPLIERS` | sedentary 1.2, light 1.375, moderate 1.55, active 1.725, very active 1.9 |
+| `CUT_DEFICIT`, `LEAN_BULK_SURPLUS` | 500, 300 kcal |
+| `PROTEIN_G_PER_KG` | (1.6, 2.2) |
+
+| Function | Does |
+| --- | --- |
+| `age_on(birth_date, today)` | Whole years; the birthday counts only once it has happened that year |
+| `bmr_mifflin_st_jeor(weight_kg, height_cm, age, sex)` | `10w + 6.25h − 5a`, `+5` male / `−161` female |
+| `calorie_targets(bmr, activity)` | `CalorieTargets` (BMR, maintenance = BMR × multiplier, cut, lean bulk), each rounded to 10 |
+| `protein_range(weight_kg)` | `ProteinRange(min_g, max_g)`, rounded to whole grams |
+| `bodyweight_in(unit, weight_kg)` | Bodyweight in a lift's unit (lbs or kg) |
+| `relative_strength(sets, lifts_by_id, machines_by_id, weight_kg)` | Per non-archived lift, the set with the best est. 1RM ÷ bodyweight (plates skipped), strongest first, ratio to 0.01 |
+| `build_body_stats(settings, today, sets, lifts_by_id, machines_by_id)` | The whole `BodyStats`. `missing` lists empty inputs; calories need all four, protein and relative strength only weight. |
+
+Worked example (80 kg, 180 cm, 29, male, moderate): BMR `800 + 1125 − 145 + 5 = 1785` → 1780; maintenance `1785 × 1.55 = 2766.75` → 2770; cut 2270; lean bulk 3070; protein 128–176 g.
 
 ---
 

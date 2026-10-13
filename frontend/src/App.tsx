@@ -2,6 +2,7 @@ import { useCallback, useRef } from 'react'
 import { Route, Routes, useLocation, useNavigate } from 'react-router'
 import { useSettings } from './api/queries'
 import { TabBar } from './components/TabBar'
+import { BodyPage } from './pages/BodyPage'
 import { CalendarPage } from './pages/CalendarPage'
 import { EditSetPage } from './pages/EditSetPage'
 import { HomePage } from './pages/HomePage'
@@ -78,6 +79,7 @@ function App() {
             <Route path="/settings" element={<SettingsPage />} />
             <Route path="/settings/split" element={<SplitPage />} />
             <Route path="/settings/theme" element={<ThemePage />} />
+            <Route path="/settings/body" element={<BodyPage />} />
             <Route path="*" element={<NotFoundPage />} />
           </Routes>
         </div>

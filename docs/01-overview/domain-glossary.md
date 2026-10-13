@@ -126,6 +126,13 @@ Which muscle groups you plan to train on each weekday. Each weekday can have any
 - **Target:** what to beat next. Within the range: one more rep at the working weight. Past the top (e.g. 9 with 6–8): **move up** to the next weight, aiming for at least the bottom of the range. This is "double progression".
 - **Increment:** the step to the next weight: the smallest gap between weights you've used on that machine + unit (else 5 lbs / 2.5 kg / 1 plate).
 
+### Body stats terms
+- **Body stats:** sex, date of birth, height, weight and activity level, entered in Settings → Body stats. Stored in metric, shown in imperial or metric.
+- **BMR:** resting calories per day (Mifflin-St Jeor formula).
+- **Maintenance (TDEE):** BMR × an activity multiplier; the calories that keep your weight steady. **Cut** is 500 below it, **lean bulk** 300 above.
+- **Protein range:** 1.6–2.2 g per kg of bodyweight a day.
+- **Relative strength:** a lift's best est. 1RM ÷ bodyweight (e.g. "1.23×"). Bodyweight is converted to the lift's unit; plates are left out.
+
 ### Plateau
 A lift is **plateaued** if it has at least one set dated in the **last 21 days** (3 weeks, today included) and **none** of those sets is a PR (calendar rule above). Plateaued lifts get an amber **Plateau** pill on their row in the muscle group's lift list. Lifts you haven't trained in the last 21 days are never plateaued. This is the app's only alert.
 

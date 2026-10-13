@@ -4,6 +4,7 @@ import { useCreateMuscleGroup, useSettings, useUpdateSettings } from '../api/que
 import type { WeightUnit } from '../api/types'
 import { AddByName } from '../components/AddByName'
 import { QueryStatus } from '../components/QueryStatus'
+import { formatBodyweight, formatHeight } from '../body'
 import styles from './SettingsPage.module.css'
 
 const UNITS: WeightUnit[] = ['lbs', 'kg', 'plates']
@@ -29,6 +30,11 @@ export function SettingsPage() {
   // useUpdateSettings changes the cache before the server answers, so these
   // already show what was just picked.
   const { default_unit: selected, rep_range_min: repMin, rep_range_max: repMax } = settings.data
+  const { height_cm: height, weight_kg: weight, body_units: bodyUnits } = settings.data
+  const bodySummary = [
+    height !== null ? formatHeight(height, bodyUnits) : null,
+    weight !== null ? formatBodyweight(weight, bodyUnits) : null,
+  ].filter(Boolean)
 
   return (
     <>
@@ -52,6 +58,14 @@ export function SettingsPage() {
       <h2 className={styles.sectionLabel}>Theme</h2>
       <p className={styles.hint}>Background and accent colours.</p>
       <SettingsLink to="/settings/theme" label="Change theme" />
+
+      <h2 className={styles.sectionLabel}>Body stats</h2>
+      <p className={styles.hint}>
+        {bodySummary.length > 0
+          ? bodySummary.join(' · ')
+          : 'Age, height and weight, for calories, protein and relative strength.'}
+      </p>
+      <SettingsLink to="/settings/body" label="Edit body stats" />
 
       <h2 className={styles.sectionLabel}>Default unit</h2>
       <p className={styles.hint}>

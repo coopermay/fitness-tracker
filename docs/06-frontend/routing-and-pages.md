@@ -3,7 +3,7 @@
 How URLs map to screens (`App.tsx`), and a detailed reference for every page component in [`frontend/src/pages/`](../../frontend/src/pages/). Pages fetch data with hooks from the [data layer](data-layer.md) and assemble [components](components.md).
 
 - [`main.tsx`](#maintsx) · [`App.tsx`](#apptsx)
-- Pages: [Today](#todaypage) · [Home](#homepage) · [Muscle group](#musclegrouppage) · [Lift](#liftpage) · [Log set](#logsetpage) · [Edit set](#editsetpage) · [Calendar](#calendarpage) · [Settings](#settingspage) · [Weekly split](#splitpage) · [Theme](#themepage) · [Not found](#notfoundpage)
+- Pages: [Today](#todaypage) · [Home](#homepage) · [Muscle group](#musclegrouppage) · [Lift](#liftpage) · [Log set](#logsetpage) · [Edit set](#editsetpage) · [Calendar](#calendarpage) · [Settings](#settingspage) · [Weekly split](#splitpage) · [Theme](#themepage) · [Body stats](#bodypage) · [Not found](#notfoundpage)
 - [`FormPage.module.css`](#formpagemodulecss)
 
 ---
@@ -45,6 +45,7 @@ The route table, the theme, swiping (between tabs, and back out of nested pages)
 <Route path="/settings" element={<SettingsPage />} />
 <Route path="/settings/split" element={<SplitPage />} />
 <Route path="/settings/theme" element={<ThemePage />} />
+<Route path="/settings/body" element={<BodyPage />} />
 <Route path="*" element={<NotFoundPage />} />
 ```
 
@@ -278,10 +279,11 @@ A GitHub-style activity heatmap turned vertical: one row per week (Sunday to Sat
 1. **Muscle groups.** A hint ("New muscle groups appear on the Home screen."), then `AddByName` ("+ Add muscle group"). After adding, it shows "“Name” is on the Home screen." because the new tile isn't visible from here.
 2. **Weekly split.** A hint, then an "Edit weekly split ›" row that opens [SplitPage](#splitpage).
 3. **Theme.** A hint, then a "Change theme ›" row that opens [ThemePage](#themepage).
-4. **Default unit.** A segmented control (lbs / kg / plates). Tapping calls `updateSettings.mutate({default_unit})`. The update is optimistic (the cache changes before the server answers), so the selection moves instantly.
-5. **Target reps.** Two `<select>`s (1–20), "6 to 8 reps", saving `{rep_range_min}` / `{rep_range_max}` on change. Options that would cross the other end are disabled. The hint names the move-up point (max + 1). Errors from either control show "Couldn't save: …".
+4. **Body stats.** Your saved height and weight as the hint ("5 ft 10 in · 180 lbs", via `formatHeight`/`formatBodyweight` from [`body.ts`](utilities.md#bodyts)), or a description if none, then an "Edit body stats ›" row that opens [BodyPage](#bodypage).
+5. **Default unit.** A segmented control (lbs / kg / plates). Tapping calls `updateSettings.mutate({default_unit})`. The update is optimistic (the cache changes before the server answers), so the selection moves instantly.
+6. **Target reps.** Two `<select>`s (1–20), "6 to 8 reps", saving `{rep_range_min}` / `{rep_range_max}` on change. Options that would cross the other end are disabled. The hint names the move-up point (max + 1). Errors from either control show "Couldn't save: …".
 
-The two rows use `SettingsLink` (in the same file): a `Link` styled `.linkRow` with a chevron.
+The three rows use `SettingsLink` (in the same file): a `Link` styled `.linkRow` with a chevron.
 
 There's no back link: Settings is a tab, reached from the tab bar.
 
@@ -310,6 +312,28 @@ A `BackLink` "‹ Settings" → `/settings` (swipe right works too) and the head
 2. **Accent.** 8 buttons from `THEME_ACCENTS`, each with a swatch carrying `data-accent`.
 
 Tapping saves `{theme_base}` or `{theme_accent}` immediately (optimistic), and `App.tsx`'s `useTheme` re-colours the whole app straight away. Errors show "Couldn't save: …". The Settings tab stays highlighted.
+
+---
+
+## BodyPage
+
+**File:** [`pages/BodyPage.tsx`](../../frontend/src/pages/BodyPage.tsx) · **Route:** `/settings/body` · **Styles:** `BodyPage.module.css`
+
+**Data:** `useSettings()` (blocks), `useUpdateSettings()`, `useBody(todayIsoDate())`.
+
+1. `BackLink` "‹ Settings" and the heading "Body stats".
+2. **Units:** a segmented control, "ft / lbs" or "cm / kg". It saves `{body_units}` immediately.
+3. **`BodyForm`** (in the same file), rendered with `key={units}` so switching units remounts it with the saved values converted to the new units:
+   - **Sex:** Male / Female segmented.
+   - **Date of birth:** `<input type="date">`, max today.
+   - **Height:** ft + in, or cm.
+   - **Bodyweight:** lbs or kg.
+   - **Activity level:** a `<select>` of the five levels, with descriptions.
+
+   Values are strings while typing (like `SetForm`). **Save** converts to cm/kg with [`body.ts`](utilities.md#bodyts), sends empty fields as `null`, checks the ranges (height 50–275 cm, weight 20–400 kg) first, and shows "Saved." or the error.
+4. **Your numbers** (from `GET /body`): a hint naming what's missing, then a `<dl>` card with Age, Resting (BMR), **Maintenance**, Cut (−500), Lean bulk (+300) and **Protein** (highlighted rows in accent).
+5. **Relative strength:** a list of lifts, strongest first. Each row shows the name, machine and est. 1RM, with the ratio ("1.23×") on the right, and links to the lift page.
+6. A footnote naming the formulas and noting they're estimates.
 
 ---
 

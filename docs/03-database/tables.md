@@ -162,12 +162,20 @@ App-wide settings. **Exactly one row**, with `id = 1`.
 | `theme_base` | `theme_base` enum | no | `'system'` | Background: `system`, `light`, `dark`, `black`, `navy` (added in `0003_settings_theme`) |
 | `rep_range_min` | `integer` | no | `6` | Bottom of the Today page's target rep range (added in `0004_settings_rep_range`) |
 | `rep_range_max` | `integer` | no | `8` | Top of the range; beat it and Today suggests the next weight |
+| `sex` | `sex` enum | yes | | `male` / `female`, for the calorie formula (columns from here to `body_units` added in `0005_settings_body`) |
+| `birth_date` | `date` | yes | | For the age |
+| `height_cm` | `numeric(5,1)` | yes | | 50–275 |
+| `weight_kg` | `numeric(5,2)` | yes | | 20–400 |
+| `activity_level` | `activity_level` enum | no | `'moderate'` | `sedentary`, `light`, `moderate`, `active`, `very_active` |
+| `body_units` | `body_units` enum | no | `'imperial'` | Display units for height/weight |
 | `theme_accent` | `theme_accent` enum | no | `'blue'` | Accent: `blue`, `green`, `purple`, `orange`, `red`, `pink`, `teal`, `gold` |
 
 | Constraint / index | Definition |
 | --- | --- |
 | `settings_pkey` | `PRIMARY KEY (id)` |
 | `ck_settings_single_row` | `CHECK (id = 1)` |
+| `ck_settings_height` | `CHECK (height_cm BETWEEN 50 AND 275)` |
+| `ck_settings_weight` | `CHECK (weight_kg BETWEEN 20 AND 400)` |
 | `ck_settings_rep_range` | `CHECK (rep_range_min >= 1 AND rep_range_min <= rep_range_max AND rep_range_max <= 50)` |
 
 The row is inserted by migration `0001_initial_schema` (`INSERT INTO settings (id) VALUES (1)`). The API reads and updates `id = 1` (`SETTINGS_ID` in `routers/settings.py`).
@@ -207,7 +215,7 @@ Alembic's bookkeeping: a single row with the revision id the database is at.
 
 | Column | Type | Notes |
 | --- | --- | --- |
-| `version_num` | `varchar(32)` | Primary key. The current head is `0004_settings_rep_range`. |
+| `version_num` | `varchar(32)` | Primary key. The current head is `0005_settings_body`. |
 
 Never edit it by hand except to recover from a broken migration. See [Migrations](migrations.md).
 

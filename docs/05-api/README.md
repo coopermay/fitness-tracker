@@ -129,8 +129,9 @@ Only the fields you **send** are changed. For sets, nullable fields (`machine_id
 | PUT | `/api/split` | Replace the weekly split | 200 | [split](calendar-split-insights.md#replace-the-weekly-split) |
 | GET | `/api/insights` | Plateaued lifts | 200 | [insights](calendar-split-insights.md#insights) |
 | GET | `/api/today` | Today's groups, usual lifts, last session, targets | 200 | [today](today.md#get-today) |
+| GET | `/api/body` | Age, calories, protein, relative strength | 200 | [body](body.md#get-body-stats) |
 | GET | `/api/settings` | Read settings | 200 | [settings-and-health](settings-and-health.md#read-settings) |
-| PATCH | `/api/settings` | Change the default unit, theme or rep range | 200 | [settings-and-health](settings-and-health.md#update-settings) |
+| PATCH | `/api/settings` | Change the default unit, theme, rep range or body stats | 200 | [settings-and-health](settings-and-health.md#update-settings) |
 
 ---
 
@@ -157,8 +158,9 @@ Only the fields you **send** are changed. For sets, nullable fields (`machine_id
 | `PUT /split` | `useUpdateSplit` | Settings (Save split) |
 | `GET /insights` | `useInsights` | Muscle group page (plateau) |
 | `GET /today` | `useToday` | Today |
-| `GET /settings` | `useSettings` | App (theme), Settings, Theme, log set page, edit set page |
-| `PATCH /settings` | `useUpdateSettings` | Settings, Theme |
+| `GET /body` | `useBody` | Body stats |
+| `GET /settings` | `useSettings` | App (theme), Settings, Theme, Body stats, log set page, edit set page |
+| `PATCH /settings` | `useUpdateSettings` | Settings, Theme, Body stats |
 | `POST /gyms`, `GET /sets`, `GET /health` | — | Not used by the UI (available for scripts, tooling and future clients) |
 
 ---

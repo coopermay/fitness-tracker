@@ -60,6 +60,12 @@ erDiagram
         theme_accent theme_accent "default blue"
         int rep_range_min "default 6"
         int rep_range_max "default 8"
+        sex sex "nullable"
+        date birth_date "nullable"
+        numeric height_cm "nullable"
+        numeric weight_kg "nullable"
+        activity_level activity_level "default moderate"
+        body_units body_units "default imperial"
     }
     SPLIT_DAYS {
         int weekday PK "0 = Monday ... 6 = Sunday"

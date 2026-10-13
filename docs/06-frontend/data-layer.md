@@ -77,8 +77,10 @@ TypeScript descriptions of the JSON the API sends and receives. **They're checke
 | `SetFields` | `SetUpdate` (the full set) | The edit body; the form always sends all fields |
 | `SetCreate extends SetFields` | `SetCreate` | + `lift_id` |
 | `Gym` | `GymRead` | |
-| `Settings` | `SettingsRead` / `SettingsUpdate` | `default_unit`, `theme_base`, `theme_accent`, `rep_range_min`, `rep_range_max`. Updates send `Partial<Settings>`. |
+| `Settings` | `SettingsRead` / `SettingsUpdate` | `default_unit`, `theme_base`, `theme_accent`, `rep_range_min`, `rep_range_max`, and the body stats (`sex`, `birth_date`, `height_cm`, `weight_kg` nullable; `activity_level`, `body_units`). Updates send `Partial<Settings>`. |
 | `TodayResponse`, `TodayGroup`, `TodayLift`, `LastSession`, `Target`, `TodaySet` | the `Today*` schemas | See [Today](../05-api/today.md) |
+| `Sex`, `ActivityLevel`, `BodyUnits` | the model enums | string-literal unions |
+| `BodyStats`, `RelativeStrength` | `BodyStats`, `RelativeStrength` (+ inline calorie/protein shapes) | See [Body stats](../05-api/body.md) |
 | `RecordRow` | `RecordRow` | |
 | `ProgressPoint` | `ProgressPoint` | |
 | `UnitRecords` | `UnitRecords` | |
@@ -134,6 +136,7 @@ Keeping keys in one object avoids typos and makes it obvious what can be invalid
 | `useInsights(today)` | `['insights', today]` | `GET /insights?today=` | default | Depends on sets and the date; the key includes `today` so a new day is a new cache entry |
 | `useMachines()` | `['machines']` | `GET /machines` | `Infinity` | Metadata |
 | `useGyms()` | `['gyms']` | `GET /gyms` | `Infinity` | Metadata |
+| `useBody(today)` | `['body', today]` | `GET /body?today=` | default | Calculations from body stats; refreshed by any settings change, set changes and lift/machine updates |
 | `useToday(today)` | `['today', today]` | `GET /today?today=` | default | Changes with sets, the split, the rep range and names; the key includes `today` |
 | `useSettings()` | `['settings']` | `GET /settings` | `Infinity` | Only changes in Settings. Also read by `App.tsx` for the theme. |
 
@@ -165,17 +168,17 @@ Keeping keys in one object avoids typos and makes it obvious what can be invalid
 
 What each mutation refreshes. ✅ = invalidated (refetched), ✏️ = written directly with `setQueryData`.
 
-| Mutation ↓ / Cache → | muscle-groups | lifts | lift-records | machines | gyms | settings | calendar | split | insights | today |
-| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| Create muscle group | ✅ | | | | | | | | | |
-| Update muscle group | ✅ | | | | | | | | | ✅ |
-| Create lift | | ✅ | | | | | | | | ✅ |
-| Update lift | | ✅ | ✅ (that lift) | | | | ✅ | | | ✅ |
-| Create machine | | | | ✅ | | | | | | |
-| Update machine | | | ✅ (all) | ✅ | | | ✅ | | | ✅ |
-| Update settings | | | | | | ✏️ | | | | ✅ (rep range only) |
-| Update split | | | | | | | | ✏️ | | ✅ |
-| Create / update / delete set | | ✅ | ✅ (that lift) | | | | ✅ | | ✅ | ✅ |
+| Mutation ↓ / Cache → | muscle-groups | lifts | lift-records | machines | gyms | settings | calendar | split | insights | today | body |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| Create muscle group | ✅ | | | | | | | | | | |
+| Update muscle group | ✅ | | | | | | | | | ✅ | |
+| Create lift | | ✅ | | | | | | | | ✅ | |
+| Update lift | | ✅ | ✅ (that lift) | | | | ✅ | | | ✅ | ✅ |
+| Create machine | | | | ✅ | | | | | | | |
+| Update machine | | | ✅ (all) | ✅ | | | ✅ | | | ✅ | ✅ |
+| Update settings | | | | | | ✏️ | | | | ✅ (rep range only) | ✅ |
+| Update split | | | | | | | | ✏️ | | ✅ | |
+| Create / update / delete set | | ✅ | ✅ (that lift) | | | | ✅ | | ✅ | ✅ | ✅ |
 
 **When you add a query or mutation, update this table.** Reasoning behind some cells:
 - *Set changes → lifts*: the muscle group list shows each lift's `last_performed_on`.
@@ -183,6 +186,7 @@ What each mutation refreshes. ✅ = invalidated (refetched), ✏️ = written di
 - *Update machine → all lift-records*: a machine's name appears on every lift that used it.
 - *Update lift → calendar*: the calendar shows lift names.
 - *→ today*: Today shows sets, the split's groups, lift/machine/group names and targets from the rep range, so all of those refresh it.
+- *→ body*: relative strength uses sets and lift/machine names; any settings save refreshes it (simplest, and it's only fetched on its own page).
 
 ### Known gaps (acceptable today)
 - Archiving/renaming a **muscle group** doesn't invalidate `split`. Split chips only list visible groups.

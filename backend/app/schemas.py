@@ -11,7 +11,7 @@ from typing import Annotated
 
 from pydantic import BaseModel, ConfigDict, Field, StringConstraints
 
-from app.models import ThemeAccent, ThemeBase, WeightUnit
+from app.models import ActivityLevel, BodyUnits, Sex, ThemeAccent, ThemeBase, WeightUnit
 
 Name = Annotated[str, StringConstraints(strip_whitespace=True, min_length=1, max_length=100)]
 Weight = Annotated[Decimal, Field(ge=0, max_digits=7, decimal_places=2)]
@@ -228,16 +228,32 @@ class SettingsRead(ReadModel):
     theme_accent: ThemeAccent
     rep_range_min: int
     rep_range_max: int
+    sex: Sex | None
+    birth_date: date | None
+    height_cm: float | None
+    weight_kg: float | None
+    activity_level: ActivityLevel
+    body_units: BodyUnits
 
 
 class SettingsUpdate(BaseModel):
-    """Only the fields sent are changed. None of them can be null."""
+    """Only the fields sent are changed.
+
+    The body stats (sex, birth_date, height_cm, weight_kg) can be sent as null
+    to clear them; the other fields can't be null.
+    """
 
     default_unit: WeightUnit = None
     theme_base: ThemeBase = None
     theme_accent: ThemeAccent = None
     rep_range_min: int = Field(default=None, ge=1, le=50)
     rep_range_max: int = Field(default=None, ge=1, le=50)
+    sex: Sex | None = None
+    birth_date: date | None = None
+    height_cm: Decimal | None = Field(default=None, ge=50, le=275, decimal_places=1)
+    weight_kg: Decimal | None = Field(default=None, ge=20, le=400, decimal_places=2)
+    activity_level: ActivityLevel = None
+    body_units: BodyUnits = None
 
 
 # --- Today ------------------------------------------------------------------
@@ -301,3 +317,37 @@ class TodayResponse(BaseModel):
     pr_count: int
     rep_range_min: int
     rep_range_max: int
+
+
+# --- Body stats ---------------------------------------------------------------
+
+
+class CalorieTargets(BaseModel):
+    bmr: int = Field(description="Resting calories (Mifflin-St Jeor).")
+    maintenance: int = Field(description="BMR x activity multiplier (TDEE).")
+    cut: int = Field(description="Maintenance - 500, about 1 lb (0.45 kg) a week.")
+    lean_bulk: int = Field(description="Maintenance + 300.")
+
+
+class ProteinRange(BaseModel):
+    min_g: int = Field(description="1.6 g per kg of bodyweight (about 0.7 g/lb).")
+    max_g: int = Field(description="2.2 g per kg (about 1 g/lb).")
+
+
+class RelativeStrength(BaseModel):
+    lift_id: int
+    lift_name: str
+    machine_name: str | None
+    one_rep_max: float = Field(description="Best est. 1RM for this lift, in its own unit.")
+    weight_unit: WeightUnit
+    ratio: float = Field(description="one_rep_max / bodyweight, rounded to 0.01.")
+
+
+class BodyStats(BaseModel):
+    age: int | None
+    calories: CalorieTargets | None = Field(description="Needs weight, height, birth date and sex.")
+    protein: ProteinRange | None = Field(description="Needs weight.")
+    relative_strength: list[RelativeStrength] = Field(
+        description="Strongest first. Empty without a weight. Plates are left out."
+    )
+    missing: list[str] = Field(description="Body fields still needed for every calculation.")
