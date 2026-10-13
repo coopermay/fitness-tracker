@@ -136,7 +136,7 @@ Keeping keys in one object avoids typos and makes it obvious what can be invalid
 | `useInsights(today)` | `['insights', today]` | `GET /insights?today=` | default | Depends on sets and the date; the key includes `today` so a new day is a new cache entry |
 | `useMachines()` | `['machines']` | `GET /machines` | `Infinity` | Metadata |
 | `useGyms()` | `['gyms']` | `GET /gyms` | `Infinity` | Metadata |
-| `useBody(today)` | `['body', today]` | `GET /body?today=` | default | Calculations from body stats; refreshed by any settings change, set changes and lift/machine updates |
+| `useBody(today)` | `['body', today]` | `GET /body?today=` | default | The Insights tab. Calculations from body stats; refreshed by any settings change, set changes and lift/machine updates |
 | `useToday(today)` | `['today', today]` | `GET /today?today=` | default | Changes with sets, the split, the rep range and names; the key includes `today` |
 | `useSettings()` | `['settings']` | `GET /settings` | `Infinity` | Only changes in Settings. Also read by `App.tsx` for the theme. |
 
@@ -186,7 +186,7 @@ What each mutation refreshes. ✅ = invalidated (refetched), ✏️ = written di
 - *Update machine → all lift-records*: a machine's name appears on every lift that used it.
 - *Update lift → calendar*: the calendar shows lift names.
 - *→ today*: Today shows sets, the split's groups, lift/machine/group names and targets from the rep range, so all of those refresh it.
-- *→ body*: relative strength uses sets and lift/machine names; any settings save refreshes it (simplest, and it's only fetched on its own page).
+- *→ body*: relative strength uses sets and lift/machine names; any settings save refreshes it (simplest, and it's only fetched on the Insights tab).
 
 ### Known gaps (acceptable today)
 - Archiving/renaming a **muscle group** doesn't invalidate `split`. Split chips only list visible groups.

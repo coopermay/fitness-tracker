@@ -53,4 +53,4 @@ curl -s "localhost:8000/api/body?today=2026-10-01"
 }
 ```
 
-**Used by:** Settings → Body stats (`useBody`). Settings changes, set changes and lift/machine updates refresh it.
+**Used by:** the Insights tab (`useBody`). Settings changes, set changes and lift/machine updates refresh it.

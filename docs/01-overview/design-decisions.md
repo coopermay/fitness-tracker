@@ -181,6 +181,11 @@ A log of the significant choices made while building Lift Tracker: what was deci
 **Why:** The user asked for it as a Settings page, picked those three calculations and a single weight (not a log), and wanted a units switch. **Date of birth instead of age**, so the age stays right after a birthday. Calculations live in Python so they're unit-tested like the rest of the domain logic.
 **Consequences:** The body fields will move to a per-user row with the rest of the settings. Relative strength converts **bodyweight** into each lift's unit, so records stay unconverted. There's no weight history yet; a log with a trend could be added later (roadmap).
 
+## 36. The far-left tab is Insights
+**Decision:** The last free tab slot became **Insights** (`/insights`), showing the numbers from body stats (Your numbers, Relative strength). Settings → Body stats keeps only the inputs and links to Insights after saving.
+**Why:** The user wanted the calculations on their own tab, separate from the form. Insights is also where future analysis (the Progress ideas, maybe the AI coach) can live, instead of reserving an empty slot.
+**Consequences:** All five tab slots are used; a new tab means replacing one or widening the grid. The page route `/insights` and the API's `/api/insights` (plateau flags) share a name but are unrelated.
+
 ---
 
 ### Template for new entries

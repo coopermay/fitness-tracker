@@ -6,6 +6,7 @@ import { BodyPage } from './pages/BodyPage'
 import { CalendarPage } from './pages/CalendarPage'
 import { EditSetPage } from './pages/EditSetPage'
 import { HomePage } from './pages/HomePage'
+import { InsightsPage } from './pages/InsightsPage'
 import { LiftPage } from './pages/LiftPage'
 import { LogSetPage } from './pages/LogSetPage'
 import { MuscleGroupPage } from './pages/MuscleGroupPage'
@@ -31,7 +32,7 @@ function App() {
   const settings = useSettings()
   useTheme(settings.data?.theme_base, settings.data?.theme_accent)
 
-  // On a tab page (Today, Home, Calendar, Settings), swiping moves to the next tab.
+  // On a tab page (Insights, Today, Home, Calendar, Settings), swiping moves to the next tab.
   const currentTab = tabIndex(location.pathname)
   function goToTab(index: number) {
     if (index >= 0 && index < TAB_PATHS.length) {
@@ -71,6 +72,7 @@ function App() {
           <Routes>
             <Route path="/" element={<HomePage />} />
             <Route path="/today" element={<TodayPage />} />
+            <Route path="/insights" element={<InsightsPage />} />
             <Route path="/muscle-groups/:muscleGroupId" element={<MuscleGroupPage />} />
             <Route path="/lifts/:liftId" element={<LiftPage />} />
             <Route path="/lifts/:liftId/log" element={<LogSetPage />} />

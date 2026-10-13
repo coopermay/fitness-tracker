@@ -346,24 +346,24 @@ The weekly split editor on the Settings page.
 
 The bottom navigation bar, fixed to the screen's bottom on every page.
 
-**Five equal slots:**
+**Five equal tabs:**
 | Slot | Content |
 | --- | --- |
-| 1 | Empty placeholder (`aria-hidden`) for a future tab (planned: the AI coach) |
+| 1 | **Insights** → `/insights` (bar chart + trend line icon) |
 | 2 | **Today** → `/today` (clipboard-with-tick icon) |
 | 3 (middle) | **Home** → `/` (house icon) |
 | 4 | **Calendar** → `/calendar` (calendar icon) |
 | 5 | **Settings** → `/settings` (gear icon) |
 
-**Active tab:** Calendar on `/calendar…`, Settings on `/settings…`, and **Home everywhere else** (muscle group, lift and form pages belong to Home). The active tab is accent-coloured and has `aria-current="page"`.
+**Active tab:** Insights on `/insights…`, Today on `/today…`, Calendar on `/calendar…`, Settings on `/settings…`, and **Home everywhere else** (muscle group, lift and form pages belong to Home). The active tab is accent-coloured and has `aria-current="page"`.
 
 **`Tab`** (in-file):
 - Props: `to`, `label`, `active`, `icon: ReactNode`.
 - Each `Link` passes router state `slideStateFor(tabIndex(currentPath), TAB_PATHS.indexOf(to))`, so tapping a tab slides the page in from the same side a swipe would.
 
-**Icons:** `HomeIcon`, `CalendarIcon` and `SettingsIcon` are inline 24×24 SVGs drawn with `stroke="currentColor"`, so they take the tab's text colour.
+**Icons:** `InsightsIcon`, `TodayIcon`, `HomeIcon`, `CalendarIcon` and `SettingsIcon` are inline 24×24 SVGs drawn with `stroke="currentColor"`, so they take the tab's text colour.
 
-**Adding a tab:** replace a placeholder `<span>` with `<Tab to="/x" label="X" icon={<XIcon/>} />`, add `/x` to `TAB_PATHS` in [`tabs.ts`](utilities.md#tabsts) at the matching position, and add the route in `App.tsx`.
+**Adding a tab:** all five slots are taken, so first decide what moves (the grid in `TabBar.module.css` is 5 columns; a sixth tab would need it changed). Then add a `<Tab to="/x" label="X" icon={<XIcon/>} />`, add `/x` to `TAB_PATHS` in [`tabs.ts`](utilities.md#tabsts) at the matching position, and add the route in `App.tsx`.
 
 ---
 

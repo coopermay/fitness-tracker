@@ -158,7 +158,7 @@ Only the fields you **send** are changed. For sets, nullable fields (`machine_id
 | `PUT /split` | `useUpdateSplit` | Settings (Save split) |
 | `GET /insights` | `useInsights` | Muscle group page (plateau) |
 | `GET /today` | `useToday` | Today |
-| `GET /body` | `useBody` | Body stats |
+| `GET /body` | `useBody` | Insights |
 | `GET /settings` | `useSettings` | App (theme), Settings, Theme, Body stats, log set page, edit set page |
 | `PATCH /settings` | `useUpdateSettings` | Settings, Theme, Body stats |
 | `POST /gyms`, `GET /sets`, `GET /health` | — | Not used by the UI (available for scripts, tooling and future clients) |

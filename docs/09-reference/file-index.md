@@ -207,6 +207,7 @@ When you add, rename or delete a file, update this page.
 | `pages/CalendarPage.tsx` + `.module.css` | `/calendar` | [Pages](../06-frontend/routing-and-pages.md#calendarpage) |
 | `pages/SettingsPage.tsx` + `.module.css` | `/settings` | [Pages](../06-frontend/routing-and-pages.md#settingspage) |
 | `pages/SplitPage.tsx` | `/settings/split` | [Pages](../06-frontend/routing-and-pages.md#splitpage) |
+| `pages/InsightsPage.tsx` + `.module.css` | `/insights` | [Pages](../06-frontend/routing-and-pages.md#insightspage) |
 | `pages/TodayPage.tsx` + `.module.css` | `/today` | [Pages](../06-frontend/routing-and-pages.md#todaypage) |
 | `pages/BodyPage.tsx` + `.module.css` | `/settings/body` | [Pages](../06-frontend/routing-and-pages.md#bodypage) |
 | `pages/ThemePage.tsx` | `/settings/theme` | [Pages](../06-frontend/routing-and-pages.md#themepage) |

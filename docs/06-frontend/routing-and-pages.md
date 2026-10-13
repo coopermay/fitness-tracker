@@ -3,7 +3,7 @@
 How URLs map to screens (`App.tsx`), and a detailed reference for every page component in [`frontend/src/pages/`](../../frontend/src/pages/). Pages fetch data with hooks from the [data layer](data-layer.md) and assemble [components](components.md).
 
 - [`main.tsx`](#maintsx) · [`App.tsx`](#apptsx)
-- Pages: [Today](#todaypage) · [Home](#homepage) · [Muscle group](#musclegrouppage) · [Lift](#liftpage) · [Log set](#logsetpage) · [Edit set](#editsetpage) · [Calendar](#calendarpage) · [Settings](#settingspage) · [Weekly split](#splitpage) · [Theme](#themepage) · [Body stats](#bodypage) · [Not found](#notfoundpage)
+- Pages: [Insights](#insightspage) · [Today](#todaypage) · [Home](#homepage) · [Muscle group](#musclegrouppage) · [Lift](#liftpage) · [Log set](#logsetpage) · [Edit set](#editsetpage) · [Calendar](#calendarpage) · [Settings](#settingspage) · [Weekly split](#splitpage) · [Theme](#themepage) · [Body stats](#bodypage) · [Not found](#notfoundpage)
 - [`FormPage.module.css`](#formpagemodulecss)
 
 ---
@@ -37,6 +37,7 @@ The route table, the theme, swiping (between tabs, and back out of nested pages)
 ```tsx
 <Route path="/" element={<HomePage />} />
 <Route path="/today" element={<TodayPage />} />
+<Route path="/insights" element={<InsightsPage />} />
 <Route path="/muscle-groups/:muscleGroupId" element={<MuscleGroupPage />} />
 <Route path="/lifts/:liftId" element={<LiftPage />} />
 <Route path="/lifts/:liftId/log" element={<LogSetPage />} />
@@ -80,9 +81,25 @@ The handlers are spread onto the page wrapper on every page.
 
 ---
 
+## InsightsPage
+
+**File:** [`pages/InsightsPage.tsx`](../../frontend/src/pages/InsightsPage.tsx) · **Route:** `/insights` (tab 0, far left) · **Styles:** `InsightsPage.module.css`
+
+Numbers worked out from your body stats and your lifts. (Not to be confused with the backend's [`GET /api/insights`](../05-api/calendar-split-insights.md#insights), which only returns plateau flags for the muscle group page; this page uses [`GET /body`](../05-api/body.md).)
+
+**Data:** `useBody(todayIsoDate())`.
+
+1. "Insights".
+2. **Setup prompt** (dashed card) while body stats are missing: "Add your sex, height… in Settings → Body stats to see everything here" (or "…your calories" when only the calorie inputs are missing), linking to `/settings/body`.
+3. **Your numbers:** a `<dl>` card with Age, Resting (BMR), **Maintenance**, Cut (−500), Lean bulk (+300) and **Protein** (highlighted in accent). Rows appear as their inputs allow; the section is hidden when there's nothing to show.
+4. **Relative strength:** lifts strongest first. Each row shows the name, machine and est. 1RM, with the ratio ("1.23×") on the right, and links to the lift page.
+5. A footnote naming the formulas and noting they're estimates (only with calories or protein shown).
+
+---
+
 ## TodayPage
 
-**File:** [`pages/TodayPage.tsx`](../../frontend/src/pages/TodayPage.tsx) · **Route:** `/today` (tab 0) · **Styles:** `TodayPage.module.css`
+**File:** [`pages/TodayPage.tsx`](../../frontend/src/pages/TodayPage.tsx) · **Route:** `/today` (tab 1) · **Styles:** `TodayPage.module.css`
 
 The gym screen: today's split groups, your usual lifts for each, what you did last time and what to beat. All data comes from one request, [`GET /today`](../05-api/today.md).
 
@@ -238,7 +255,7 @@ Edit or delete an existing set. It's reached by tapping a row in a machine card'
 
 ## CalendarPage
 
-**File:** [`pages/CalendarPage.tsx`](../../frontend/src/pages/CalendarPage.tsx) · **Route:** `/calendar` (tab 2) · **Styles:** `CalendarPage.module.css`
+**File:** [`pages/CalendarPage.tsx`](../../frontend/src/pages/CalendarPage.tsx) · **Route:** `/calendar` (tab 3) · **Styles:** `CalendarPage.module.css`
 
 A GitHub-style activity heatmap turned vertical: one row per week (Sunday to Saturday), newest week at the top.
 
@@ -271,7 +288,7 @@ A GitHub-style activity heatmap turned vertical: one row per week (Sunday to Sat
 
 ## SettingsPage
 
-**File:** [`pages/SettingsPage.tsx`](../../frontend/src/pages/SettingsPage.tsx) · **Route:** `/settings` (tab 3) · **Styles:** `SettingsPage.module.css`
+**File:** [`pages/SettingsPage.tsx`](../../frontend/src/pages/SettingsPage.tsx) · **Route:** `/settings` (tab 4) · **Styles:** `SettingsPage.module.css`
 
 **Data:** `useSettings()` (blocks), `useUpdateSettings()`, `useCreateMuscleGroup()`.
 
@@ -319,7 +336,9 @@ Tapping saves `{theme_base}` or `{theme_accent}` immediately (optimistic), and `
 
 **File:** [`pages/BodyPage.tsx`](../../frontend/src/pages/BodyPage.tsx) · **Route:** `/settings/body` · **Styles:** `BodyPage.module.css`
 
-**Data:** `useSettings()` (blocks), `useUpdateSettings()`, `useBody(todayIsoDate())`.
+**Data:** `useSettings()` (blocks), `useUpdateSettings()`.
+
+Only the **inputs** live here; the numbers worked out from them are on the [Insights](#insightspage) tab.
 
 1. `BackLink` "‹ Settings" and the heading "Body stats".
 2. **Units:** a segmented control, "ft / lbs" or "cm / kg". It saves `{body_units}` immediately.
@@ -330,10 +349,7 @@ Tapping saves `{theme_base}` or `{theme_accent}` immediately (optimistic), and `
    - **Bodyweight:** lbs or kg.
    - **Activity level:** a `<select>` of the five levels, with descriptions.
 
-   Values are strings while typing (like `SetForm`). **Save** converts to cm/kg with [`body.ts`](utilities.md#bodyts), sends empty fields as `null`, checks the ranges (height 50–275 cm, weight 20–400 kg) first, and shows "Saved." or the error.
-4. **Your numbers** (from `GET /body`): a hint naming what's missing, then a `<dl>` card with Age, Resting (BMR), **Maintenance**, Cut (−500), Lean bulk (+300) and **Protein** (highlighted rows in accent).
-5. **Relative strength:** a list of lifts, strongest first. Each row shows the name, machine and est. 1RM, with the ratio ("1.23×") on the right, and links to the lift page.
-6. A footnote naming the formulas and noting they're estimates.
+   Values are strings while typing (like `SetForm`). **Save** converts to cm/kg with [`body.ts`](utilities.md#bodyts), sends empty fields as `null`, and checks the ranges (height 50–275 cm, weight 20–400 kg) first. A validation or save error shows in `message`; success sets `saved`, which shows "Saved. See your numbers in Insights" with a link. Editing any field clears both.
 
 ---
 

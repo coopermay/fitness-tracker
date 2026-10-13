@@ -1,6 +1,6 @@
-// The swipeable tab pages, in tab-bar order (placeholder slots are skipped).
+// The swipeable tab pages, in tab-bar order.
 
-export const TAB_PATHS = ['/today', '/', '/calendar', '/settings']
+export const TAB_PATHS = ['/insights', '/today', '/', '/calendar', '/settings']
 
 // Position of `pathname` among the tabs, or null if it isn't a tab page
 // (e.g. /lifts/3, which belongs to Home; there, swiping right goes back instead).

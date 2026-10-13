@@ -1,11 +1,11 @@
 import { useState, type FormEvent } from 'react'
 import { Link } from 'react-router'
-import { useBody, useSettings, useUpdateSettings } from '../api/queries'
+import { useSettings, useUpdateSettings } from '../api/queries'
 import type { ActivityLevel, BodyUnits, Settings, Sex } from '../api/types'
 import { BackLink } from '../components/BackLink'
 import { QueryStatus } from '../components/QueryStatus'
 import { cmToFeetInches, feetInchesToCm, kgToLbs, lbsToKg } from '../body'
-import { formatWeight, todayIsoDate } from '../format'
+import { todayIsoDate } from '../format'
 import styles from './BodyPage.module.css'
 
 const ACTIVITY_LEVELS: { value: ActivityLevel; label: string }[] = [
@@ -16,14 +16,11 @@ const ACTIVITY_LEVELS: { value: ActivityLevel; label: string }[] = [
   { value: 'very_active', label: 'Very active (hard training + physical job)' },
 ]
 
-const MISSING_LABELS = { sex: 'sex', birth_date: 'date of birth', height_cm: 'height', weight_kg: 'weight' }
-
-// Settings → Body stats: enter sex, date of birth, height, weight and activity;
-// below, the numbers worked out from them.
+// Settings → Body stats: enter sex, date of birth, height, weight and activity.
+// The numbers worked out from them are on the Insights tab.
 export function BodyPage() {
   const settings = useSettings()
   const updateSettings = useUpdateSettings()
-  const body = useBody(todayIsoDate())
 
   if (settings.isPending || settings.isError) {
     return <QueryStatus isError={settings.isError} error={settings.error} />
@@ -52,77 +49,7 @@ export function BodyPage() {
       {/* key={units}: switching units remounts the form, so its fields start
           again from the saved values, converted to the new units. */}
       <BodyForm key={units} settings={settings.data} />
-
-      <h2 className={styles.sectionLabel}>Your numbers</h2>
-      {body.isPending || body.isError ? (
-        <QueryStatus isError={body.isError} error={body.error} />
-      ) : (
-        <>
-          {body.data.missing.length > 0 && (
-            <p className={styles.hint}>
-              Add your {body.data.missing.map((field) => MISSING_LABELS[field]).join(', ')} to
-              see {body.data.missing.includes('weight_kg') ? 'everything' : 'your calories'}.
-            </p>
-          )}
-
-          <dl className={styles.stats}>
-            {body.data.age !== null && <Stat label="Age" value={`${body.data.age}`} />}
-            {body.data.calories && (
-              <>
-                <Stat label="Resting (BMR)" value={`${body.data.calories.bmr} kcal`} />
-                <Stat label="Maintenance" value={`${body.data.calories.maintenance} kcal`} strong />
-                <Stat label="Cut (−500)" value={`${body.data.calories.cut} kcal`} />
-                <Stat label="Lean bulk (+300)" value={`${body.data.calories.lean_bulk} kcal`} />
-              </>
-            )}
-            {body.data.protein && (
-              <Stat
-                label="Protein"
-                value={`${body.data.protein.min_g}–${body.data.protein.max_g} g a day`}
-                strong
-              />
-            )}
-          </dl>
-
-          {body.data.relative_strength.length > 0 && (
-            <>
-              <h2 className={styles.sectionLabel}>Relative strength</h2>
-              <p className={styles.hint}>Best estimated 1RM ÷ bodyweight.</p>
-              <ul className={styles.strength}>
-                {body.data.relative_strength.map((row) => (
-                  <li key={row.lift_id}>
-                    <Link className={styles.strengthRow} to={`/lifts/${row.lift_id}`}>
-                      <span className={styles.strengthName}>
-                        {row.lift_name}
-                        <span className={styles.strengthDetail}>
-                          {row.machine_name ? `${row.machine_name} · ` : ''}
-                          1RM {formatWeight(row.one_rep_max, row.weight_unit)}
-                        </span>
-                      </span>
-                      <span className={styles.ratio}>{row.ratio.toFixed(2)}×</span>
-                    </Link>
-                  </li>
-                ))}
-              </ul>
-            </>
-          )}
-          <p className={styles.footnote}>
-            Calories use the Mifflin-St Jeor formula times your activity level; protein is
-            1.6–2.2 g per kg of bodyweight. They're estimates: adjust by how your weight actually
-            changes.
-          </p>
-        </>
-      )}
     </>
-  )
-}
-
-function Stat({ label, value, strong }: { label: string; value: string; strong?: boolean }) {
-  return (
-    <div className={styles.stat}>
-      <dt className={styles.statLabel}>{label}</dt>
-      <dd className={strong ? styles.statValueStrong : styles.statValue}>{value}</dd>
-    </div>
   )
 }
 
@@ -157,11 +84,13 @@ function BodyForm({ settings }: { settings: Settings }) {
   const updateSettings = useUpdateSettings()
   const metric = settings.body_units === 'metric'
   const [values, setValues] = useState(() => initialValues(settings))
-  const [message, setMessage] = useState<string | null>(null)
+  const [message, setMessage] = useState<string | null>(null) // validation or save error
+  const [saved, setSaved] = useState(false)
 
   function update(changes: Partial<BodyFormValues>) {
     setValues((previous) => ({ ...previous, ...changes }))
     setMessage(null)
+    setSaved(false)
   }
 
   // Empty fields are saved as "not entered" (null).
@@ -202,7 +131,7 @@ function BodyForm({ settings }: { settings: Settings }) {
         weight_kg: weight,
         activity_level: values.activity,
       })
-      setMessage('Saved.')
+      setSaved(true)
     } catch (err) {
       setMessage(err instanceof Error ? `Couldn't save: ${err.message}` : "Couldn't save")
     }
@@ -306,6 +235,11 @@ function BodyForm({ settings }: { settings: Settings }) {
         {updateSettings.isPending ? 'Saving…' : 'Save'}
       </button>
       {message && <p className={styles.message}>{message}</p>}
+      {saved && (
+        <p className={styles.message}>
+          Saved. See your numbers in <Link to="/insights">Insights</Link>.
+        </p>
+      )}
     </form>
   )
 }

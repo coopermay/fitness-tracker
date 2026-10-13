@@ -4,22 +4,23 @@ import { slideStateFor, tabIndex, TAB_PATHS } from '../tabs'
 import styles from './TabBar.module.css'
 
 // The bar fixed to the bottom of every screen, like a social media app.
-// Five slots: a blank placeholder for a future tab, Today, Home in the middle,
-// then Calendar and Settings on the right.
+// Five tabs: Insights and Today, Home in the middle, then Calendar and
+// Settings on the right.
 export function TabBar() {
   const { pathname } = useLocation()
   const onSettings = pathname.startsWith('/settings')
   const onCalendar = pathname.startsWith('/calendar')
   const onToday = pathname.startsWith('/today')
+  const onInsights = pathname.startsWith('/insights')
 
   return (
     <nav className={styles.bar} aria-label="Main">
       <div className={styles.slots}>
-        <span className={styles.placeholder} aria-hidden="true" />
+        <Tab to="/insights" label="Insights" active={onInsights} icon={<InsightsIcon />} />
         <Tab to="/today" label="Today" active={onToday} icon={<TodayIcon />} />
         {/* Home stays highlighted on muscle group and lift pages too, since
             they're all reached from Home. */}
-        <Tab to="/" label="Home" active={!onSettings && !onCalendar && !onToday} icon={<HomeIcon />} />
+        <Tab to="/" label="Home" active={!onSettings && !onCalendar && !onToday && !onInsights} icon={<HomeIcon />} />
         <Tab to="/calendar" label="Calendar" active={onCalendar} icon={<CalendarIcon />} />
         <Tab to="/settings" label="Settings" active={onSettings} icon={<SettingsIcon />} />
       </div>
@@ -59,6 +60,17 @@ function HomeIcon() {
       strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
       <path d="M3 10.5 12 3l9 7.5" />
       <path d="M5 9.5V21h5v-6h4v6h5V9.5" />
+    </svg>
+  )
+}
+
+// A bar chart with a trend line.
+function InsightsIcon() {
+  return (
+    <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor"
+      strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <path d="M4 20h16M7 16v-3M12 16V9M17 16v-6" />
+      <path d="M5 9l5-4 4 3 5-5" />
     </svg>
   )
 }

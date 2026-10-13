@@ -12,19 +12,19 @@ Roughly ordered by how much they'd help at the gym.
 | --- | --- | --- |
 | **"Last time" in the log form** | When a machine is picked, show your last session and target on it, like the Today cards | The data is in the records response (`history`); the target rule is in `today.py` |
 | **Targets on the lift page** | Show the Today-style target on each machine card | Reuse `target_for` from `today.py` |
-| **Progress tab** | The far-left slot until the AI coach: weekly sets per muscle group (8-week bars), this week vs last, recent PRs, biggest est. 1RM gains/stalls | One aggregation endpoint; PR flags and progress points already exist |
+| **More Insights** | Sections for the Insights tab: weekly sets per muscle group (8-week bars), this week vs last, recent PRs, biggest est. 1RM gains/stalls | One aggregation endpoint; PR flags and progress points already exist |
 | **Bodyweight log** | Turn the single body-stats weight into dated weigh-ins with a trend chart | A `weigh_ins` table; Body stats would use the latest |
 | **Weekly volume** | Hard sets per muscle group per week, shown next to the split or on the calendar | A new aggregation endpoint (sets per group per ISO week) |
 | **Rest timer** | Starts automatically after saving a set | Frontend only; vibrate/notify when done |
 | **PR dots on the calendar** | Mark PR days on the grid itself, not just in the tap details | `pr_count` is already in the response |
-| **AI coach** (pinned) | A chat in the far-left tab that answers questions from your data | See [below](#ai-assistant-plan) |
+| **AI coach** (pinned) | A chat, probably inside the Insights tab, that answers questions from your data | See [below](#ai-assistant-plan) |
 | **Multi-gym UI** | A gym picker, shown once a second gym exists | The schema already supports gyms; needs `PATCH /gyms`, gym selection in the set form, and per-gym machine lists |
 | **Move a lift between muscle groups** | `PATCH /lifts/{id}` with `muscle_group_id` | Must re-check name uniqueness in the target group |
 | **Merge duplicate metadata** | Merge two machines or lifts, re-pointing their sets | Explicitly out of scope so far; rename returns 409 instead |
 | **Charts beyond est. 1RM** | Volume per session, per-weight rep trends | Extend `ProgressPoint` or add a new series |
 
 ### AI assistant plan
-**Pinned.** Planned for the far-left tab slot. The user wanted to **self-host an open model**, but a test with Llama on the homelab (October 2026) wasn't usable, so this waits for better hardware or a switch to a hosted model API. The tool-calling design below works either way (Ollama's API is OpenAI-compatible).
+**Pinned.** Probably a section or sub-page of the Insights tab (all tab slots are used). The user wanted to **self-host an open model**, but a test with Llama on the homelab (October 2026) wasn't usable, so this waits for better hardware or a switch to a hosted model API. The tool-calling design below works either way (Ollama's API is OpenAI-compatible).
 
 - **Don't fine-tune on the data. Use tool calling.** The model calls functions backed by the existing logic (`today.py` targets, records, calendar, insights), so answers come from real numbers. Fine-tuning teaches style, not facts, and the data changes every workout.
 - **Other documents** (training articles, notes): RAG, with embeddings stored in this Postgres database via the **pgvector** extension.
@@ -33,7 +33,7 @@ Roughly ordered by how much they'd help at the gym.
 
 Steps:
 1. Ollama on the homelab, chat from the terminal.
-2. `POST /api/coach/chat` plus a chat page in the far-left slot.
+2. `POST /api/coach/chat` plus a chat page reached from Insights.
 3. Read-only tools (Today, records, calendar, insights).
 4. Streaming replies.
 5. RAG with pgvector for your own documents.

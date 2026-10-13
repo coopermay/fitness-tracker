@@ -218,12 +218,12 @@ There are no automated UI tests. After UI changes, run `npm run build && npm run
 5. **Edit set:** change reps → "Set updated". Delete → confirm → "Set deleted", with no "Not found" flash.
 6. **Calendar:** grid, today outlined, tap a day → details with PR badges and lift links; tap again or ✕ to close.
 7. **Settings:** order is muscle groups, split, theme, default unit; the default unit switches instantly; Edit weekly split → change a day → Save split → Home reflects it; add a muscle group.
-8. **Tabs:** tap each tab (it slides in); swipe left/right across Today/Home/Calendar/Settings.
+8. **Tabs:** tap each tab (it slides in); swipe left/right across Insights/Today/Home/Calendar/Settings.
 9. **Swipe back:** on a lift page swipe right → muscle group, again → Home (each slides in from the left); same on Weekly split → Settings. The log/edit set forms don't swipe.
 10. **Themes:** in Settings → Change theme, try each background and a few accents (buttons, Home tiles, calendar, chart); on System, toggle macOS/iOS dark mode; reload and check there's no flash of the old colours.
 11. **Narrow screen:** 320px and 390px in DevTools' device mode.
 12. **Today:** today's groups with 2 lifts each, last session and target; Log set → save → back on Today with the banner, ✓ Done and "1 of 2 done"; Cancel returns to Today; Show all; change Target reps in Settings and the targets update; on a rest day, the next training day shows.
-13. **Body stats:** enter sex, date of birth, height and weight in ft/lbs, Save, check Your numbers and relative strength; switch to cm/kg and the values convert; the Settings row shows "5 ft 10 in · 180 lbs".
+13. **Body stats + Insights:** Insights first shows the setup prompt; enter sex, date of birth, height and weight in ft/lbs, Save, follow the link to Insights and check Your numbers and relative strength; switch to cm/kg and the values convert; the Settings row shows "5 ft 10 in · 180 lbs".
 
 ---
 

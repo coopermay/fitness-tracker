@@ -41,17 +41,18 @@ flowchart TD
 
 | Path | Page | Data hooks | Swipe | Tab highlighted |
 | --- | --- | --- | --- | --- |
-| `/today` | `TodayPage` | `useToday` | Tab (index 0) | Today |
-| `/` | `HomePage` | `useMuscleGroups`, `useSplit` | Tab (index 1) | Home |
+| `/insights` | `InsightsPage` | `useBody` | Tab (index 0) | Insights |
+| `/today` | `TodayPage` | `useToday` | Tab (index 1) | Today |
+| `/` | `HomePage` | `useMuscleGroups`, `useSplit` | Tab (index 2) | Home |
 | `/muscle-groups/:muscleGroupId` | `MuscleGroupPage` | `useMuscleGroups`, `useLifts`, `useInsights` (+ create lift, update group) | Right → Home | Home |
 | `/lifts/:liftId` | `LiftPage` | `useLiftRecords`, `useMuscleGroups` (+ update lift) | Right → muscle group | Home |
 | `/lifts/:liftId/log` | `LogSetPage` | `useLiftRecords`, `useSettings` (+ create set) | — | Home |
 | `/lifts/:liftId/sets/:setId` | `EditSetPage` | `useLiftRecords`, `useSettings` (+ update/delete set) | — | Home |
-| `/calendar` | `CalendarPage` | `useCalendar` | Tab (index 2) | Calendar |
-| `/settings` | `SettingsPage` | `useSettings` (+ default unit, create group) | Tab (index 3) | Settings |
+| `/calendar` | `CalendarPage` | `useCalendar` | Tab (index 3) | Calendar |
+| `/settings` | `SettingsPage` | `useSettings` (+ default unit, create group) | Tab (index 4) | Settings |
 | `/settings/split` | `SplitPage` | `useSplit`, `useMuscleGroups` (+ split) | Right → Settings | Settings |
 | `/settings/theme` | `ThemePage` | `useSettings` (+ theme) | Right → Settings | Settings |
-| `/settings/body` | `BodyPage` | `useSettings`, `useBody` (+ settings) | Right → Settings | Settings |
+| `/settings/body` | `BodyPage` | `useSettings` (+ settings) | Right → Settings | Settings |
 | `*` | `NotFoundPage` | — | — | Home |
 
 ### Navigation flow
@@ -67,7 +68,9 @@ flowchart LR
     MG -->|back link or swipe right| Home
     Lift -->|back link or swipe right| MG
     Cal["Calendar /calendar"] -->|tap lift in day details| Lift
+    Ins["Insights /insights"] <-->|swipe or tab| Today
     Today["Today /today"] <-->|swipe or tab| Home
+    Ins -->|set up body stats| Body
     Today -->|Log set| Log
     Log -->|Save, from Today| Today
     Home <-->|swipe or tab| Cal
@@ -80,7 +83,7 @@ flowchart LR
     Body -->|back link or swipe right| Set
 ```
 
-- **Tabs** (Today, Home, Calendar, Settings) are reached from the bottom bar or by swiping left/right on a tab page.
+- **Tabs** (Insights, Today, Home, Calendar, Settings) are reached from the bottom bar or by swiping left/right on a tab page.
 - **Drill-down pages** (muscle group → lift, Settings → weekly split / theme / body stats) use the **back link** at the top, and **swiping right** does the same thing. When installed as an app there's no browser back button, so every non-tab page has a back link or a Cancel button. The set forms only have Cancel and don't swipe, so a half-filled form can't be lost by accident.
 - **Forms navigate with `replace: true`**, so the phone's back button after saving goes to the muscle group, not back into the form.
 
@@ -91,6 +94,7 @@ flowchart LR
 ```mermaid
 flowchart TD
     App --> TabBar
+    App --> InsightsPage
     App --> TodayPage
     TodayPage --> TodayLiftCard
     App --> HomePage

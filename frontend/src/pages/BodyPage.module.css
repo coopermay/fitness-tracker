@@ -3,17 +3,6 @@
   font-size: 1.5rem;
 }
 
-.sectionLabel {
-  margin: 28px 0 4px;
-  font-size: 1rem;
-}
-
-.hint {
-  margin: 0 0 12px;
-  color: var(--text-muted);
-  font-size: 0.9rem;
-}
-
 /* Same look as the segmented controls in Settings */
 .segmented {
   display: flex;
@@ -108,94 +97,7 @@
   font-size: 0.9rem;
 }
 
-/* "Your numbers": label on the left, value on the right */
-.stats {
-  margin: 8px 0 0;
-  overflow: hidden;
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  background: var(--surface);
-}
-
-.stats:empty {
-  display: none;
-}
-
-.stat {
-  display: flex;
-  justify-content: space-between;
-  gap: 12px;
-  padding: 12px 14px;
-}
-
-.stat + .stat {
-  border-top: 1px solid var(--border);
-}
-
-.statLabel {
-  color: var(--text-muted);
-}
-
-.statValue,
-.statValueStrong {
-  margin: 0;
-  text-align: right;
-}
-
-.statValueStrong {
+.message a {
   color: var(--accent);
-  font-weight: 700;
-}
-
-.strength {
-  margin: 0;
-  padding: 0;
-  overflow: hidden;
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  background: var(--surface);
-  list-style: none;
-}
-
-.strength li + li {
-  border-top: 1px solid var(--border);
-}
-
-.strengthRow {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  min-height: 56px;
-  padding: 8px 14px;
-  color: var(--text);
-  text-decoration: none;
-}
-
-.strengthRow:active {
-  background: var(--surface-pressed);
-}
-
-.strengthName {
-  display: flex;
-  flex-direction: column;
   font-weight: 600;
-}
-
-.strengthDetail {
-  color: var(--text-muted);
-  font-size: 0.85rem;
-  font-weight: normal;
-}
-
-.ratio {
-  color: var(--accent);
-  font-size: 1.15rem;
-  font-weight: 700;
-}
-
-.footnote {
-  margin: 16px 0 0;
-  color: var(--text-muted);
-  font-size: 0.8rem;
 }

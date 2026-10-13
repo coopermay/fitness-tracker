@@ -127,7 +127,7 @@ Which muscle groups you plan to train on each weekday. Each weekday can have any
 - **Increment:** the step to the next weight: the smallest gap between weights you've used on that machine + unit (else 5 lbs / 2.5 kg / 1 plate).
 
 ### Body stats terms
-- **Body stats:** sex, date of birth, height, weight and activity level, entered in Settings → Body stats. Stored in metric, shown in imperial or metric.
+- **Body stats:** sex, date of birth, height, weight and activity level, entered in Settings → Body stats. Stored in metric, shown in imperial or metric. The numbers below are shown on the **Insights** tab.
 - **BMR:** resting calories per day (Mifflin-St Jeor formula).
 - **Maintenance (TDEE):** BMR × an activity multiplier; the calories that keep your weight steady. **Cut** is 500 below it, **lean bulk** 300 above.
 - **Protein range:** 1.6–2.2 g per kg of bodyweight a day.
@@ -181,8 +181,8 @@ Changing an item's display name. Renaming onto a name another item already uses 
 
 | Term | Meaning |
 | --- | --- |
-| **Tab** | One of the bottom-bar destinations: Today, Home, Calendar, Settings. The far-left slot is a blank placeholder (planned: an AI coach). |
-| **Tab page** | `/today`, `/`, `/calendar`, `/settings`. Swiping left/right here changes tab. On other pages with a back link, swiping right goes back instead. |
+| **Tab** | One of the five bottom-bar destinations: Insights, Today, Home (middle), Calendar, Settings. |
+| **Tab page** | `/insights`, `/today`, `/`, `/calendar`, `/settings`. Swiping left/right here changes tab. On other pages with a back link, swiping right goes back instead. |
 | **Machine card** | One card per machine on a lift page: records per unit, a progress chart, and an expandable history. |
 | **Flash message** | A one-off banner on the lift page after saving ("New best at 185 lbs!", "Logged 185 lbs × 4", "Set updated", "Set deleted"), passed via router state. |
 | **Body figure** | The small SVG person on each Home tile, with the muscle group's body part highlighted. Back, triceps and glutes show the figure from behind. |
