@@ -1,5 +1,36 @@
-/* Global styles and design tokens. Component styles live in *.module.css files. */
+/* Global styles and design tokens. Component styles live in *.module.css files.
+
+   Theme: <html> carries data-base (light | dark | black | navy) and
+   data-accent (blue, green, ...), set by theme.ts from Settings ("system" is
+   resolved to light or dark first). Each block below fills in the colour
+   tokens for one base or accent; components only ever use the tokens. */
+
 :root {
+  --radius: 12px;
+  --tap-size: 48px; /* minimum height for anything tappable */
+  --tab-bar-height: 60px;
+
+  /* Derived from the accent: calendar intensity from no sets (--heat-0, set
+     per base) to the busiest day (the accent itself). */
+  --heat-1: color-mix(in srgb, var(--accent) 25%, var(--heat-0));
+  --heat-2: color-mix(in srgb, var(--accent) 50%, var(--heat-0));
+  --heat-3: color-mix(in srgb, var(--accent) 75%, var(--heat-0));
+  --heat-4: var(--accent);
+
+  font: 16px/1.5 system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  color: var(--text);
+  background: var(--bg);
+  -webkit-font-smoothing: antialiased;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* --- Bases ---------------------------------------------------------------
+   Written as [data-base=…] rather than :root[data-base=…] so the base
+   swatches in Settings can preview each one with the same tokens. */
+
+:root,
+[data-base='light'] {
+  color-scheme: light;
   --text: #1f2328;
   --text-muted: #6b6f76;
   --bg: #f6f7f9;
@@ -8,53 +39,124 @@
   --border: #e3e4e8;
   --border-strong: #c9ccd3;
   --figure: #c4c8cf; /* un-highlighted body parts on the home tiles */
-  /* Calendar intensity: no sets, then light to busiest (blues ending in --accent) */
   --heat-0: #ebedf0;
-  --heat-1: #c4d9fc;
-  --heat-2: #86b1f7;
-  --heat-3: #4a8af0;
-  --heat-4: #1f6feb;
-  --accent: #1f6feb;
-  --accent-tint: #eaf1fe; /* light blue background for highlighted tiles */
-  --on-accent: #ffffff;
+  --accent: var(--accent-l);
+  --on-accent: var(--on-accent-l);
+  --accent-tint: color-mix(in srgb, var(--accent) 10%, var(--surface)); /* highlighted tiles */
   --ok: #1a7f37;
-  --warn: #9a6700; /* plateau / overdue badges */
+  --warn: #9a6700; /* plateau badge */
   --error: #cf222e;
-
-  --radius: 12px;
-  --tap-size: 48px; /* minimum height for anything tappable */
-  --tab-bar-height: 60px;
-
-  font: 16px/1.5 system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
-  color-scheme: light dark;
-  color: var(--text);
-  background: var(--bg);
-  -webkit-font-smoothing: antialiased;
-  -webkit-tap-highlight-color: transparent;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --text: #e6e7ea;
-    --text-muted: #9a9ea6;
-    --bg: #111215;
-    --surface: #1b1d22;
-    --surface-pressed: #262930;
-    --border: #2c2e35;
-    --border-strong: #3d4049;
-    --figure: #393c45;
-    --heat-0: #262930;
-    --heat-1: #15305c;
-    --heat-2: #1d4a94;
-    --heat-3: #2f6ad1;
-    --heat-4: #4c8dff;
-    --accent: #4c8dff;
-    --accent-tint: #18243a;
-    --on-accent: #ffffff;
-    --ok: #3fb950;
-    --warn: #d29922;
-    --error: #f85149;
-  }
+/* What the three dark bases share */
+[data-base='dark'],
+[data-base='black'],
+[data-base='navy'] {
+  color-scheme: dark;
+  --text: #e6e7ea;
+  --text-muted: #9a9ea6;
+  --accent: var(--accent-d);
+  --on-accent: var(--on-accent-d);
+  --accent-tint: color-mix(in srgb, var(--accent) 16%, var(--surface));
+  --ok: #3fb950;
+  --warn: #d29922;
+  --error: #f85149;
+}
+
+[data-base='dark'] {
+  --bg: #111215;
+  --surface: #1b1d22;
+  --surface-pressed: #262930;
+  --border: #2c2e35;
+  --border-strong: #3d4049;
+  --figure: #393c45;
+  --heat-0: #262930;
+}
+
+/* Pure black background, which saves battery on OLED screens */
+[data-base='black'] {
+  --bg: #000000;
+  --surface: #0e0f11;
+  --surface-pressed: #1a1b1f;
+  --border: #1f2125;
+  --border-strong: #33363d;
+  --figure: #2e3138;
+  --heat-0: #1a1b1f;
+}
+
+[data-base='navy'] {
+  --text: #e6e9f0;
+  --text-muted: #94a0b8;
+  --bg: #0b1324;
+  --surface: #121c31;
+  --surface-pressed: #1b2740;
+  --border: #22304b;
+  --border-strong: #34456a;
+  --figure: #2d3b5a;
+  --heat-0: #1b2740;
+}
+
+/* --- Accents -------------------------------------------------------------
+   The light-base shade is darker so white text on it stays readable. Bright
+   dark-base shades get dark text instead. -l is used on the light base, -d on
+   the dark ones. Blue is also the default (plain :root). */
+
+:root,
+[data-accent='blue'] {
+  --accent-l: #1f6feb;
+  --accent-d: #4c8dff;
+  --on-accent-l: #ffffff;
+  --on-accent-d: #ffffff;
+}
+
+[data-accent='green'] {
+  --accent-l: #1a7f37;
+  --accent-d: #3fb950;
+  --on-accent-d: #0d1117;
+}
+
+[data-accent='purple'] {
+  --accent-l: #8250df;
+  --accent-d: #a371f7;
+}
+
+[data-accent='orange'] {
+  --accent-l: #bc4c00;
+  --accent-d: #f0883e;
+  --on-accent-d: #0d1117;
+}
+
+[data-accent='red'] {
+  --accent-l: #cf222e;
+  --accent-d: #f85149;
+}
+
+[data-accent='pink'] {
+  --accent-l: #bf3989;
+  --accent-d: #f778ba;
+  --on-accent-d: #0d1117;
+}
+
+[data-accent='teal'] {
+  --accent-l: #0f7b8a;
+  --accent-d: #39c5cf;
+  --on-accent-d: #0d1117;
+}
+
+[data-accent='gold'] {
+  --accent-l: #9a6700;
+  --accent-d: #e3b341;
+  --on-accent-d: #0d1117;
+}
+
+/* Accent swatches in Settings carry their own data-accent; this picks the
+   shade that matches the current base. */
+[data-accent] {
+  --accent-swatch: var(--accent-l);
+}
+
+:root:is([data-base='dark'], [data-base='black'], [data-base='navy']) [data-accent] {
+  --accent-swatch: var(--accent-d);
 }
 
 html {

@@ -11,7 +11,7 @@ from typing import Annotated
 
 from pydantic import BaseModel, ConfigDict, Field, StringConstraints
 
-from app.models import WeightUnit
+from app.models import ThemeAccent, ThemeBase, WeightUnit
 
 Name = Annotated[str, StringConstraints(strip_whitespace=True, min_length=1, max_length=100)]
 Weight = Annotated[Decimal, Field(ge=0, max_digits=7, decimal_places=2)]
@@ -215,11 +215,7 @@ class SplitBody(BaseModel):
 
 class Insights(BaseModel):
     plateaued_lift_ids: list[int] = Field(
-        description="Lifts done in the last 4 weeks with no PR in that time."
-    )
-    overdue_muscle_group_ids: list[int] = Field(
-        description="Muscle groups whose scheduled split days earlier this week outnumber "
-        "the days they've been trained this week."
+        description="Lifts done in the last 3 weeks with no PR in that time."
     )
 
 
@@ -228,7 +224,13 @@ class Insights(BaseModel):
 
 class SettingsRead(ReadModel):
     default_unit: WeightUnit
+    theme_base: ThemeBase
+    theme_accent: ThemeAccent
 
 
 class SettingsUpdate(BaseModel):
-    default_unit: WeightUnit
+    """Only the fields sent are changed. None of them can be null."""
+
+    default_unit: WeightUnit = None
+    theme_base: ThemeBase = None
+    theme_accent: ThemeAccent = None

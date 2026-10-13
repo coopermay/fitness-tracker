@@ -84,6 +84,8 @@ Members `lbs`, `kg`, `plates`. As a `StrEnum` it compares equal to its string va
 ### `weight_unit_type`
 `SAEnum(WeightUnit, name="weight_unit")`. One shared SQLAlchemy enum type so both `sets.weight_unit` and `settings.default_unit` use the same Postgres type named `weight_unit`.
 
+`ThemeBase` (`system`, `light`, `dark`, `black`, `navy`) and `ThemeAccent` (`blue`, `green`, `purple`, `orange`, `red`, `pink`, `teal`, `gold`) are `StrEnum`s stored as Postgres enums `theme_base` and `theme_accent`.
+
 ### `created_at_field()`
 A factory returning a fresh `Field(...)` for `created_at`: `timestamptz`, `server_default=func.now()`, `nullable=False`, Python default `None` (the database fills it in). It's a function rather than a shared constant so each table gets its own column object.
 
@@ -106,7 +108,7 @@ A factory returning a fresh `Field(...)` for `created_at`: `timestamptz`, `serve
 | `Lift(MetadataBase)` | `lifts` | `muscle_group_id: int` (FK) | `uq_lifts_muscle_group_name` on `(muscle_group_id, lower(trim(name)))` |
 | `Machine(MetadataBase)` | `machines` | `gym_id: int` (FK) | `uq_machines_gym_name` on `(gym_id, lower(trim(name)))` |
 | `WorkoutSet(SQLModel)` | `sets` | see below | `ck_sets_reps_positive`, `ck_sets_weight_non_negative` |
-| `Settings(SQLModel)` | `settings` | `id: int = 1`, `default_unit: WeightUnit` | `ck_settings_single_row` (`id = 1`) |
+| `Settings(SQLModel)` | `settings` | `id: int = 1`, `default_unit: WeightUnit`, `theme_base: ThemeBase`, `theme_accent: ThemeAccent` | `ck_settings_single_row` (`id = 1`) |
 | `SplitDay(SQLModel)` | `split_days` | `weekday: int` (PK), `muscle_group_id: int` (PK, FK) | `ck_split_days_weekday` (`0..6`) |
 
 ### `WorkoutSet` fields
@@ -195,9 +197,9 @@ Full column/constraint reference: [Tables](../03-database/tables.md).
 | --- | --- |
 | `SplitDayBody` | `weekday: int (0..6)`, `muscle_group_ids: list[int]` |
 | `SplitBody` | `days: list[SplitDayBody]`, used for both the `PUT /split` body and the `GET`/`PUT` response |
-| `Insights` | `plateaued_lift_ids: list[int]`, `overdue_muscle_group_ids: list[int]` |
-| `SettingsRead(ReadModel)` | `default_unit` |
-| `SettingsUpdate` | `default_unit` (required) |
+| `Insights` | `plateaued_lift_ids: list[int]` |
+| `SettingsRead(ReadModel)` | `default_unit`, `theme_base`, `theme_accent` |
+| `SettingsUpdate` | the same three, all optional (`= None`) and not nullable |
 
 ### Why weights change type
 Input weights are `Decimal`, so validation is exact and they match `NUMERIC` in the database. Output weights are `float`, so JSON carries plain numbers (`185.0`, `72.5`) rather than strings, which is what Pydantic does with `Decimal` by default. Values have at most 2 decimals, so floats represent them closely enough for display.

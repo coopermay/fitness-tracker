@@ -40,7 +40,7 @@ flowchart TD
         names["names.py<br/>clean_name, find_by_name"]
         records["records.py<br/>records, Epley, progress"]
         calendar["calendar.py<br/>PR replay, per-day activity"]
-        insights["insights.py<br/>plateau, overdue"]
+        insights["insights.py<br/>plateau"]
     end
 
     db["db.py<br/>engine, SessionDep"]

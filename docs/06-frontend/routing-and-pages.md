@@ -30,7 +30,7 @@ The entry point loaded by `index.html`.
 
 **File:** [`frontend/src/App.tsx`](../../frontend/src/App.tsx) · **Styles:** [`App.module.css`](styling.md#appmodulecss)
 
-The route table, swiping (between tabs, and back out of nested pages) and the bottom tab bar.
+The route table, the theme, swiping (between tabs, and back out of nested pages) and the bottom tab bar.
 
 ### Routes
 
@@ -62,6 +62,9 @@ const swipeHandlers = useSwipe({
 
 The handlers are spread onto the page wrapper on every page.
 
+### Theme
+`useTheme(settings.data?.theme_base, settings.data?.theme_accent)` keeps `<html>`'s `data-base`/`data-accent` in line with Settings on every page. See [`theme.ts`](utilities.md#themets).
+
 ### Slide-in animation
 ```tsx
 <div key={location.pathname} className={`${styles.page} ${slideClass}`} …>
@@ -85,19 +88,17 @@ The grid of muscle groups. It's the app's landing page.
 | --- | --- | --- |
 | `useMuscleGroups()` | the tiles | yes |
 | `useSplit()` | which groups are today's | yes (so tiles don't jump when today's groups move up) |
-| `useInsights(todayIsoDate())` | OVERDUE labels | no (labels appear when it loads) |
 
 **Behaviour:**
 1. Works out today's group ids: `split.data.days.find(d => d.weekday === currentWeekday())?.muscle_group_ids`.
 2. Orders tiles as **today's groups first**, then everything else, each in creation order.
 3. Renders a `<ul>` 2-column grid. Each tile is a `<Link to="/muscle-groups/:id">` containing:
    - a **TODAY** label (top-left) if it's in today's split, and the tile gets `.today` (blue tint + border),
-   - an **OVERDUE** label (top-right) if it's in `insights.overdue_muscle_group_ids`,
    - a `<BodyFigure region={regionForMuscleGroup(name)} />`,
    - the name.
 4. The heading reads **Lift Tracker** in the accent colour.
 
-**Layout rule:** tiles keep `12px` padding and a `132px` minimum height so all 8 fit on one phone screen. Labels sit in the corners beside the figure's head (see [Design decisions → 29](../01-overview/design-decisions.md#29-home-tiles-keep-their-height)).
+**Layout rule:** tiles keep `12px` padding and a `132px` minimum height so all 8 fit on one phone screen. The TODAY label sits in a corner beside the figure's head (see [Design decisions → 29](../01-overview/design-decisions.md#29-home-tiles-keep-their-height)).
 
 ---
 
@@ -251,9 +252,10 @@ A GitHub-style activity heatmap turned vertical: one row per week (Sunday to Sat
 **Data:** `useSettings()` (blocks), `useUpdateSettings()`, `useCreateMuscleGroup()`.
 
 **Sections:**
-1. **Default unit.** A segmented control (lbs / kg / plates). Tapping calls `updateSettings.mutate({default_unit})`. While saving, the button shows the unit **being saved** as selected (`updateSettings.variables.default_unit`), so the UI responds instantly. Errors show "Couldn't save: …".
-2. **Weekly split.** A hint, then an "Edit weekly split ›" row (`.linkRow`, a `Link` to `/settings/split`). The editor itself is on [SplitPage](#splitpage).
-3. **Muscle groups.** A hint ("New muscle groups appear on the Home screen."), then `AddByName` ("+ Add muscle group"). After adding, it shows "“Name” is on the Home screen." because the new tile isn't visible from here.
+1. **Default unit.** A segmented control (lbs / kg / plates). Tapping calls `updateSettings.mutate({default_unit})`. The update is optimistic (the cache changes before the server answers), so the selection moves instantly.
+2. **Theme.** *Background*: 5 buttons from `THEME_BASES`, each with a preview whose spans carry `data-base` (System shows a light and a dark half) and a dot in the current accent. *Accent*: 8 buttons from `THEME_ACCENTS`, each with a swatch carrying `data-accent`. Tapping saves `{theme_base}` or `{theme_accent}`; `App.tsx`'s `useTheme` re-colours the whole app straight away. Errors from either section show "Couldn't save: …" under the theme pickers.
+3. **Weekly split.** A hint, then an "Edit weekly split ›" row (`.linkRow`, a `Link` to `/settings/split`). The editor itself is on [SplitPage](#splitpage).
+4. **Muscle groups.** A hint ("New muscle groups appear on the Home screen."), then `AddByName` ("+ Add muscle group"). After adding, it shows "“Name” is on the Home screen." because the new tile isn't visible from here.
 
 There's no back link: Settings is a tab, reached from the tab bar.
 

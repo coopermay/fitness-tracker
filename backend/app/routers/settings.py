@@ -18,7 +18,8 @@ def get_settings(session: SessionDep):
 @router.patch("", response_model=SettingsRead)
 def update_settings(body: SettingsUpdate, session: SessionDep):
     settings = session.get(Settings, SETTINGS_ID)
-    settings.default_unit = body.default_unit
+    for field, value in body.model_dump(exclude_unset=True).items():
+        setattr(settings, field, value)
     session.add(settings)
     session.commit()
     session.refresh(settings)

@@ -159,6 +159,8 @@ App-wide settings. **Exactly one row**, with `id = 1`.
 | --- | --- | --- | --- | --- |
 | `id` | `integer` | no | `1` | Primary key; must be 1 |
 | `default_unit` | `weight_unit` enum | no | `'lbs'` | Unit preselected the first time you log a lift + machine |
+| `theme_base` | `theme_base` enum | no | `'system'` | Background: `system`, `light`, `dark`, `black`, `navy` (added in `0003_settings_theme`) |
+| `theme_accent` | `theme_accent` enum | no | `'blue'` | Accent: `blue`, `green`, `purple`, `orange`, `red`, `pink`, `teal`, `gold` |
 
 | Constraint / index | Definition |
 | --- | --- |
@@ -190,7 +192,7 @@ The weekly split: which muscle groups you train on which weekday. One row per (w
 | `ck_split_days_weekday` | `CHECK (weekday BETWEEN 0 AND 6)` |
 
 **Written by:** `PUT /api/split`, which deletes **all** rows and inserts the new week in one transaction.
-**Read by:** `GET /api/split`, `GET /api/insights` (overdue calculation)
+**Read by:** `GET /api/split`
 
 Rows may point at **archived** muscle groups. The API returns them, and the UI ignores ids it can't find among visible muscle groups.
 
@@ -202,7 +204,7 @@ Alembic's bookkeeping: a single row with the revision id the database is at.
 
 | Column | Type | Notes |
 | --- | --- | --- |
-| `version_num` | `varchar(32)` | Primary key. The current head is `0002_split_days`. |
+| `version_num` | `varchar(32)` | Primary key. The current head is `0003_settings_theme`. |
 
 Never edit it by hand except to recover from a broken migration. See [Migrations](migrations.md).
 

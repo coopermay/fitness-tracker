@@ -127,7 +127,7 @@ Only the fields you **send** are changed. For sets, nullable fields (`machine_id
 | GET | `/api/calendar` | Per-day activity with PR flags | 200 | [calendar](calendar-split-insights.md#calendar) |
 | GET | `/api/split` | The weekly split | 200 | [split](calendar-split-insights.md#get-the-weekly-split) |
 | PUT | `/api/split` | Replace the weekly split | 200 | [split](calendar-split-insights.md#replace-the-weekly-split) |
-| GET | `/api/insights` | Plateaued lifts, overdue muscle groups | 200 | [insights](calendar-split-insights.md#insights) |
+| GET | `/api/insights` | Plateaued lifts | 200 | [insights](calendar-split-insights.md#insights) |
 | GET | `/api/settings` | Read settings | 200 | [settings-and-health](settings-and-health.md#read-settings) |
 | PATCH | `/api/settings` | Change the default unit | 200 | [settings-and-health](settings-and-health.md#update-settings) |
 
@@ -154,7 +154,7 @@ Only the fields you **send** are changed. For sets, nullable fields (`machine_id
 | `GET /calendar` | `useCalendar` | Calendar |
 | `GET /split` | `useSplit` | Home, Settings |
 | `PUT /split` | `useUpdateSplit` | Settings (Save split) |
-| `GET /insights` | `useInsights` | Home (overdue), muscle group page (plateau) |
+| `GET /insights` | `useInsights` | Muscle group page (plateau) |
 | `GET /settings` | `useSettings` | Settings, log set page, edit set page |
 | `PATCH /settings` | `useUpdateSettings` | Settings |
 | `POST /gyms`, `GET /sets`, `GET /health` | — | Not used by the UI (available for scripts, tooling and future clients) |

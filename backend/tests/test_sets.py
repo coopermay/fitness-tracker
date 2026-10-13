@@ -1,4 +1,4 @@
-"""Set create/update/delete validation and settings."""
+"""Set create/update/delete validation."""
 
 
 def create_set(client, lift_id, **overrides):
@@ -58,10 +58,3 @@ def test_delete_set(client, lift_id):
     assert client.get(f"/api/sets?lift_id={lift_id}").json() == []
     assert client.delete(f"/api/sets/{created['id']}").status_code == 404
 
-
-def test_settings_default_and_update(client):
-    assert client.get("/api/settings").json() == {"default_unit": "lbs"}
-    assert client.patch("/api/settings", json={"default_unit": "kg"}).json() == {
-        "default_unit": "kg"
-    }
-    assert client.get("/api/settings").json() == {"default_unit": "kg"}

@@ -60,7 +60,7 @@ def session(engine):
         connection.execute(
             text("TRUNCATE split_days, sets, lifts, machines, muscle_groups, gyms RESTART IDENTITY CASCADE")
         )
-        connection.execute(text("UPDATE settings SET default_unit = 'lbs'"))
+        connection.execute(text("UPDATE settings SET default_unit = 'lbs', theme_base = 'system', theme_accent = 'blue'"))
     with Session(engine) as session:
         yield session
 

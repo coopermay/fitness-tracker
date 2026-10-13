@@ -5,6 +5,10 @@
 // A union of string literals: weight_unit can only be one of these three strings.
 export type WeightUnit = 'lbs' | 'kg' | 'plates'
 
+// 'system' follows the phone's light/dark setting.
+export type ThemeBase = 'system' | 'light' | 'dark' | 'black' | 'navy'
+export type ThemeAccent = 'blue' | 'green' | 'purple' | 'orange' | 'red' | 'pink' | 'teal' | 'gold'
+
 // Dates arrive as strings: "2026-09-25" for dates, ISO timestamps for created_at.
 export type DateString = string
 
@@ -86,6 +90,8 @@ export interface Gym {
 
 export interface Settings {
   default_unit: WeightUnit
+  theme_base: ThemeBase
+  theme_accent: ThemeAccent
 }
 
 // --- GET /lifts/{id}/records ---
@@ -169,6 +175,5 @@ export interface Split {
 // --- GET /insights ---
 
 export interface Insights {
-  plateaued_lift_ids: number[] // trained in the last 4 weeks, no PR in that time
-  overdue_muscle_group_ids: number[] // behind on this week's split
+  plateaued_lift_ids: number[] // trained in the last 3 weeks, no PR in that time
 }

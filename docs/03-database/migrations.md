@@ -34,7 +34,7 @@ flowchart TD
 
 ```mermaid
 flowchart LR
-    base(("base<br/>empty")) --> m1["ba7a79739cdb<br/>0001_initial_schema"] --> m2["0002_split_days<br/>weekly split"] --> head(("head"))
+    base(("base<br/>empty")) --> m1["ba7a79739cdb<br/>0001_initial_schema"] --> m2["0002_split_days<br/>weekly split"] --> m3["0003_settings_theme<br/>theme settings"] --> head(("head"))
 ```
 
 ### `0001_initial_schema.py` (revision `ba7a79739cdb`)
@@ -63,6 +63,15 @@ Created on 2026-10-01, hand-written. `down_revision = 'ba7a79739cdb'`.
 - `CHECK (weekday BETWEEN 0 AND 6)` named `ck_split_days_weekday`
 
 **Downgrade** drops `split_days`.
+
+### `0003_settings_theme.py` (revision `0003_settings_theme`)
+Created on 2026-10-12, hand-written. `down_revision = '0002_split_days'`.
+
+**Upgrade:**
+1. Creates the enum types `theme_base` (`system`, `light`, `dark`, `black`, `navy`) and `theme_accent` (`blue`, `green`, `purple`, `orange`, `red`, `pink`, `teal`, `gold`) explicitly. Unlike `create_table`, `add_column` doesn't create enum types itself, so the `ENUM` objects use `create_type=False` and are created with `.create(op.get_bind())`.
+2. Adds `settings.theme_base` (default `'system'`) and `settings.theme_accent` (default `'blue'`), both `NOT NULL`. The server defaults fill in the existing row.
+
+**Downgrade** drops both columns, then both enum types.
 
 ---
 

@@ -117,24 +117,10 @@ A chart needs at least two dated sessions.
 Which muscle groups you plan to train on each weekday. Each weekday can have any number of muscle groups. A weekday with none is a **rest day**. Weekdays are numbered **Monday = 0 … Sunday = 6** (Python's `date.weekday()`). The split is edited in Settings and saved as a whole week at once.
 
 ### Today
-"Today" always means **the phone's local date**, not the server's. The frontend sends it to the insights endpoint (`?today=YYYY-MM-DD`). Home uses it to put today's split muscle groups first, with a **TODAY** label.
-
-### Overdue
-A muscle group is **overdue** when it has fallen behind this week's split. Count, for the current week (Monday to today):
-
-- **scheduled days passed** = how many of its split weekdays fall **before** today,
-- **days trained** = how many **distinct dates** this week have at least one set for a lift in that group.
-
-It's overdue if `days trained < scheduled days passed`.
-
-- Training on a different day than scheduled still counts.
-- Today's scheduled groups are never overdue yet.
-- Last week's training doesn't count.
-
-Overdue groups get an amber **OVERDUE** label on Home.
+"Today" always means **the phone's local date**, not the server's. The frontend sends it to the insights endpoint (`?today=YYYY-MM-DD`), which uses it to place the 3-week plateau window. Home uses it to put today's split muscle groups first, with a **TODAY** label.
 
 ### Plateau
-A lift is **plateaued** if it has at least one set dated in the **last 28 days** (today included) and **none** of those sets is a PR (calendar rule above). Plateaued lifts get an amber **Plateau** pill in the muscle group's lift list. Lifts you haven't trained in the last 28 days are never plateaued.
+A lift is **plateaued** if it has at least one set dated in the **last 21 days** (3 weeks, today included) and **none** of those sets is a PR (calendar rule above). Plateaued lifts get an amber **Plateau** pill on their row in the muscle group's lift list. Lifts you haven't trained in the last 21 days are never plateaued. This is the app's only alert.
 
 ### Heat level
 How bright a calendar square is. It's based on **sets logged that day** relative to your busiest day:

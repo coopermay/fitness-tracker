@@ -83,7 +83,7 @@ That needs HTTPS. Over plain HTTP use *Add to Home screen*, or serve the app ove
 ### "New best!" banner shows again after refreshing
 It shouldn't any more: the lift page clears the flash message from history after showing it. If you see it, check `LiftPage.tsx`'s `useEffect` that calls `navigate(…, { replace: true, state: null })`.
 
-### OVERDUE labels look wrong right after midnight, or in another timezone
+### Plateau pills or the TODAY tile look wrong right after midnight, or in another timezone
 "Today" comes from the phone. Insights are cached per date (`['insights', today]`) and update when a page re-renders with the new date (navigate or reload). The server's UTC clock isn't used when the app passes `today`.
 
 ### A scroll indicator still flashes on iPhone

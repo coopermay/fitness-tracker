@@ -24,6 +24,27 @@ class WeightUnit(StrEnum):
 weight_unit_type = SAEnum(WeightUnit, name="weight_unit")
 
 
+class ThemeBase(StrEnum):
+    """Background colours. `system` follows the phone's light/dark setting."""
+
+    system = "system"
+    light = "light"
+    dark = "dark"
+    black = "black"
+    navy = "navy"
+
+
+class ThemeAccent(StrEnum):
+    blue = "blue"
+    green = "green"
+    purple = "purple"
+    orange = "orange"
+    red = "red"
+    pink = "pink"
+    teal = "teal"
+    gold = "gold"
+
+
 def created_at_field() -> datetime | None:
     return Field(
         default=None,
@@ -112,6 +133,16 @@ class Settings(SQLModel, table=True):
         default=WeightUnit.lbs,
         sa_type=weight_unit_type,
         sa_column_kwargs={"server_default": WeightUnit.lbs.value},
+    )
+    theme_base: ThemeBase = Field(
+        default=ThemeBase.system,
+        sa_type=SAEnum(ThemeBase, name="theme_base"),
+        sa_column_kwargs={"server_default": ThemeBase.system.value},
+    )
+    theme_accent: ThemeAccent = Field(
+        default=ThemeAccent.blue,
+        sa_type=SAEnum(ThemeAccent, name="theme_accent"),
+        sa_column_kwargs={"server_default": ThemeAccent.blue.value},
     )
 
 

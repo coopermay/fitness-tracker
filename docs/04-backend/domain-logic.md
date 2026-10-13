@@ -8,9 +8,9 @@ The business rules of Lift Tracker live in five modules. Apart from two small ex
 | [`metadata.py`](#metadatapy) | Shared list / create / rename / archive behaviour for gyms, muscle groups, lifts, machines |
 | [`records.py`](#recordspy) | Records per weight, recency order, Epley est. 1RM, progress points, "new best" check |
 | [`calendar.py`](#calendarpy) | Which sets were PRs (history replay), per-day activity |
-| [`insights.py`](#insightspy) | Plateaued lifts and overdue muscle groups |
+| [`insights.py`](#insightspy) | Plateaued lifts |
 
-The vocabulary used here (record, PR, session, overdue…) is defined in the [Domain glossary](../01-overview/domain-glossary.md).
+The vocabulary used here (record, PR, session, plateau…) is defined in the [Domain glossary](../01-overview/domain-glossary.md).
 
 ---
 
@@ -191,48 +191,23 @@ Flattens a set for the calendar: machine **name** (not id; `None` for no machine
 
 **File:** [`backend/app/insights.py`](../../backend/app/insights.py)
 
-`PLATEAU_WINDOW_DAYS = 28` means "the last 4 weeks", including today.
+`PLATEAU_WINDOW_DAYS = 21` means "the last 3 weeks", including today.
 
 ### `plateaued_lift_ids(sets, today) -> list[int]`
 ```text
-window = [today - 27 days, today]
+window = [today - 20 days, today]
 trained = lifts with any set dated in the window
 had_pr  = lifts with a PR (find_pr_set_ids) dated in the window
 return sorted(trained - had_pr)
 ```
 
-A lift you haven't done in 28 days is never plateaued. Example (today = Oct 1):
+A lift you haven't done in the last 21 days is never plateaued. Example (today = Oct 1):
 
 | Bench sets | In window? | PR? | Result |
 | --- | --- | --- | --- |
 | Aug 1: 185 × 5 | no | yes | — |
 | Sep 20: 185 × 5 | yes | no (tie) | |
 | Sep 27: 185 × 4 | yes | no | **plateaued** |
-
-### `overdue_muscle_group_ids(sets, lifts_by_id, split_days, today) -> list[int]`
-
-```mermaid
-flowchart TD
-    A["monday = today - today.weekday()"] --> B["scheduled_days_passed[group] =<br/>count of split rows whose weekday is before today"]
-    A --> C["days_trained[group] =<br/>distinct dates in [monday, today] with a set<br/>for any lift in that group"]
-    B & C --> D{"days_trained fewer than<br/>scheduled_days_passed?"}
-    D -- "yes" --> E["overdue"]
-    D -- "no" --> F["on track"]
-```
-
-Worked example (today = Thursday Oct 1, so `today.weekday() = 3`; the week is Mon Sep 28 – Thu Oct 1):
-
-| Group | Scheduled | Passed (before Thu) | Trained this week (distinct days) | Overdue? |
-| --- | --- | --- | --- | --- |
-| Chest | Mon | 1 | 1 (Mon) | no |
-| Back | Wed | 1 | 0 | **yes** |
-| Legs | Thu | 0 (today doesn't count yet) | 0 | no |
-| Back (alt) | Wed | 1 | 1 (trained Thu instead) | no: a different day still counts |
-| Chest (twice) | Mon, Wed | 2 | 1 (two sets on Mon = one day) | **yes** |
-
-- Training on any day this week counts toward any scheduled day.
-- Last week's training doesn't count.
-- `lifts_by_id` must contain every lift referenced by the sets; the router loads them all.
 
 ---
 

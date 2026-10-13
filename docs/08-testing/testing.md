@@ -1,6 +1,6 @@
 # Testing
 
-How Lift Tracker is tested: the backend's automated pytest suite (61 tests), what each test covers, how to write new ones, and the manual checks used for the frontend.
+How Lift Tracker is tested: the backend's automated pytest suite (60 tests), what each test covers, how to write new ones, and the manual checks used for the frontend.
 
 ---
 
@@ -29,7 +29,7 @@ uv run pytest -k "plateau"                       # tests whose name matches
 uv run pytest -x                                 # stop at the first failure
 ```
 
-Expected output ends with `61 passed, 1 warning`. The warning is a harmless Starlette deprecation notice about `httpx`.
+Expected output ends with `60 passed, 1 warning`. The warning is a harmless Starlette deprecation notice about `httpx`.
 
 ---
 
@@ -43,7 +43,7 @@ flowchart TD
     B --> C["create lifts_test DB if missing<br/>(connects to 'postgres' with AUTOCOMMIT)"]
     C --> D["alembic downgrade base<br/>alembic upgrade head<br/>(against lifts_test)"]
     D --> E["for each test"]
-    E --> F["session fixture:<br/>TRUNCATE split_days, sets, lifts, machines,<br/>muscle_groups, gyms RESTART IDENTITY CASCADE<br/>+ reset settings.default_unit = 'lbs'"]
+    E --> F["session fixture:<br/>TRUNCATE split_days, sets, lifts, machines,<br/>muscle_groups, gyms RESTART IDENTITY CASCADE<br/>+ reset settings to lbs, system, blue"]
     F --> G["client fixture:<br/>override get_session → test session<br/>TestClient(app)"]
     G --> H["test runs real HTTP requests"]
     H --> E
@@ -110,7 +110,7 @@ Because tables are truncated **before** each test (not after), the last test's d
 | `test_progress_has_one_point_per_day_oldest_first` | The day's best est. 1RM per date; undated skipped |
 | `test_progress_for_plates_uses_heaviest_weight` | Plates chart the heaviest weight |
 
-### `test_sets.py` (8): set validation and settings
+### `test_sets.py` (7): set validation
 | Test | Checks |
 | --- | --- |
 | `test_reps_must_be_positive` | `reps: 0` → 422 |
@@ -120,7 +120,13 @@ Because tables are truncated **before** each test (not after), the last test's d
 | `test_patch_can_clear_nullable_fields` | `machine_id: null`, `performed_on: null` clear them |
 | `test_patch_rejects_null_for_required_fields` | `reps: null` → 422 |
 | `test_delete_set` | 204, then gone, then a second delete → 404 |
-| `test_settings_default_and_update` | Defaults to `lbs`; PATCH to `kg` persists |
+
+### `test_settings.py` (3)
+| Test | Checks |
+| --- | --- |
+| `test_defaults` | `{default_unit: lbs, theme_base: system, theme_accent: blue}` |
+| `test_patch_changes_only_the_fields_sent` | Changing the unit leaves the theme alone, and vice versa; the change persists |
+| `test_unknown_theme_values_are_rejected` | Unknown base/accent → 422, `null` → 422, nothing changes |
 
 ### `test_calendar.py` (6)
 | Test | Checks |
@@ -141,18 +147,15 @@ Because tables are truncated **before** each test (not after), the last test's d
 | `test_unknown_muscle_group_is_404_and_changes_nothing` | 404 and the previous split is intact |
 | `test_invalid_weekdays_are_rejected` | Weekday 7 → 422; a repeated weekday → 422 |
 
-### `test_insights.py` (7)
-Uses `TODAY = "2026-10-01"` (a Thursday) and fixtures for Chest/Back/Legs with Bench/Row/Squat.
+### `test_insights.py` (4)
+Uses `TODAY = "2026-10-01"`, so the 3-week window is Sep 11 – Oct 1, with Bench and Fly under Chest.
 
 | Test | Checks |
 | --- | --- |
-| `test_lift_with_no_pr_in_last_4_weeks_is_plateaued` | Only non-PR sets in the window → plateaued |
+| `test_lift_with_no_pr_in_last_3_weeks_is_plateaued` | Only non-PR sets in the window → plateaued (and the response has no other fields) |
 | `test_a_pr_in_the_window_clears_the_plateau` | A PR in the window → not plateaued |
-| `test_lifts_not_trained_recently_are_not_plateaued` | A set 28 days ago (just outside) → not flagged |
-| `test_scheduled_day_passed_without_training_is_overdue` | Missed Wednesday → overdue; today's group isn't |
-| `test_training_on_a_different_day_this_week_counts` | Wednesday's group trained Thursday → fine |
-| `test_last_weeks_training_does_not_count` | Last Sunday doesn't count for this week |
-| `test_group_scheduled_twice_needs_two_days` | Two sets on one day ≠ two days |
+| `test_window_starts_20_days_before_today` | A set on Sep 11 counts (flagged); one on Sep 10 is just outside (not flagged) |
+| `test_lifts_never_trained_are_not_plateaued` | No sets → empty list |
 
 ---
 
@@ -172,7 +175,7 @@ Uses `TODAY = "2026-10-01"` (a Thursday) and fixtures for Chest/Back/Legs with B
 
 There are no automated UI tests. After UI changes, run `npm run build && npm run lint`, then click through the affected screens. A full smoke test:
 
-1. **Home:** 8 tiles with body figures, all visible on a phone screen. Today's split groups are first with TODAY. OVERDUE where expected.
+1. **Home:** 8 tiles with body figures, all visible on a phone screen. Today's split groups are first with TODAY. No OVERDUE labels.
 2. **Muscle group:** lifts with last dates. "+ Add lift" with an existing name in another case doesn't duplicate. Edit → rename → archive (confirm) → back home.
 3. **Lift:** machine cards, records `185 lbs × 5 · Sep 25`, 1RM on the right (none for plates), approximate `7~`, chart with tappable points, History opens.
 4. **Log set:**
@@ -185,7 +188,7 @@ There are no automated UI tests. After UI changes, run `npm run build && npm run
 7. **Settings:** the default unit switches instantly; Edit weekly split → change a day → Save split → Home reflects it; add a muscle group.
 8. **Tabs:** tap each tab (it slides in); swipe left/right on Home/Calendar/Settings.
 9. **Swipe back:** on a lift page swipe right → muscle group, again → Home (each slides in from the left); same on Weekly split → Settings. The log/edit set forms don't swipe.
-10. **Both themes:** toggle macOS/iOS dark mode.
+10. **Themes:** in Settings try each background and a few accents (buttons, Home tiles, calendar, chart); on System, toggle macOS/iOS dark mode; reload and check there's no flash of the old colours.
 11. **Narrow screen:** 320px and 390px in DevTools' device mode.
 
 ---

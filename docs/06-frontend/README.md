@@ -47,7 +47,7 @@ flowchart TD
 | `/lifts/:liftId/log` | `LogSetPage` | `useLiftRecords`, `useSettings` (+ create set) | — | Home |
 | `/lifts/:liftId/sets/:setId` | `EditSetPage` | `useLiftRecords`, `useSettings` (+ update/delete set) | — | Home |
 | `/calendar` | `CalendarPage` | `useCalendar` | Tab (index 1) | Calendar |
-| `/settings` | `SettingsPage` | `useSettings` (+ settings, create group) | Tab (index 2) | Settings |
+| `/settings` | `SettingsPage` | `useSettings` (+ settings incl. theme, create group) | Tab (index 2) | Settings |
 | `/settings/split` | `SplitPage` | `useSplit`, `useMuscleGroups` (+ split) | Right → Settings | Settings |
 | `*` | `NotFoundPage` | — | — | Home |
 
@@ -134,8 +134,8 @@ frontend/src/
 ├── pages/                One component (+ .module.css) per route
 ├── components/           Shared UI (+ .module.css each)
 └── *.ts                  Pure helpers (format, dates, calendar, records,
-                          flash, tabs, bodyRegions), the useSwipe hook and
-                          SwipeBackContext
+                          flash, tabs, bodyRegions), the useSwipe and
+                          useTheme hooks, SwipeBackContext
 ```
 
 ---
@@ -147,6 +147,7 @@ frontend/src/
 | **Server data** | TanStack Query cache via hooks in `api/queries.ts` | muscle groups, records, calendar |
 | **Local UI state** | `useState` in the owning component | an Edit panel being open, the selected calendar day, the form's values, the split draft |
 | **URL state** | The path, read with `useParams` | which lift or set is shown |
+| **Per-device cache** | `localStorage` (`theme` only) | the last theme, so `index.html` can apply it before React loads |
 | **One-off navigation data** | React Router `location.state` | the "New best!" flash message, the slide direction |
 | **Shared client state** | One small context, `SwipeBackContext` | where swiping right goes; no Redux/Zustand store is needed |
 
@@ -194,7 +195,8 @@ This project was also a way to learn React and TypeScript. Each concept below is
 | Routing, `useParams`, `Link` | `App.tsx`, `pages/MuscleGroupPage.tsx` |
 | `useNavigate`, router state | `pages/LogSetPage.tsx`, `flash.ts` |
 | `useQuery`, `useMutation`, invalidation | `api/queries.ts` |
-| `setQueryData`, `mutation.variables` | `api/queries.ts` (`useUpdateSettings`), `pages/SettingsPage.tsx` |
+| `setQueryData` | `api/queries.ts` (`useUpdateSettings`, `useUpdateSplit`) |
+| Optimistic updates (`onMutate` + rollback in `onError`) | `api/queries.ts` (`useUpdateSettings`) |
 | `useEffect` + cleanup | `components/MachineCombobox.tsx` |
 | `useRef` (DOM element) | `components/MachineCombobox.tsx` |
 | `useRef` (value that doesn't re-render) | `useSwipe.ts` |

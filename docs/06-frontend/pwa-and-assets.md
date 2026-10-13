@@ -17,11 +17,12 @@ The HTML shell. Vite injects the built script and CSS into it at build time.
 | `<link rel="manifest" href="/manifest.webmanifest">` | Makes the app installable (name, icons, display mode) |
 | `<link rel="icon" type="image/svg+xml" href="/icon.svg">` | Favicon |
 | `<link rel="apple-touch-icon" href="/apple-touch-icon.png">` | iOS home-screen icon |
-| `<meta name="theme-color" content="#f6f7f9" media="(prefers-color-scheme: light)">` | Browser/status bar colour, light mode (= `--bg`) |
+| `<meta name="theme-color" content="#f6f7f9" media="(prefers-color-scheme: light)">` | Browser/status bar colour, light mode (= `--bg`). `theme.ts` replaces the content with the chosen base's `--bg` once the app starts. |
 | `<meta name="theme-color" content="#111215" media="(prefers-color-scheme: dark)">` | Same, dark mode |
 | `<meta name="apple-mobile-web-app-capable" content="yes">` | iOS: open full screen from the home screen |
 | `<meta name="apple-mobile-web-app-title" content="Lifts">` | iOS: name under the icon |
 | `<meta name="apple-mobile-web-app-status-bar-style" content="default">` | iOS status bar style |
+| Inline `<script>` (theme) | Runs before anything is drawn: reads the last theme from `localStorage` (`theme`), resolves `system` to light/dark, and sets `data-base`/`data-accent` on `<html>`, so the page never flashes the default colours while settings load. Mirrors `applyTheme()` in [`theme.ts`](utilities.md#themets). |
 | `<div id="root">` | React mounts here |
 | `<script type="module" src="/src/main.tsx">` | Entry point (rewritten to the hashed bundle at build) |
 

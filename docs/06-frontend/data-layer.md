@@ -64,6 +64,8 @@ TypeScript descriptions of the JSON the API sends and receives. **They're checke
 | TypeScript type | Mirrors (backend) | Notes |
 | --- | --- | --- |
 | `WeightUnit` | `WeightUnit` | `'lbs' \| 'kg' \| 'plates'` (a union of string literals) |
+| `ThemeBase` | `ThemeBase` | `'system' \| 'light' \| 'dark' \| 'black' \| 'navy'` |
+| `ThemeAccent` | `ThemeAccent` | `'blue' \| 'green' \| … \| 'gold'` (8 colours) |
 | `DateString` | — | Alias for `string`: `"YYYY-MM-DD"` dates and ISO timestamps |
 | `MuscleGroup` | `MuscleGroupRead` | |
 | `Lift` | `LiftRead` | |
@@ -75,7 +77,7 @@ TypeScript descriptions of the JSON the API sends and receives. **They're checke
 | `SetFields` | `SetUpdate` (the full set) | The edit body; the form always sends all fields |
 | `SetCreate extends SetFields` | `SetCreate` | + `lift_id` |
 | `Gym` | `GymRead` | |
-| `Settings` | `SettingsRead` / `SettingsUpdate` | |
+| `Settings` | `SettingsRead` / `SettingsUpdate` | `default_unit`, `theme_base`, `theme_accent`. Updates send `Partial<Settings>`. |
 | `RecordRow` | `RecordRow` | |
 | `ProgressPoint` | `ProgressPoint` | |
 | `UnitRecords` | `UnitRecords` | |
@@ -128,10 +130,10 @@ Keeping keys in one object avoids typos and makes it obvious what can be invalid
 | `useLiftRecords(liftId)` | `['lift-records', liftId]` | `GET /lifts/{id}/records` | default | Changes whenever a set changes |
 | `useCalendar()` | `['calendar']` | `GET /calendar` | default | Changes with sets |
 | `useSplit()` | `['split']` | `GET /split` | `Infinity` | Only changes in Settings |
-| `useInsights(today)` | `['insights', today]` | `GET /insights?today=` | default | Depends on sets, the split and the date; the key includes `today` so a new day is a new cache entry |
+| `useInsights(today)` | `['insights', today]` | `GET /insights?today=` | default | Depends on sets and the date; the key includes `today` so a new day is a new cache entry |
 | `useMachines()` | `['machines']` | `GET /machines` | `Infinity` | Metadata |
 | `useGyms()` | `['gyms']` | `GET /gyms` | `Infinity` | Metadata |
-| `useSettings()` | `['settings']` | `GET /settings` | `Infinity` | Only changes in Settings |
+| `useSettings()` | `['settings']` | `GET /settings` | `Infinity` | Only changes in Settings. Also read by `App.tsx` for the theme. |
 
 ### Mutation hooks
 
@@ -143,7 +145,7 @@ Keeping keys in one object avoids typos and makes it obvious what can be invalid
 | `useUpdateMuscleGroup()` | `PATCH /muscle-groups/{id}` | invalidate `muscle-groups` (**not awaited**) |
 | `useUpdateLift()` | `PATCH /lifts/{id}` | invalidate `lifts`, `lift-records/{id}`, `calendar` (**not awaited**) |
 | `useUpdateMachine()` | `PATCH /machines/{id}` | invalidate `machines`, **all** `lift-records`, `calendar` (**not awaited**) |
-| `useUpdateSettings()` | `PATCH /settings` | `setQueryData(settings, response)` (no refetch) |
+| `useUpdateSettings()` | `PATCH /settings` with only the changed fields | **Optimistic:** `onMutate` merges the change into the cache immediately and returns the previous settings; `onError` puts them back; `onSuccess` writes the response (no refetch) |
 | `useUpdateSplit()` | `PUT /split` | `setQueryData(split, response)` + invalidate `insights` |
 | `useCreateSet(liftId)` | `POST /sets` | `refreshAfterSetChange` (**awaited**) |
 | `useUpdateSet(liftId)` | `PATCH /sets/{id}` | `refreshAfterSetChange` (**awaited**) |
@@ -170,18 +172,17 @@ What each mutation refreshes. ✅ = invalidated (refetched), ✏️ = written di
 | Create machine | | | | ✅ | | | | | |
 | Update machine | | | ✅ (all) | ✅ | | | ✅ | | |
 | Update settings | | | | | | ✏️ | | | |
-| Update split | | | | | | | | ✏️ | ✅ |
+| Update split | | | | | | | | ✏️ | |
 | Create / update / delete set | | ✅ | ✅ (that lift) | | | | ✅ | | ✅ |
 
 **When you add a query or mutation, update this table.** Reasoning behind some cells:
 - *Set changes → lifts*: the muscle group list shows each lift's `last_performed_on`.
-- *Set changes → insights*: plateau and overdue depend on sets.
+- *Set changes → insights*: plateau flags depend on sets.
 - *Update machine → all lift-records*: a machine's name appears on every lift that used it.
 - *Update lift → calendar*: the calendar shows lift names.
-- *Update split → insights*: overdue depends on the split.
 
 ### Known gaps (acceptable today)
-- Archiving/renaming a **muscle group** doesn't invalidate `insights` or `split`. Badges for archived groups simply aren't shown, and split chips only list visible groups.
+- Archiving/renaming a **muscle group** doesn't invalidate `split`. Split chips only list visible groups.
 - Changes made **outside the app** (curl, `/docs`, another device) to `Infinity` caches don't appear until the page is reloaded.
 
 ---

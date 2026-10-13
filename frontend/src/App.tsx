@@ -1,5 +1,6 @@
 import { useCallback, useRef } from 'react'
 import { Route, Routes, useLocation, useNavigate } from 'react-router'
+import { useSettings } from './api/queries'
 import { TabBar } from './components/TabBar'
 import { CalendarPage } from './pages/CalendarPage'
 import { EditSetPage } from './pages/EditSetPage'
@@ -11,6 +12,7 @@ import { NotFoundPage } from './pages/NotFoundPage'
 import { SettingsPage } from './pages/SettingsPage'
 import { SplitPage } from './pages/SplitPage'
 import { SwipeBackContext } from './swipeBack'
+import { useTheme } from './theme'
 import { slideStateFor, tabIndex, TAB_PATHS, type SlideState } from './tabs'
 import { useSwipe } from './useSwipe'
 import styles from './App.module.css'
@@ -21,6 +23,10 @@ import styles from './App.module.css'
 function App() {
   const location = useLocation()
   const navigate = useNavigate()
+
+  // Colours from Settings, applied on every page.
+  const settings = useSettings()
+  useTheme(settings.data?.theme_base, settings.data?.theme_accent)
 
   // On a tab page (Home, Calendar, Settings), swiping moves to the next tab.
   const currentTab = tabIndex(location.pathname)

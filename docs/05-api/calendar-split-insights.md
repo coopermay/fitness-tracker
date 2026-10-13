@@ -1,6 +1,6 @@
 # Calendar, weekly split and insights
 
-The endpoints behind the Calendar tab, the weekly split in Settings, and the plateau/overdue flags.
+The endpoints behind the Calendar tab, the weekly split in Settings, and the plateau flags.
 
 **Code:** [`routers/calendar.py`](../../backend/app/routers/calendar.py), [`routers/split.py`](../../backend/app/routers/split.py), [`routers/insights.py`](../../backend/app/routers/insights.py), logic in [`calendar.py`](../04-backend/domain-logic.md#calendarpy) and [`insights.py`](../04-backend/domain-logic.md#insightspy)
 
@@ -143,22 +143,20 @@ Flags used for badges in the UI.
 
 | Field | Type | Meaning |
 | --- | --- | --- |
-| `plateaued_lift_ids` | integer[] | Lifts with at least one set dated in the last 28 days (including `today`) and **no PR** among those sets |
-| `overdue_muscle_group_ids` | integer[] | Muscle groups with more split days earlier **this week** (Monday up to yesterday) than distinct days trained this week (Monday to today) |
+| `plateaued_lift_ids` | integer[] | Lifts with at least one set dated in the last 21 days (including `today`) and **no PR** among those sets |
 
-Both lists are sorted ascending. They may contain archived ids; the UI only shows badges on visible items.
+The list is sorted ascending. It may contain archived ids; the UI only shows badges on visible items.
 
 ```bash
 curl -s "localhost:8000/api/insights?today=2026-10-01"
 ```
 ```json
-{"plateaued_lift_ids": [], "overdue_muscle_group_ids": [3, 4]}
+{"plateaued_lift_ids": [2, 7]}
 ```
 
 ### Rules in brief
-- **Plateau:** a lift you haven't trained in 28 days is never flagged. Any PR in the window clears it. The PR rule is the calendar's.
-- **Overdue:** training a group on any day this week counts toward its scheduled days. Today's scheduled groups are never overdue yet. Last week doesn't count. A group scheduled twice needs two distinct training days.
+- **Plateau:** a lift you haven't trained in the last 21 days is never flagged. Any PR in the window clears it. The PR rule is the calendar's.
 
-Worked examples are in [Domain logic → insights.py](../04-backend/domain-logic.md#insightspy).
+A worked example is in [Domain logic → insights.py](../04-backend/domain-logic.md#insightspy).
 
-**Used by:** Home (OVERDUE labels on tiles) and the muscle group page (Plateau pills on lifts). Logging/editing/deleting a set or saving the split refreshes it.
+**Used by:** the muscle group page (Plateau pills on lift rows). Logging/editing/deleting a set refreshes it.

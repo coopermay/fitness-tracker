@@ -4,6 +4,7 @@ import { useCreateMuscleGroup, useSettings, useUpdateSettings } from '../api/que
 import type { WeightUnit } from '../api/types'
 import { AddByName } from '../components/AddByName'
 import { QueryStatus } from '../components/QueryStatus'
+import { THEME_ACCENTS, THEME_BASES } from '../theme'
 import styles from './SettingsPage.module.css'
 
 const UNITS: WeightUnit[] = ['lbs', 'kg', 'plates']
@@ -24,10 +25,9 @@ export function SettingsPage() {
     return <QueryStatus isError={settings.isError} error={settings.error} />
   }
 
-  // While a change is saving, show the unit being saved as selected.
-  const selected = updateSettings.isPending
-    ? updateSettings.variables.default_unit
-    : settings.data.default_unit
+  // useUpdateSettings changes the cache before the server answers, so these
+  // already show what was just tapped.
+  const { default_unit: selected, theme_base: base, theme_accent: accent } = settings.data
 
   return (
     <>
@@ -48,6 +48,47 @@ export function SettingsPage() {
             onClick={() => updateSettings.mutate({ default_unit: unit })}
           >
             {unit}
+          </button>
+        ))}
+      </div>
+
+      <h2 className={styles.sectionLabel}>Theme</h2>
+      <h3 className={styles.subLabel}>Background</h3>
+      <div className={styles.bases} role="group" aria-label="Background">
+        {THEME_BASES.map(({ value, label }) => (
+          <button
+            key={value}
+            type="button"
+            className={value === base ? styles.baseActive : styles.base}
+            aria-pressed={value === base}
+            onClick={() => updateSettings.mutate({ theme_base: value })}
+          >
+            {/* data-base gives the preview that base's colours (see index.css).
+                System shows light and dark side by side. */}
+            <span className={styles.basePreview} aria-hidden="true">
+              {(value === 'system' ? ['light', 'dark'] : [value]).map((half) => (
+                <span key={half} className={styles.basePreviewHalf} data-base={half}>
+                  <span className={styles.basePreviewDot} />
+                </span>
+              ))}
+            </span>
+            {label}
+          </button>
+        ))}
+      </div>
+
+      <h3 className={styles.subLabel}>Accent</h3>
+      <div className={styles.accents} role="group" aria-label="Accent colour">
+        {THEME_ACCENTS.map((value) => (
+          <button
+            key={value}
+            type="button"
+            className={value === accent ? styles.accentActive : styles.accent}
+            aria-pressed={value === accent}
+            onClick={() => updateSettings.mutate({ theme_accent: value })}
+          >
+            <span className={styles.accentSwatch} data-accent={value} aria-hidden="true" />
+            {value}
           </button>
         ))}
       </div>

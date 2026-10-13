@@ -83,7 +83,7 @@ A log of the significant choices made while building Lift Tracker: what was deci
 
 ## 16. "Today" comes from the client
 **Decision:** `GET /insights?today=YYYY-MM-DD` takes the date from the phone, and only falls back to the server's date if it's missing.
-**Why:** The server runs on UTC, which is already tomorrow on a US evening. Overdue logic depends on the exact weekday.
+**Why:** The server runs on UTC, which is already tomorrow on a US evening. The 3-week plateau window depends on the exact date.
 **Consequences:** The insights cache key includes the date, so it naturally refreshes the next day.
 
 ## 17. Same origin, no CORS
@@ -113,7 +113,7 @@ A log of the significant choices made while building Lift Tracker: what was deci
 
 ## 22. Plain CSS modules with design tokens
 **Decision:** Each component has a `*.module.css`. Shared colours and sizes are CSS variables in `index.css`, with dark-mode overrides. There's no Tailwind or UI kit.
-**Why:** It's conventional, easy to learn, and dark mode comes for free with `prefers-color-scheme`.
+**Why:** It's conventional and easy to learn, and switching every colour at once (dark mode, then themes) is just a different set of variable values.
 **Consequences:** New colours should become tokens, not hard-coded hex values (the few exceptions are documented in [Styling](../06-frontend/styling.md)).
 
 ## 23. Installable PWA without offline support
@@ -147,7 +147,7 @@ A log of the significant choices made while building Lift Tracker: what was deci
 **Consequences:** On desktop there's no visual scroll cue. iOS may still flash its own thin indicator on the main page.
 
 ## 29. Home tiles keep their height
-**Decision:** The TODAY / OVERDUE labels are small corner labels beside the figure's head. Tiles keep `12px` padding and a `132px` minimum height.
+**Decision:** The TODAY label is a small corner label beside the figure's head. Tiles keep `12px` padding and a `132px` minimum height.
 **Why:** All eight muscle group tiles should fit on one phone screen (the user asked for this when extra padding made the tiles taller).
 **Consequences:** Don't add vertical padding to tiles for new labels; find room in the corners instead.
 
@@ -160,6 +160,16 @@ A log of the significant choices made while building Lift Tracker: what was deci
 **Decision:** Settings shows an "Edit weekly split ›" row that opens `/settings/split`, instead of the 7-day editor inline.
 **Why:** The user asked for it. It keeps Settings short as it grows.
 **Consequences:** The route is nested under `/settings`, so the Settings tab stays highlighted there.
+
+## 32. One alert: lifts with no PR in 3 weeks
+**Decision:** The only alert is the **Plateau** pill on a lift's row: the lift was trained in the last 21 days and none of those sets was a PR. The OVERDUE label on Home tiles (muscle groups behind on the weekly split) was removed.
+**Why:** The user wanted alerts per lift, not per muscle group, and chose "no new PR in 3 weeks" over "not logged in 3 weeks".
+**Consequences:** The split no longer affects insights, so saving it doesn't refresh them. A lift you've stopped doing is never flagged. `GET /insights` returns only `plateaued_lift_ids`.
+
+## 33. Themes: a background base plus an accent, saved on the server
+**Decision:** Settings offers a base (System, Light, Dark, Black, Navy) and one of 8 accents, stored as `settings.theme_base` / `theme_accent`. CSS token blocks keyed by `data-base`/`data-accent` on `<html>` do the colouring; the calendar scale and tile tint are derived from the accent with `color-mix()`. The last theme is cached in `localStorage` only so `index.html` can apply it before the first paint.
+**Why:** The user chose presets + accent over free colour pickers (every combination stays readable) and kept "System" as the default. Saving on the server means the theme follows you across devices now, and can become per-user when logins are added.
+**Consequences:** New bases/accents need an enum migration plus CSS (see [Styling](../06-frontend/styling.md#accents)). `color-mix()` needs a 2023-or-newer browser (Safari 16.2+, Chrome 111+). The web manifest and icon keep the default blue.
 
 ---
 

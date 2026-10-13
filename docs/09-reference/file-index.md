@@ -84,7 +84,7 @@ When you add, rename or delete a file, update this page.
 | `app/metadata.py` | `get_or_404`, `list_items`, `create_or_restore`, `update_item` | [Domain logic](../04-backend/domain-logic.md#metadatapy) |
 | `app/records.py` | Epley, `recency_key`, records, progress points, `previous_best_reps` | [Domain logic](../04-backend/domain-logic.md#recordspy) |
 | `app/calendar.py` | `find_pr_set_ids`, `build_calendar` | [Domain logic](../04-backend/domain-logic.md#calendarpy) |
-| `app/insights.py` | `plateaued_lift_ids`, `overdue_muscle_group_ids` | [Domain logic](../04-backend/domain-logic.md#insightspy) |
+| `app/insights.py` | `plateaued_lift_ids` | [Domain logic](../04-backend/domain-logic.md#insightspy) |
 
 ### backend/app/routers/
 
@@ -110,6 +110,7 @@ When you add, rename or delete a file, update this page.
 | `migrations/README` | Alembic's one-line placeholder | [Migrations](../03-database/migrations.md#files) |
 | `migrations/versions/0001_initial_schema.py` | All core tables, the enum, the settings row | [Migrations](../03-database/migrations.md#0001_initial_schemapy-revision-ba7a79739cdb) |
 | `migrations/versions/0002_split_days.py` | The `split_days` table | [Migrations](../03-database/migrations.md#0002_split_dayspy-revision-0002_split_days) |
+| `migrations/versions/0003_settings_theme.py` | `settings.theme_base` / `theme_accent` and their enums | [Migrations](../03-database/migrations.md#0003_settings_themepy-revision-0003_settings_theme) |
 
 ### backend/scripts/
 
@@ -125,10 +126,11 @@ When you add, rename or delete a file, update this page.
 | `tests/test_health.py` | 1 | [Testing](../08-testing/testing.md#test_healthpy-1) |
 | `tests/test_metadata.py` | 15 | [Testing](../08-testing/testing.md#test_metadatapy-15-idempotent-create-archive-rename) |
 | `tests/test_records.py` | 19 | [Testing](../08-testing/testing.md#test_recordspy-19-epley-records-new-best-flag-progress) |
-| `tests/test_sets.py` | 8 | [Testing](../08-testing/testing.md#test_setspy-8-set-validation-and-settings) |
+| `tests/test_sets.py` | 7 | [Testing](../08-testing/testing.md#test_setspy-7-set-validation) |
+| `tests/test_settings.py` | 3 | [Testing](../08-testing/testing.md#test_settingspy-3) |
 | `tests/test_calendar.py` | 6 | [Testing](../08-testing/testing.md#test_calendarpy-6) |
 | `tests/test_split.py` | 5 | [Testing](../08-testing/testing.md#test_splitpy-5) |
-| `tests/test_insights.py` | 7 | [Testing](../08-testing/testing.md#test_insightspy-7) |
+| `tests/test_insights.py` | 4 | [Testing](../08-testing/testing.md#test_insightspy-4) |
 
 ---
 
@@ -145,7 +147,7 @@ When you add, rename or delete a file, update this page.
 | `frontend/.oxlintrc.json` | Lint rules | [Build and tooling](../06-frontend/build-and-tooling.md#oxlintrcjson) |
 | `frontend/.gitignore` | Vite template ignores | [Build and tooling](../06-frontend/build-and-tooling.md#ignore-files) |
 | `frontend/.dockerignore` | `node_modules`, `dist` | [Build and tooling](../06-frontend/build-and-tooling.md#ignore-files) |
-| `frontend/index.html` | HTML shell; PWA and mobile meta tags | [PWA and assets](../06-frontend/pwa-and-assets.md#indexhtml) |
+| `frontend/index.html` | HTML shell; PWA and mobile meta tags; first-paint theme script | [PWA and assets](../06-frontend/pwa-and-assets.md#indexhtml) |
 | `frontend/nginx.conf` | Production web server: static files, `/api` proxy, SPA fallback, caching | [Docker](../07-operations/docker-and-deployment.md#nginxconf) |
 | `frontend/Dockerfile` | Two-stage build: Node → nginx | [Docker](../07-operations/docker-and-deployment.md#frontend-image) |
 
@@ -166,7 +168,7 @@ When you add, rename or delete a file, update this page.
 | `src/main.tsx` | Entry: QueryClient (retry rule), providers, StrictMode | [Pages](../06-frontend/routing-and-pages.md#maintsx) |
 | `src/App.tsx` | Route table, tab swipe, slide-in, TabBar | [Pages](../06-frontend/routing-and-pages.md#apptsx) |
 | `src/App.module.css` | Page wrapper height; slide animations | [Styling](../06-frontend/styling.md#appmodulecss) |
-| `src/index.css` | Design tokens (light/dark) and global rules | [Styling](../06-frontend/styling.md#design-tokens-indexcss) |
+| `src/index.css` | Design tokens per theme base and accent, global rules | [Styling](../06-frontend/styling.md#design-tokens-indexcss) |
 | `src/api/client.ts` | `fetch` wrapper, `ApiError` | [Data layer](../06-frontend/data-layer.md#clientts) |
 | `src/api/types.ts` | TypeScript mirrors of API schemas | [Data layer](../06-frontend/data-layer.md#typests) |
 | `src/api/queries.ts` | Query keys, query and mutation hooks | [Data layer](../06-frontend/data-layer.md#queriests) |
@@ -177,6 +179,7 @@ When you add, rename or delete a file, update this page.
 | `src/flash.ts` | Flash message types | [Utilities](../06-frontend/utilities.md#flashts) |
 | `src/tabs.ts` | Tab order and slide direction | [Utilities](../06-frontend/utilities.md#tabsts) |
 | `src/useSwipe.ts` | Swipe-detection custom hook | [Utilities](../06-frontend/utilities.md#useswipets) |
+| `src/theme.ts` | Theme choices + `useTheme` (applies the theme to `<html>`) | [Utilities](../06-frontend/utilities.md#themets) |
 | `src/swipeBack.ts` | `SwipeBackContext`: where swiping right goes | [Utilities](../06-frontend/utilities.md#swipebackts) |
 | `src/bodyRegions.ts` | Muscle group name → body region | [Utilities](../06-frontend/utilities.md#bodyregionsts) |
 

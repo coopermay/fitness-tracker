@@ -1,6 +1,6 @@
 # Styling
 
-Lift Tracker uses **plain CSS**: one global stylesheet with design tokens (`index.css`), plus a **CSS module** per component or page. There's no Tailwind, UI kit or CSS-in-JS. Dark mode follows the phone's setting automatically.
+Lift Tracker uses **plain CSS**: one global stylesheet with design tokens (`index.css`), plus a **CSS module** per component or page. There's no Tailwind, UI kit or CSS-in-JS. Colours come from a **theme** chosen in Settings: a background base (System, Light, Dark, Black, Navy) and an accent colour.
 
 ---
 
@@ -14,7 +14,7 @@ import styles from './MachineCard.module.css'
 Vite turns each class in a `*.module.css` file into a unique name (e.g. `card` → `_card_x7f2a`), so `.title` in one module never clashes with `.title` in another. Combine classes with template strings: ``className={`${styles.tile} ${styles.today}`}``.
 
 Rules of thumb:
-- **Colours, radii and sizes come from tokens** (`var(--accent)`), never hard-coded, so dark mode works.
+- **Colours, radii and sizes come from tokens** (`var(--accent)`), never hard-coded, so every theme works.
 - **Tappable things are at least `var(--tap-size)` (48px) tall.**
 - **Inputs use a font size of 16px or more.** iOS Safari zooms the page in on smaller inputs.
 - Interactive states use `:active` (a press), because there's no hover on phones.
@@ -25,31 +25,58 @@ Rules of thumb:
 
 **File:** [`frontend/src/index.css`](../../frontend/src/index.css)
 
-Defined on `:root`. Dark values replace them inside `@media (prefers-color-scheme: dark)`.
+### How themes work
+
+`<html>` carries two attributes, and `index.css` has one block of tokens per value:
+
+| Attribute | Values | Set by |
+| --- | --- | --- |
+| `data-base` | `light`, `dark`, `black`, `navy` | [`theme.ts`](utilities.md#themets) from `settings.theme_base`. **System** is resolved to `light` or `dark` from the phone's setting, and re-resolved when it changes. |
+| `data-accent` | `blue`, `green`, `purple`, `orange`, `red`, `pink`, `teal`, `gold` | `theme.ts` from `settings.theme_accent` |
+
+- The blocks are written as `[data-base='navy']` rather than `:root[data-base='navy']`, so **any** element with the attribute gets those tokens. Settings uses that to preview each base inside its own button.
+- Plain `:root` (no attributes) gets the light base and blue accent, as a fallback.
+- Each accent defines a shade for the light base (`--accent-l`, darker, so white text on it stays readable) and one for dark bases (`--accent-d`). The base block picks one: `--accent: var(--accent-l)` or `var(--accent-d)`. Bright dark-base shades (green, orange, pink, teal, gold) set `--on-accent-d` to near-black text.
+- **Derived tokens** use `color-mix()`, so they follow any accent: `--heat-1…3` mix the accent into `--heat-0` at 25/50/75%, `--heat-4` is the accent, and `--accent-tint` is 10% (light) or 16% (dark) accent over `--surface`.
+- To avoid a flash of the default colours, a small script in `index.html` sets both attributes from the last theme (cached in `localStorage`) before anything is drawn. See [PWA and assets → index.html](pwa-and-assets.md#indexhtml).
 
 ### Colours
 
-| Token | Light | Dark | Used for |
+| Token | Light | Dark | Black | Navy | Used for |
+| --- | --- | --- | --- | --- | --- |
+| `--text` | `#1f2328` | `#e6e7ea` | `#e6e7ea` | `#e6e9f0` | Body text |
+| `--text-muted` | `#6b6f76` | `#9a9ea6` | `#9a9ea6` | `#94a0b8` | Secondary text, dates, hints |
+| `--bg` | `#f6f7f9` | `#111215` | `#000000` | `#0b1324` | Page background |
+| `--surface` | `#ffffff` | `#1b1d22` | `#0e0f11` | `#121c31` | Cards, tiles, inputs, tab bar |
+| `--surface-pressed` | `#eceef2` | `#262930` | `#1a1b1f` | `#1b2740` | `:active` press feedback, selected options |
+| `--border` | `#e3e4e8` | `#2c2e35` | `#1f2125` | `#22304b` | Card and row borders |
+| `--border-strong` | `#c9ccd3` | `#3d4049` | `#33363d` | `#34456a` | Input and control borders |
+| `--figure` | `#c4c8cf` | `#393c45` | `#2e3138` | `#2d3b5a` | Un-highlighted body-figure parts |
+| `--heat-0` | `#ebedf0` | `#262930` | `#1a1b1f` | `#1b2740` | Calendar: no sets |
+| `--heat-1…4` | derived | derived | derived | derived | Calendar levels 1–4 (4 = the accent) |
+| `--accent` | `--accent-l` | `--accent-d` | `--accent-d` | `--accent-d` | Primary buttons, links, active tab, highlights, chart line |
+| `--accent-tint` | derived | derived | derived | derived | Background of today's split tiles |
+| `--on-accent` | `--on-accent-l` | `--on-accent-d` | `--on-accent-d` | `--on-accent-d` | Text on accent buttons |
+| `--ok` | `#1a7f37` | `#3fb950` | same | same | Success colour (defined but not currently used) |
+| `--warn` | `#9a6700` | `#d29922` | same | same | Plateau pill |
+| `--error` | `#cf222e` | `#f85149` | same | same | Errors, Delete/Archive buttons |
+
+### Accents
+
+| Accent | `--accent-l` (light base) | `--accent-d` (dark bases) | Text on it (dark bases) |
 | --- | --- | --- | --- |
-| `--text` | `#1f2328` | `#e6e7ea` | Body text |
-| `--text-muted` | `#6b6f76` | `#9a9ea6` | Secondary text, dates, hints |
-| `--bg` | `#f6f7f9` | `#111215` | Page background |
-| `--surface` | `#ffffff` | `#1b1d22` | Cards, tiles, inputs, tab bar |
-| `--surface-pressed` | `#eceef2` | `#262930` | `:active` press feedback, selected options |
-| `--border` | `#e3e4e8` | `#2c2e35` | Card and row borders |
-| `--border-strong` | `#c9ccd3` | `#3d4049` | Input and control borders |
-| `--figure` | `#c4c8cf` | `#393c45` | Un-highlighted body-figure parts |
-| `--heat-0` | `#ebedf0` | `#262930` | Calendar: no sets |
-| `--heat-1` | `#c4d9fc` | `#15305c` | Calendar level 1 |
-| `--heat-2` | `#86b1f7` | `#1d4a94` | Calendar level 2 |
-| `--heat-3` | `#4a8af0` | `#2f6ad1` | Calendar level 3 |
-| `--heat-4` | `#1f6feb` | `#4c8dff` | Calendar level 4 (= accent) |
-| `--accent` | `#1f6feb` | `#4c8dff` | Primary buttons, links, active tab, highlights, chart line |
-| `--accent-tint` | `#eaf1fe` | `#18243a` | Background of today's split tiles |
-| `--on-accent` | `#ffffff` | `#ffffff` | Text on accent buttons |
-| `--ok` | `#1a7f37` | `#3fb950` | Success colour (defined but not currently used) |
-| `--warn` | `#9a6700` | `#d29922` | OVERDUE label, Plateau pill |
-| `--error` | `#cf222e` | `#f85149` | Errors, Delete/Archive buttons |
+| blue (default) | `#1f6feb` | `#4c8dff` | white |
+| green | `#1a7f37` | `#3fb950` | `#0d1117` |
+| purple | `#8250df` | `#a371f7` | white |
+| orange | `#bc4c00` | `#f0883e` | `#0d1117` |
+| red | `#cf222e` | `#f85149` | white |
+| pink | `#bf3989` | `#f778ba` | `#0d1117` |
+| teal | `#0f7b8a` | `#39c5cf` | `#0d1117` |
+| gold | `#9a6700` | `#e3b341` | `#0d1117` |
+
+Text on the light-base shades is always white. `--accent-swatch` is a helper for the Settings swatches: each swatch carries its own `data-accent`, and gets `--accent-l` or `--accent-d` depending on the current base.
+
+**Adding a base or accent:** add the value to the enum in `backend/app/models.py` and a migration (`ALTER TYPE … ADD VALUE`), to the union in `api/types.ts`, to `THEME_BASES`/`THEME_ACCENTS` in `theme.ts`, and a token block in `index.css`.
 
 ### Sizes
 
@@ -63,8 +90,8 @@ Defined on `:root`. Dark values replace them inside `@media (prefers-color-schem
 | Where | Value | Why |
 | --- | --- | --- |
 | `.flashRecord` (LiftPage) and `.prBadge` (DayDetails) | `#1a7f37` + white text | The same green in both modes, so white text stays readable (dark-mode `--ok` is too light for white text) |
-| `index.html` `theme-color` metas | `#f6f7f9` / `#111215` | Browser UI colour must be a literal value; it matches `--bg` |
-| `manifest.webmanifest` | `#f6f7f9`, `#1f6feb` | Same reason |
+| `index.html` `theme-color` metas | `#f6f7f9` / `#111215` | Initial browser UI colour. `theme.ts` overwrites both with the current `--bg` once the theme is applied. |
+| `manifest.webmanifest` | `#f6f7f9`, `#1f6feb` | Must be literal values; it doesn't follow the chosen theme |
 | Icon SVG | `#1f6feb`, white | Matches the light accent |
 
 ### Global rules in `index.css`
@@ -72,7 +99,7 @@ Defined on `:root`. Dark values replace them inside `@media (prefers-color-schem
 | Selector | Rule | Why |
 | --- | --- | --- |
 | `:root` | `font: 16px/1.5 system-ui, …` | Native system font on every device |
-| `:root` | `color-scheme: light dark` | Native controls (date picker, scrollbars, checkboxes) follow the theme |
+| each base block | `color-scheme: light` or `dark` | Native controls (date picker, checkboxes) match the chosen base |
 | `:root` | `-webkit-tap-highlight-color: transparent` | No grey flash on tap (iOS) |
 | `html` | `touch-action: manipulation` | Disables double-tap-to-zoom, so taps register instantly |
 | `html` | `-webkit-text-size-adjust: 100%` | Stops iOS enlarging text in landscape |
@@ -121,15 +148,15 @@ Every module and its classes. Shared patterns (segmented controls, title rows, b
 | `components/TabBar.module.css` | `bar`, `slots`, `tab`, `tabActive`, `label`, `placeholder` | Fixed bottom, `z-index: 20`, 5-column grid, safe-area bottom padding |
 | `pages/CalendarPage.module.css` | `title`, `totals`, `grid`, `weekday`, `month`, `square`, `today`, `selected`, `level0`…`level4`, `legend`, `legendSquare`, `sheetSpacer` | Grid `2.5rem repeat(7, minmax(0, 1fr))`, gap 5px, max 420px; squares `aspect-ratio: 1`, radius 6px |
 | `pages/FormPage.module.css` | `title`, `liftName` | Shared by log/edit set pages |
-| `pages/HomePage.module.css` | `title`, `grid`, `tile`, `today`, `todayLabel`, `overdueLabel` | 2-column grid; tiles `min-height: 132px; padding: 12px` (keep, so all 8 fit on screen); corner labels are 0.6rem uppercase |
+| `pages/HomePage.module.css` | `title`, `grid`, `tile`, `today`, `todayLabel` | 2-column grid; tiles `min-height: 132px; padding: 12px` (keep, so all 8 fit on screen); the TODAY corner label is 0.6rem uppercase |
 | `pages/LiftPage.module.css` | `titleRow`, `title`, `archived`, `logButton`, `flash`, `flashRecord`, `cards`, `empty` | Log set is a 56px accent link-button |
 | `pages/MuscleGroupPage.module.css` | `titleRow`, `title`, `list`, `row`, `liftName`, `badge`, `lastDate`, `empty` | Rows ≥ 60px; `badge` = amber outlined "Plateau" pill |
-| `pages/SettingsPage.module.css` | `title`, `label`, `sectionLabel`, `hint`, `segmented`, `segment`, `segmentActive`, `linkRow`, `error`, `added` | `linkRow`: a 52px bordered row with a muted chevron that opens another page. `SplitPage` reuses `title` and `hint`. |
+| `pages/SettingsPage.module.css` | `title`, `label`, `sectionLabel`, `hint`, `segmented`, `segment`, `segmentActive`, `linkRow`, `subLabel`, `bases`, `base`, `baseActive`, `basePreview`, `basePreviewHalf`, `basePreviewDot`, `accents`, `accent`, `accentActive`, `accentSwatch`, `error`, `added` | `linkRow`: a 52px bordered row with a muted chevron that opens another page. Theme pickers: a 5-column grid of base buttons (each preview span has `data-base`, so `var(--bg)` shows that base) and a 4-column grid of accent buttons (`accentSwatch` uses `--accent-swatch`); the selected one gets an accent border. `SplitPage` reuses `title` and `hint`. |
 
 ### Shared patterns
 - **Segmented control** (`segmented` / `segment` / `segmentActive`), in SetForm and SettingsPage: a bordered row of equal buttons, the active one filled with `--accent`. Adjacent segments get a left border (`.segment + .segment` etc.).
 - **Title row** (`titleRow`), in MuscleGroupPage and LiftPage: a flex row with the title and the Edit button, `flex-wrap: wrap`. `.titleRow > form { flex-basis: 100% }` makes an open Edit panel drop to its own line.
-- **Badges/labels:** small uppercase bold text in `--accent` (TODAY) or `--warn` (OVERDUE, Plateau).
+- **Badges/labels:** small uppercase bold text in `--accent` (TODAY) or `--warn` (Plateau).
 
 ---
 
@@ -139,7 +166,7 @@ When adding UI, check:
 - [ ] Tap targets ≥ 48px tall (`min-height: var(--tap-size)`)
 - [ ] Inputs have a font-size of 16px or more (`1rem`)
 - [ ] It fits at **320px** wide (smallest iPhone) with no sideways scrolling
-- [ ] It looks right in both light and dark mode (only tokens used)
+- [ ] It looks right on a light and a dark base, with a couple of accents (only tokens used)
 - [ ] Nothing is hidden behind the fixed tab bar (`#root` bottom padding handles normal flow; fixed elements must offset by `--tab-bar-height`)
 - [ ] Animations are disabled under `prefers-reduced-motion`
 - [ ] On Home, all 8 tiles still fit on a ~390×844 screen

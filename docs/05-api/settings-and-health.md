@@ -26,39 +26,45 @@ Through nginx you'll get a **502 Bad Gateway** for a few seconds after `docker c
 
 ## Settings
 
-App-wide settings, stored as a single database row. Today there's one setting.
+App-wide settings, stored as a single database row: the default unit and the theme. (When users are added, this becomes one row per user.)
 
 ### The settings object
 
 | Field | Type | Default | Meaning |
 | --- | --- | --- | --- |
 | `default_unit` | `"lbs"` \| `"kg"` \| `"plates"` | `"lbs"` | The unit preselected the **first** time you log a lift on a machine. After that, the form uses the unit you last used on that lift + machine. |
+| `theme_base` | `"system"` \| `"light"` \| `"dark"` \| `"black"` \| `"navy"` | `"system"` | Background colours. `system` follows the phone's light/dark setting. |
+| `theme_accent` | `"blue"` \| `"green"` \| `"purple"` \| `"orange"` \| `"red"` \| `"pink"` \| `"teal"` \| `"gold"` | `"blue"` | Accent colour (buttons, highlights, calendar) |
 
 ### Read settings
 `GET /api/settings`
 
 **Response 200:**
 ```json
-{"default_unit": "lbs"}
+{"default_unit": "lbs", "theme_base": "system", "theme_accent": "blue"}
 ```
 
 ### Update settings
 `PATCH /api/settings`
 
+Send only the fields to change; the others are left alone. None of them can be `null`.
+
 | Body field | Type | Required |
 | --- | --- | --- |
-| `default_unit` | `"lbs"` \| `"kg"` \| `"plates"` | yes |
+| `default_unit` | as above | no |
+| `theme_base` | as above | no |
+| `theme_accent` | as above | no |
 
 | Status | When |
 | --- | --- |
 | 200 | Saved; returns the settings |
-| 422 | Missing or unknown unit |
+| 422 | An unknown value, or `null` |
 
 ```bash
-curl -s -X PATCH localhost:8000/api/settings -H 'Content-Type: application/json' -d '{"default_unit": "kg"}'
-# {"default_unit": "kg"}
+curl -s -X PATCH localhost:8000/api/settings -H 'Content-Type: application/json' -d '{"theme_accent": "teal"}'
+# {"default_unit": "lbs", "theme_base": "system", "theme_accent": "teal"}
 ```
 
-**UI:** Settings → *Default unit* (lbs / kg / plates). Tapping a unit saves immediately. The response is written straight into the frontend cache (`setQueryData`) rather than refetched.
+**UI:** Settings → *Default unit* and *Theme*. Tapping saves immediately. The frontend updates its cache optimistically before the response arrives, then writes the response in (`setQueryData`) rather than refetching.
 
-> Adding another setting means adding a column to the `settings` table (with a migration), a field to `SettingsRead`/`SettingsUpdate` in `schemas.py`, and to `Settings` in `frontend/src/api/types.ts`. `SettingsUpdate.default_unit` is currently **required**, so make new fields optional if you want true partial updates.
+> Adding another setting means adding a column to the `settings` table (with a migration), a field to `SettingsRead`/`SettingsUpdate` in `schemas.py`, and to `Settings` in `frontend/src/api/types.ts`. Give the new `SettingsUpdate` field a default of `None` so it stays optional; the router applies only the fields sent (`exclude_unset`).

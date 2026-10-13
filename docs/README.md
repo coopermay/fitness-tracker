@@ -11,7 +11,7 @@ This wiki covers the whole project: how it's put together, every database table,
 | If you want to… | Read |
 | --- | --- |
 | Understand the system in 5 minutes | [Architecture](01-overview/architecture.md) |
-| Learn the vocabulary (record, PR, est. 1RM, split, overdue…) | [Domain glossary](01-overview/domain-glossary.md) |
+| Learn the vocabulary (record, PR, est. 1RM, split, plateau…) | [Domain glossary](01-overview/domain-glossary.md) |
 | Run the app on your machine | [Setup](02-getting-started/setup.md) |
 | Build a new feature end to end | [Development workflow](02-getting-started/development-workflow.md) |
 | Call the API | [API overview](05-api/README.md) |
@@ -58,7 +58,7 @@ This wiki covers the whole project: how it's put together, every database table,
 - [Components](06-frontend/components.md): every shared component
 - [Data layer](06-frontend/data-layer.md): API client, TypeScript types, TanStack Query hooks, cache invalidation
 - [Utilities](06-frontend/utilities.md): formatting, dates, calendar maths, swipe hook, body regions
-- [Styling](06-frontend/styling.md): design tokens, dark mode, CSS modules, mobile rules
+- [Styling](06-frontend/styling.md): design tokens, themes, CSS modules, mobile rules
 - [PWA and assets](06-frontend/pwa-and-assets.md): manifest, icons, installing on a phone
 - [Build and tooling](06-frontend/build-and-tooling.md): Vite, TypeScript, oxlint, npm scripts
 

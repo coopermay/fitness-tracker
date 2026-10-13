@@ -53,15 +53,3 @@
   letter-spacing: 0.03em;
   text-transform: uppercase;
 }
-
-/* Behind on this week's split */
-.overdueLabel {
-  position: absolute;
-  top: 7px;
-  right: 8px;
-  color: var(--warn);
-  font-size: 0.6rem;
-  font-weight: 700;
-  letter-spacing: 0.03em;
-  text-transform: uppercase;
-}

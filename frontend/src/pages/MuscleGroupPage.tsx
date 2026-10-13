@@ -67,7 +67,7 @@ export function MuscleGroupPage() {
                 <span className={styles.liftName}>
                   {lift.name}
                   {plateaued.has(lift.id) && (
-                    <span className={styles.badge} title="No PR in the last 4 weeks">
+                    <span className={styles.badge} title="No PR in the last 3 weeks">
                       Plateau
                     </span>
                   )}

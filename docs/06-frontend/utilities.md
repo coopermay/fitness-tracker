@@ -1,6 +1,6 @@
 # Utilities
 
-Small, mostly pure helper modules at the top of [`frontend/src/`](../../frontend/src/). None of them render anything. Only `useSwipe` (a custom hook) and `swipeBack.ts` (a context) use React.
+Small, mostly pure helper modules at the top of [`frontend/src/`](../../frontend/src/). None of them render anything. Only `useSwipe` and `useTheme` (custom hooks) and `swipeBack.ts` (a context) use React.
 
 | File | Exports |
 | --- | --- |
@@ -12,6 +12,7 @@ Small, mostly pure helper modules at the top of [`frontend/src/`](../../frontend
 | [`tabs.ts`](#tabsts) | `TAB_PATHS`, `tabIndex`, `SlideState`, `slideStateFor` |
 | [`useSwipe.ts`](#useswipets) | `useSwipe` |
 | [`swipeBack.ts`](#swipebackts) | `SwipeBackContext` |
+| [`theme.ts`](#themets) | `THEME_BASES`, `THEME_ACCENTS`, `useTheme` |
 | [`bodyRegions.ts`](#bodyregionsts) | `BodyRegion`, `regionForMuscleGroup` |
 
 > **Why build dates from parts?** `new Date("2026-09-25")` treats the string as **UTC** midnight, which in US timezones is the evening of Sep 24. Every helper here splits `"YYYY-MM-DD"` into numbers and calls `new Date(year, month - 1, day)`, which is local midnight.
@@ -150,6 +151,27 @@ A **context** passes a value to every component inside its provider without thre
 - On a swipe right on a non-tab page, App navigates to the ref's current value, if there is one.
 
 The default value (outside any provider) does nothing. That keeps `BackLink` usable on its own, e.g. in isolation or in a future test.
+
+---
+
+## theme.ts
+
+**File:** [`frontend/src/theme.ts`](../../frontend/src/theme.ts) — applies the theme chosen in Settings.
+
+| Export | What it is |
+| --- | --- |
+| `THEME_BASES` | `{value, label}[]`: System, Light, Dark, Black, Navy (display order) |
+| `THEME_ACCENTS` | The 8 accent names, in display order |
+| `useTheme(base, accent)` | Custom hook, called once in `App.tsx` with `settings.data?.theme_base/theme_accent`. Does nothing until settings load. |
+
+**`useTheme`** runs an effect whenever `base` or `accent` changes. The effect:
+1. calls `applyTheme` (not exported), which
+   - sets `data-base` on `<html>` (resolving `system` with `matchMedia('(prefers-color-scheme: dark)')`) and `data-accent`,
+   - copies the resulting `--bg` into both `<meta name="theme-color">` tags, so the browser's toolbar/status bar matches,
+   - saves `{base, accent}` to `localStorage` under `theme` (in a `try`, since storage can be unavailable);
+2. on **System** only, listens for the phone switching light/dark and re-applies. The cleanup removes the listener.
+
+The `localStorage` copy is only a cache for the first paint; the server's settings are the source of truth. The inline script in `index.html` reads the same key and does the same `system` resolution, so **keep the two in sync**.
 
 ---
 

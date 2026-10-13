@@ -16,6 +16,23 @@
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-title" content="Lifts" />
     <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+
+    <!-- Apply the last-used theme before anything is drawn, so the page never
+         flashes the default colours. Mirrors applyTheme() in src/theme.ts. -->
+    <script>
+      ;(function () {
+        var theme = {}
+        try {
+          theme = JSON.parse(localStorage.getItem('theme')) || {}
+        } catch (e) {}
+        var base = theme.base || 'system'
+        if (base === 'system') {
+          base = matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
+        }
+        document.documentElement.dataset.base = base
+        document.documentElement.dataset.accent = theme.accent || 'blue'
+      })()
+    </script>
   </head>
   <body>
     <div id="root"></div>

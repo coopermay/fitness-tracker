@@ -88,7 +88,7 @@ export function useSplit() {
   })
 }
 
-// Plateau / overdue flags. `today` comes from the phone, not the server's
+// Plateau flags. `today` comes from the phone, not the server's
 // clock, which may be in another timezone.
 export function useInsights(today: string) {
   return useQuery({
@@ -191,11 +191,25 @@ export function useUpdateMachine() {
   })
 }
 
+// Send only what changed, e.g. { theme_accent: 'teal' }.
 export function useUpdateSettings() {
   const queryClient = useQueryClient()
   return useMutation({
-    mutationFn: (changes: Settings) => apiPatch<Settings>('/settings', changes),
-    // The response is the new settings, so put it straight into the cache
+    mutationFn: (changes: Partial<Settings>) => apiPatch<Settings>('/settings', changes),
+    // Optimistic update: change the cache right away, before the server
+    // answers, so a new theme or unit shows instantly. onMutate's return value
+    // is handed to onError as `context`, to undo the change if the save fails.
+    onMutate: (changes) => {
+      const previous = queryClient.getQueryData<Settings>(queryKeys.settings)
+      if (previous) {
+        queryClient.setQueryData(queryKeys.settings, { ...previous, ...changes })
+      }
+      return { previous }
+    },
+    onError: (_error, _changes, context) => {
+      queryClient.setQueryData(queryKeys.settings, context?.previous)
+    },
+    // The response is the saved settings, so put it straight into the cache
     // instead of refetching.
     onSuccess: (settings) => queryClient.setQueryData(queryKeys.settings, settings),
   })
@@ -205,10 +219,7 @@ export function useUpdateSplit() {
   const queryClient = useQueryClient()
   return useMutation({
     mutationFn: (split: Split) => apiPut<Split>('/split', split),
-    onSuccess: (split) => {
-      queryClient.setQueryData(queryKeys.split, split)
-      void queryClient.invalidateQueries({ queryKey: queryKeys.insights }) // overdue depends on it
-    },
+    onSuccess: (split) => queryClient.setQueryData(queryKeys.split, split),
   })
 }
 

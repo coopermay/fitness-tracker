@@ -55,7 +55,7 @@ flowchart TD
 | 7. Types | Mirror the new schema in `types.ts`. | Nothing checks this at runtime; keep it in sync by hand. |
 | 8. Hooks | Add a query key to `queryKeys` and a `use…` hook. Decide `staleTime`. Update every mutation that should invalidate it. | Update the [invalidation matrix](../06-frontend/data-layer.md#invalidation-matrix). |
 | 9. UI | Pages fetch, components display. Call every hook before any early `return`. | Read the clock only through `todayIsoDate()` / `currentWeekday()`. |
-| 10. Styles | A `*.module.css` per component. Use tokens. Make tap targets ≥ 48px and inputs ≥ 16px font. | Dark mode: use variables, not hex values. |
+| 10. Styles | A `*.module.css` per component. Use tokens. Make tap targets ≥ 48px and inputs ≥ 16px font. | Themes: use variables, not hex values. |
 | 11. Docs | Update the pages listed in the [wiki home](../README.md#keeping-this-wiki-up-to-date). | Add a [design decision](../01-overview/design-decisions.md) if you chose between alternatives. |
 
 ---
@@ -155,7 +155,7 @@ Full details are in [Migrations](../03-database/migrations.md).
 ## Quality checks before committing
 
 ```bash
-cd backend && uv run pytest              # 61 tests, ~5s; needs the db container
+cd backend && uv run pytest              # 60 tests, ~5s; needs the db container
 cd frontend && npm run build             # type-checks (tsc -b) then bundles
 cd frontend && npm run lint              # oxlint
 ```
