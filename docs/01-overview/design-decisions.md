@@ -136,10 +136,10 @@ A log of the significant choices made while building Lift Tracker: what was deci
 **Why:** It's fast and reproducible, and installs the right Python (3.12) itself.
 **Consequences:** On the Intel Mac this was built on, `brew install uv` failed, so the official installer (`curl … | sh`) is the documented route.
 
-## 27. Swipe between tabs only, with a slide-in animation
-**Decision:** Left/right swipes change tabs on the three tab pages only. The new page slides 48px in from the side and fades in. Tapping a tab slides the same way. (The user chose "tabs only" and "swipe then slide" over following the finger.)
+## 27. Swipe between tabs, with a slide-in animation
+**Decision:** Left/right swipes change tabs on the three tab pages. The new page slides 48px in from the side and fades in. Tapping a tab slides the same way. (The user chose "swipe then slide" over following the finger.)
 **Why:** It feels native without the complexity, and conflicts with vertical scrolling, of a drag-to-follow carousel.
-**Consequences:** Nested pages (muscle group, lift, forms) don't swipe. The page wrapper is keyed by path, so every navigation remounts the page.
+**Consequences:** The page wrapper is keyed by path, so every navigation remounts the page. Nested pages swipe differently; see 30.
 
 ## 28. Hidden scrollbars
 **Decision:** Scrollbars are hidden globally with CSS. Scrolling still works.
@@ -150,6 +150,16 @@ A log of the significant choices made while building Lift Tracker: what was deci
 **Decision:** The TODAY / OVERDUE labels are small corner labels beside the figure's head. Tiles keep `12px` padding and a `132px` minimum height.
 **Why:** All eight muscle group tiles should fit on one phone screen (the user asked for this when extra padding made the tiles taller).
 **Consequences:** Don't add vertical padding to tiles for new labels; find room in the corners instead.
+
+## 30. Swipe right to go back, wherever there's a back link
+**Decision:** On a nested page, swiping right goes to the same place as the page's `BackLink` (lift → muscle group → Home, weekly split → Settings), sliding in from the left. Each `BackLink` registers its target with App through a small context. Pages without a back link (the set forms) don't swipe.
+**Why:** The user asked to swipe out of pages like a native app. Going to the back link's target rather than `history.back()` means a deep link or a fresh app launch still goes to the logical parent. Tying it to `BackLink` keeps one source of truth for "where back goes". Leaving the forms out means a half-filled set can't be lost by an accidental swipe.
+**Consequences:** Every new nested page gets swipe-back for free by using `BackLink`. In mobile Safari (not the installed app), the browser's own edge-swipe can also go back through history; started away from the screen edge, the app's swipe is used.
+
+## 31. The weekly split has its own page
+**Decision:** Settings shows an "Edit weekly split ›" row that opens `/settings/split`, instead of the 7-day editor inline.
+**Why:** The user asked for it. It keeps Settings short as it grows.
+**Consequences:** The route is nested under `/settings`, so the Settings tab stays highlighted there.
 
 ---
 

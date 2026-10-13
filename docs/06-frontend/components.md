@@ -5,7 +5,7 @@ Every reusable component in [`frontend/src/components/`](../../frontend/src/comp
 | Component | Purpose | Used by |
 | --- | --- | --- |
 | [AddByName](#addbyname) | Button that becomes a one-field "add by name" form | MuscleGroupPage, SettingsPage |
-| [BackLink](#backlink) | "‹ Previous page" pill | MuscleGroupPage, LiftPage |
+| [BackLink](#backlink) | "‹ Previous page" pill; also sets the swipe-back target | MuscleGroupPage, LiftPage, SplitPage |
 | [BodyFigure](#bodyfigure) | SVG person with one body part highlighted | HomePage |
 | [DayDetails](#daydetails) | Calendar day panel above the tab bar | CalendarPage |
 | [EditItem](#edititem) | "Edit" → rename / archive / unarchive panel | MuscleGroupPage, LiftPage, MachineCard |
@@ -15,7 +15,7 @@ Every reusable component in [`frontend/src/components/`](../../frontend/src/comp
 | [ProgressChart](#progresschart) | Hand-drawn SVG line chart of est. 1RM per session | MachineCard |
 | [QueryStatus](#querystatus) | "Loading…" / "Couldn't load: …" | Most pages |
 | [SetForm](#setform) | The set form (log and edit) | LogSetPage, EditSetPage |
-| [SplitEditor](#spliteditor) | Weekly split editor with a draft + Save | SettingsPage |
+| [SplitEditor](#spliteditor) | Weekly split editor with a draft + Save | SplitPage |
 | [TabBar](#tabbar) | Fixed bottom navigation | App |
 
 ---
@@ -51,7 +51,9 @@ A dashed "+ Add …" button. Tapping it turns into a text input with **Add** and
 | `to` | `string` | Destination path |
 | `label` | `string` | Where it goes, e.g. "Muscle groups", "Chest" |
 
-Renders a React Router `Link`: an inline SVG chevron (`M15 5l-7 7 7 7`) followed by the label, styled as an accent-coloured pill (40px tall). It always links to the **logical parent**, not browser history, so it works the same whether you arrived by tapping through or by a deep link.
+Renders a React Router `Link`: an inline SVG chevron (`M15 5l-7 7 7 7`) followed by the label, styled as an accent-coloured pill (40px tall). It always links to the **logical parent**, not browser history, so it works the same whether you arrived by tapping through or by a deep link. The link passes router state `{slideFrom: 'left'}`, so the parent page slides in from the left.
+
+**Swipe back:** while it's on screen, an effect registers `to` with App through `SwipeBackContext` (`useContext`), and the cleanup clears it when the page goes away. App's swipe-right handler then navigates there. That's why any page with a `BackLink` can be swiped out of. See [App.tsx → Swiping](routing-and-pages.md#swiping).
 
 ---
 

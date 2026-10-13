@@ -119,7 +119,7 @@ Full details are in [Migrations](../03-database/migrations.md).
 1. Create `frontend/src/pages/MyPage.tsx` and `MyPage.module.css`.
 2. Add a `<Route path="/my-path" element={<MyPage />} />` in `App.tsx`, **above** the `*` catch-all.
 3. Navigation:
-   - **A page inside Home** (like a lift page): link to it, and give it a `BackLink`.
+   - **A page inside Home** (like a lift page) **or Settings** (like the weekly split): link to it, and give it a `BackLink`. That also makes swiping right go back.
    - **A new tab**: replace one of the empty placeholder `<span>`s in `TabBar.tsx` with a `<Tab to="/my-path" label="…" icon={…} />`, then add the path to `TAB_PATHS` in `tabs.ts` at the matching position, so swiping and the slide direction work. Tab pages don't need a back link.
 4. Loading/error: return `<QueryStatus …/>` while queries are pending or failed.
 

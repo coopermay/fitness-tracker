@@ -124,7 +124,7 @@ Every module and its classes. Shared patterns (segmented controls, title rows, b
 | `pages/HomePage.module.css` | `title`, `grid`, `tile`, `today`, `todayLabel`, `overdueLabel` | 2-column grid; tiles `min-height: 132px; padding: 12px` (keep, so all 8 fit on screen); corner labels are 0.6rem uppercase |
 | `pages/LiftPage.module.css` | `titleRow`, `title`, `archived`, `logButton`, `flash`, `flashRecord`, `cards`, `empty` | Log set is a 56px accent link-button |
 | `pages/MuscleGroupPage.module.css` | `titleRow`, `title`, `list`, `row`, `liftName`, `badge`, `lastDate`, `empty` | Rows ≥ 60px; `badge` = amber outlined "Plateau" pill |
-| `pages/SettingsPage.module.css` | `title`, `label`, `sectionLabel`, `hint`, `segmented`, `segment`, `segmentActive`, `error`, `added` | |
+| `pages/SettingsPage.module.css` | `title`, `label`, `sectionLabel`, `hint`, `segmented`, `segment`, `segmentActive`, `linkRow`, `error`, `added` | `linkRow`: a 52px bordered row with a muted chevron that opens another page. `SplitPage` reuses `title` and `hint`. |
 
 ### Shared patterns
 - **Segmented control** (`segmented` / `segment` / `segmentActive`), in SetForm and SettingsPage: a bordered row of equal buttons, the active one filled with `--accent`. Adjacent segments get a left border (`.segment + .segment` etc.).

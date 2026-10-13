@@ -1,6 +1,6 @@
 # Utilities
 
-Small, mostly pure helper modules at the top of [`frontend/src/`](../../frontend/src/). None of them render anything; `useSwipe` is the only one that uses React (it's a custom hook).
+Small, mostly pure helper modules at the top of [`frontend/src/`](../../frontend/src/). None of them render anything. Only `useSwipe` (a custom hook) and `swipeBack.ts` (a context) use React.
 
 | File | Exports |
 | --- | --- |
@@ -11,6 +11,7 @@ Small, mostly pure helper modules at the top of [`frontend/src/`](../../frontend
 | [`flash.ts`](#flashts) | `FlashMessage`, `LiftPageState` (types only) |
 | [`tabs.ts`](#tabsts) | `TAB_PATHS`, `tabIndex`, `SlideState`, `slideStateFor` |
 | [`useSwipe.ts`](#useswipets) | `useSwipe` |
+| [`swipeBack.ts`](#swipebackts) | `SwipeBackContext` |
 | [`bodyRegions.ts`](#bodyregionsts) | `BodyRegion`, `regionForMuscleGroup` |
 
 > **Why build dates from parts?** `new Date("2026-09-25")` treats the string as **UTC** midnight, which in US timezones is the evening of Sep 24. Every helper here splits `"YYYY-MM-DD"` into numbers and calls `new Date(year, month - 1, day)`, which is local midnight.
@@ -105,7 +106,7 @@ The form pages pass it as router state, `navigate('/lifts/3', { replace: true, s
 | Export | Value / behaviour |
 | --- | --- |
 | `TAB_PATHS` | `['/', '/calendar', '/settings']`, the swipeable pages in tab-bar order (placeholders skipped) |
-| `tabIndex(pathname)` | Index in `TAB_PATHS` for an **exact** match, else `null` (e.g. `/lifts/3` → `null`, so no swiping) |
+| `tabIndex(pathname)` | Index in `TAB_PATHS` for an **exact** match, else `null` (e.g. `/lifts/3` → `null`, where swiping right goes back instead) |
 | `interface SlideState` | `{ slideFrom: 'left' \| 'right' }`, carried in router state |
 | `slideStateFor(from, to)` | `undefined` if `from` is null or the same tab; else `{slideFrom: to > from ? 'right' : 'left'}` |
 
@@ -125,13 +126,30 @@ const handlers = useSwipe({ onSwipeLeft, onSwipeRight })
 | Option | Called when |
 | --- | --- |
 | `onSwipeLeft` | The finger moved right-to-left (go to the **next** tab) |
-| `onSwipeRight` | The finger moved left-to-right (go to the **previous** tab) |
+| `onSwipeRight` | The finger moved left-to-right (go to the **previous** tab, or **back** on a nested page) |
 
 **How it decides:**
 - `onTouchStart` records the start position in a **ref** (`useRef`): it needs remembering, but changing it shouldn't re-render anything. It **ignores** multi-finger touches and touches that start inside an `input` or `textarea`, so dragging to move the text cursor doesn't change pages.
 - `onTouchEnd` computes `dx` and `dy`. It's a swipe only if `|dx| ≥ 60px` (`MIN_DISTANCE`) **and** `|dx| ≥ 2 × |dy|` (mostly sideways), so vertical scrolling never triggers it.
 
 Touch events only fire on touch screens. To try it on a Mac, use Chrome DevTools' device mode, which emulates touch.
+
+---
+
+## swipeBack.ts
+
+**File:** [`frontend/src/swipeBack.ts`](../../frontend/src/swipeBack.ts) — where swiping right should go on the current page.
+
+```ts
+export const SwipeBackContext = createContext<(to: string | null) => void>(() => {})
+```
+
+A **context** passes a value to every component inside its provider without threading it through props. Here the value is a function:
+- **`App.tsx`** provides `setSwipeBackTarget`, which writes App's `swipeBackTarget` ref. It's wrapped in `useCallback` so it's the same function on every render.
+- **`BackLink`** reads it with `useContext` and, in an effect, calls it with its `to`. The effect's cleanup calls it with `null`.
+- On a swipe right on a non-tab page, App navigates to the ref's current value, if there is one.
+
+The default value (outside any provider) does nothing. That keeps `BackLink` usable on its own, e.g. in isolation or in a future test.
 
 ---
 

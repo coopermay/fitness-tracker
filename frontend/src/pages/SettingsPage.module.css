@@ -49,6 +49,29 @@
   font-weight: 600;
 }
 
+/* A full-width row that opens another page, with a chevron on the right */
+.linkRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 52px;
+  padding: 0 14px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface);
+  color: var(--text);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.linkRow:active {
+  background: var(--surface-pressed);
+}
+
+.linkRow svg {
+  color: var(--text-muted);
+}
+
 .error {
   color: var(--error);
 }

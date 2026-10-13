@@ -3,7 +3,7 @@
 export const TAB_PATHS = ['/', '/calendar', '/settings']
 
 // Position of `pathname` among the tabs, or null if it isn't a tab page
-// (e.g. /lifts/3, which belongs to Home but doesn't swipe).
+// (e.g. /lifts/3, which belongs to Home; there, swiping right goes back instead).
 export function tabIndex(pathname: string): number | null {
   const index = TAB_PATHS.indexOf(pathname)
   return index === -1 ? null : index

@@ -182,7 +182,7 @@ Changing an item's display name. Renaming onto a name another item already uses 
 | Term | Meaning |
 | --- | --- |
 | **Tab** | One of the bottom-bar destinations: Home, Calendar, Settings. Two slots left of Home are blank placeholders for future tabs. |
-| **Tab page** | `/`, `/calendar`, `/settings`. Only these respond to left/right swipes. |
+| **Tab page** | `/`, `/calendar`, `/settings`. Swiping left/right here changes tab. On other pages with a back link, swiping right goes back instead. |
 | **Machine card** | One card per machine on a lift page: records per unit, a progress chart, and an expandable history. |
 | **Flash message** | A one-off banner on the lift page after saving ("New best at 185 lbs!", "Logged 185 lbs × 4", "Set updated", "Set deleted"), passed via router state. |
 | **Body figure** | The small SVG person on each Home tile, with the muscle group's body part highlighted. Back, triceps and glutes show the figure from behind. |

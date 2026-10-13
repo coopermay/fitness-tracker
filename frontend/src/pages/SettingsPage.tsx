@@ -1,15 +1,9 @@
 import { useState } from 'react'
-import {
-  useCreateMuscleGroup,
-  useMuscleGroups,
-  useSettings,
-  useSplit,
-  useUpdateSettings,
-} from '../api/queries'
+import { Link } from 'react-router'
+import { useCreateMuscleGroup, useSettings, useUpdateSettings } from '../api/queries'
 import type { WeightUnit } from '../api/types'
 import { AddByName } from '../components/AddByName'
 import { QueryStatus } from '../components/QueryStatus'
-import { SplitEditor } from '../components/SplitEditor'
 import styles from './SettingsPage.module.css'
 
 const UNITS: WeightUnit[] = ['lbs', 'kg', 'plates']
@@ -18,8 +12,6 @@ export function SettingsPage() {
   const settings = useSettings()
   const updateSettings = useUpdateSettings()
   const createMuscleGroup = useCreateMuscleGroup()
-  const split = useSplit()
-  const muscleGroups = useMuscleGroups()
   // Confirms the add, since the new group appears on Home, not on this page.
   const [addedMessage, setAddedMessage] = useState<string | null>(null)
 
@@ -67,14 +59,13 @@ export function SettingsPage() {
       <p className={styles.hint}>
         Pick what you train each day. Today's muscle groups are highlighted at the top of Home.
       </p>
-      {split.isPending || split.isError || muscleGroups.isPending || muscleGroups.isError ? (
-        <QueryStatus
-          isError={split.isError || muscleGroups.isError}
-          error={split.error ?? muscleGroups.error}
-        />
-      ) : (
-        <SplitEditor split={split.data} muscleGroups={muscleGroups.data} />
-      )}
+      <Link className={styles.linkRow} to="/settings/split">
+        Edit weekly split
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor"
+          strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+          <path d="M9 5l7 7-7 7" />
+        </svg>
+      </Link>
 
       <h2 className={styles.sectionLabel}>Muscle groups</h2>
       <p className={styles.hint}>New muscle groups appear on the Home screen.</p>

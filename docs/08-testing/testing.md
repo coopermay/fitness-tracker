@@ -182,10 +182,11 @@ There are no automated UI tests. After UI changes, run `npm run build && npm run
    - refreshing doesn't show the banner again.
 5. **Edit set:** change reps → "Set updated". Delete → confirm → "Set deleted", with no "Not found" flash.
 6. **Calendar:** grid, today outlined, tap a day → details with PR badges and lift links; tap again or ✕ to close.
-7. **Settings:** the default unit switches instantly; edit the split → Save split → Home reflects it; add a muscle group.
-8. **Tabs:** tap each tab (it slides in); swipe left/right on Home/Calendar/Settings; nested pages don't swipe.
-9. **Both themes:** toggle macOS/iOS dark mode.
-10. **Narrow screen:** 320px and 390px in DevTools' device mode.
+7. **Settings:** the default unit switches instantly; Edit weekly split → change a day → Save split → Home reflects it; add a muscle group.
+8. **Tabs:** tap each tab (it slides in); swipe left/right on Home/Calendar/Settings.
+9. **Swipe back:** on a lift page swipe right → muscle group, again → Home (each slides in from the left); same on Weekly split → Settings. The log/edit set forms don't swipe.
+10. **Both themes:** toggle macOS/iOS dark mode.
+11. **Narrow screen:** 320px and 390px in DevTools' device mode.
 
 ---
 

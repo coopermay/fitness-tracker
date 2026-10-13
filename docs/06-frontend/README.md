@@ -25,28 +25,30 @@ flowchart TD
     SM --> QCP["QueryClientProvider<br/>(server-data cache for every component)"]
     QCP --> BR["BrowserRouter<br/>(URL ↔ page)"]
     BR --> APP["App.tsx"]
-    APP --> WRAP["page wrapper div<br/>key = pathname, swipe handlers, slide-in class"]
+    APP --> CTX["SwipeBackContext<br/>(BackLink tells App where swipe-right goes)"]
+    CTX --> WRAP["page wrapper div<br/>key = pathname, swipe handlers, slide-in class"]
     WRAP --> ROUTES["Routes → one page"]
     APP --> TAB["TabBar (fixed bottom)"]
 ```
 
 1. **`index.html`** loads `/src/main.tsx` and declares the manifest, icons and mobile meta tags.
 2. **`main.tsx`** creates the one `QueryClient` and wraps the app in **providers**: `QueryClientProvider` (the cache) and `BrowserRouter` (routing). Every component inside can use their hooks without passing anything down.
-3. **`App.tsx`** renders the current route's page inside a wrapper that handles tab swipes and the slide-in animation, and renders the `TabBar` below it.
+3. **`App.tsx`** renders the current route's page inside a wrapper that handles swipes (between tabs, and back out of nested pages) and the slide-in animation, and renders the `TabBar` below it.
 
 ---
 
 ## Route map
 
-| Path | Page | Data hooks | Swipeable tab? | Tab highlighted |
+| Path | Page | Data hooks | Swipe | Tab highlighted |
 | --- | --- | --- | --- | --- |
-| `/` | `HomePage` | `useMuscleGroups`, `useSplit`, `useInsights` | ✅ (index 0) | Home |
-| `/muscle-groups/:muscleGroupId` | `MuscleGroupPage` | `useMuscleGroups`, `useLifts`, `useInsights` (+ create lift, update group) | — | Home |
-| `/lifts/:liftId` | `LiftPage` | `useLiftRecords`, `useMuscleGroups` (+ update lift) | — | Home |
+| `/` | `HomePage` | `useMuscleGroups`, `useSplit`, `useInsights` | Tab (index 0) | Home |
+| `/muscle-groups/:muscleGroupId` | `MuscleGroupPage` | `useMuscleGroups`, `useLifts`, `useInsights` (+ create lift, update group) | Right → Home | Home |
+| `/lifts/:liftId` | `LiftPage` | `useLiftRecords`, `useMuscleGroups` (+ update lift) | Right → muscle group | Home |
 | `/lifts/:liftId/log` | `LogSetPage` | `useLiftRecords`, `useSettings` (+ create set) | — | Home |
 | `/lifts/:liftId/sets/:setId` | `EditSetPage` | `useLiftRecords`, `useSettings` (+ update/delete set) | — | Home |
-| `/calendar` | `CalendarPage` | `useCalendar` | ✅ (index 1) | Calendar |
-| `/settings` | `SettingsPage` | `useSettings`, `useSplit`, `useMuscleGroups` (+ settings, split, create group) | ✅ (index 2) | Settings |
+| `/calendar` | `CalendarPage` | `useCalendar` | Tab (index 1) | Calendar |
+| `/settings` | `SettingsPage` | `useSettings` (+ settings, create group) | Tab (index 2) | Settings |
+| `/settings/split` | `SplitPage` | `useSplit`, `useMuscleGroups` (+ split) | Right → Settings | Settings |
 | `*` | `NotFoundPage` | — | — | Home |
 
 ### Navigation flow
@@ -59,15 +61,17 @@ flowchart LR
     Lift -->|tap history row| Edit["Edit set"]
     Log -->|Save, replace| Lift
     Edit -->|Save or Delete, replace| Lift
-    MG -->|back link| Home
-    Lift -->|back link| MG
+    MG -->|back link or swipe right| Home
+    Lift -->|back link or swipe right| MG
     Cal["Calendar /calendar"] -->|tap lift in day details| Lift
     Home <-->|swipe or tab| Cal
     Cal <-->|swipe or tab| Set["Settings /settings"]
+    Set -->|Edit weekly split| Split["Weekly split"]
+    Split -->|back link or swipe right| Set
 ```
 
 - **Tabs** (Home, Calendar, Settings) are reached from the bottom bar or by swiping left/right on a tab page.
-- **Drill-down pages** (muscle group → lift → forms) use the **back link** at the top. When installed as an app there's no browser back button, so every non-tab page has one (or a Cancel button).
+- **Drill-down pages** (muscle group → lift, Settings → weekly split) use the **back link** at the top, and **swiping right** does the same thing. When installed as an app there's no browser back button, so every non-tab page has a back link or a Cancel button. The set forms only have Cancel and don't swipe, so a half-filled form can't be lost by accident.
 - **Forms navigate with `replace: true`**, so the phone's back button after saving goes to the muscle group, not back into the form.
 
 ---
@@ -84,6 +88,7 @@ flowchart TD
     App --> EditSetPage
     App --> CalendarPage
     App --> SettingsPage
+    App --> SplitPage
     App --> NotFoundPage
 
     HomePage --> BodyFigure
@@ -107,8 +112,9 @@ flowchart TD
     CalendarPage --> DaySquare["DaySquare (in-file)"]
     CalendarPage --> DayDetails
 
-    SettingsPage --> SplitEditor
     SettingsPage --> AddByName2["AddByName (muscle group)"]
+    SplitPage --> BackLink2["BackLink"]
+    SplitPage --> SplitEditor
 ```
 
 ---
@@ -128,7 +134,8 @@ frontend/src/
 ├── pages/                One component (+ .module.css) per route
 ├── components/           Shared UI (+ .module.css each)
 └── *.ts                  Pure helpers (format, dates, calendar, records,
-                          flash, tabs, bodyRegions) and the useSwipe hook
+                          flash, tabs, bodyRegions), the useSwipe hook and
+                          SwipeBackContext
 ```
 
 ---
@@ -141,7 +148,7 @@ frontend/src/
 | **Local UI state** | `useState` in the owning component | an Edit panel being open, the selected calendar day, the form's values, the split draft |
 | **URL state** | The path, read with `useParams` | which lift or set is shown |
 | **One-off navigation data** | React Router `location.state` | the "New best!" flash message, the slide direction |
-| **Global client state** | *None* | No Redux/Zustand/Context store is needed |
+| **Shared client state** | One small context, `SwipeBackContext` | where swiping right goes; no Redux/Zustand store is needed |
 
 The rule of thumb: if it comes from the server, it's a query. If only one component cares, it's `useState`. If it should survive a reload or be linkable, it's in the URL.
 
@@ -197,6 +204,8 @@ This project was also a way to learn React and TypeScript. Each concept below is
 | Lifting state up / controlled child | `SetForm.tsx` ↔ `MachineCombobox.tsx` |
 | Draft vs saved state | `components/SplitEditor.tsx` |
 | Custom hooks | `useSwipe.ts` |
+| Context (`createContext`, `useContext`, provider) | `swipeBack.ts`, `App.tsx`, `components/BackLink.tsx` |
+| `useCallback` (a function that stays the same between renders) | `App.tsx` (`setSwipeBackTarget`) |
 | `key` to force a remount | `App.tsx` (page wrapper), `MachineCard.tsx` (chart) |
 | `Fragment` with a key | `pages/CalendarPage.tsx` |
 | SVG in JSX | `components/BodyFigure.tsx`, `ProgressChart.tsx` |

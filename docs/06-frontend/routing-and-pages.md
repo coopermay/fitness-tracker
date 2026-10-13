@@ -3,7 +3,7 @@
 How URLs map to screens (`App.tsx`), and a detailed reference for every page component in [`frontend/src/pages/`](../../frontend/src/pages/). Pages fetch data with hooks from the [data layer](data-layer.md) and assemble [components](components.md).
 
 - [`main.tsx`](#maintsx) · [`App.tsx`](#apptsx)
-- Pages: [Home](#homepage) · [Muscle group](#musclegrouppage) · [Lift](#liftpage) · [Log set](#logsetpage) · [Edit set](#editsetpage) · [Calendar](#calendarpage) · [Settings](#settingspage) · [Not found](#notfoundpage)
+- Pages: [Home](#homepage) · [Muscle group](#musclegrouppage) · [Lift](#liftpage) · [Log set](#logsetpage) · [Edit set](#editsetpage) · [Calendar](#calendarpage) · [Settings](#settingspage) · [Weekly split](#splitpage) · [Not found](#notfoundpage)
 - [`FormPage.module.css`](#formpagemodulecss)
 
 ---
@@ -30,7 +30,7 @@ The entry point loaded by `index.html`.
 
 **File:** [`frontend/src/App.tsx`](../../frontend/src/App.tsx) · **Styles:** [`App.module.css`](styling.md#appmodulecss)
 
-The route table, the tab-swipe behaviour and the bottom tab bar.
+The route table, swiping (between tabs, and back out of nested pages) and the bottom tab bar.
 
 ### Routes
 
@@ -42,26 +42,31 @@ The route table, the tab-swipe behaviour and the bottom tab bar.
 <Route path="/lifts/:liftId/sets/:setId" element={<EditSetPage />} />
 <Route path="/calendar" element={<CalendarPage />} />
 <Route path="/settings" element={<SettingsPage />} />
+<Route path="/settings/split" element={<SplitPage />} />
 <Route path="*" element={<NotFoundPage />} />
 ```
 
 `<Routes>` renders the first matching route. `:name` segments are URL parameters read with `useParams()` (always strings, so pages convert them with `Number(...)`). `*` catches everything else.
 
-### Swiping between tabs
+### Swiping
 ```ts
 const currentTab = tabIndex(location.pathname)       // 0, 1, 2 or null (not a tab page)
 const swipeHandlers = useSwipe({
   onSwipeLeft:  () => currentTab !== null && goToTab(currentTab + 1),
-  onSwipeRight: () => currentTab !== null && goToTab(currentTab - 1),
+  onSwipeRight: () => (currentTab !== null ? goToTab(currentTab - 1) : goBack()),
 })
 ```
-`goToTab(index)` navigates to `TAB_PATHS[index]` (if it exists) with router state `slideStateFor(currentTab, index)`, i.e. `{slideFrom: 'right' | 'left'}`. The handlers are spread onto the page wrapper **only on tab pages**: `{...(currentTab !== null ? swipeHandlers : {})}`.
+- **On a tab page**, `goToTab(index)` navigates to `TAB_PATHS[index]` (if it exists) with router state `slideStateFor(currentTab, index)`, i.e. `{slideFrom: 'right' | 'left'}`.
+- **On any other page**, swiping right calls `goBack()`, which navigates to the page's **back-link target** with `{slideFrom: 'left'}`. Swiping left does nothing. So lift → muscle group → Home is right-swipe, right-swipe.
+- How App knows the target: App keeps it in a ref, `swipeBackTarget`, and provides a stable setter (`useCallback`) through `SwipeBackContext` ([`swipeBack.ts`](utilities.md#swipebackts)). Each [`BackLink`](components.md#backlink) registers its `to` in an effect and clears it on unmount. Pages without a `BackLink` (the set forms, Not found) therefore don't swipe back, and a form can't be thrown away by an accidental swipe.
+
+The handlers are spread onto the page wrapper on every page.
 
 ### Slide-in animation
 ```tsx
 <div key={location.pathname} className={`${styles.page} ${slideClass}`} …>
 ```
-- `slideClass` is `styles.slideFromRight` / `styles.slideFromLeft` when `location.state.slideFrom` is set (by a swipe or a tab tap), otherwise empty.
+- `slideClass` is `styles.slideFromRight` / `styles.slideFromLeft` when `location.state.slideFrom` is set (by a swipe, a tab tap, or a back-link tap), otherwise empty.
 - `key={location.pathname}` makes React **replace** the wrapper on every navigation, so the CSS animation replays. A side effect is that every page remounts on navigation, which is fine because data comes from the query cache.
 
 ### Layout
@@ -243,14 +248,26 @@ A GitHub-style activity heatmap turned vertical: one row per week (Sunday to Sat
 
 **File:** [`pages/SettingsPage.tsx`](../../frontend/src/pages/SettingsPage.tsx) · **Route:** `/settings` (tab 2) · **Styles:** `SettingsPage.module.css`
 
-**Data:** `useSettings()` (blocks), `useUpdateSettings()`, `useSplit()`, `useMuscleGroups()`, `useCreateMuscleGroup()`.
+**Data:** `useSettings()` (blocks), `useUpdateSettings()`, `useCreateMuscleGroup()`.
 
 **Sections:**
 1. **Default unit.** A segmented control (lbs / kg / plates). Tapping calls `updateSettings.mutate({default_unit})`. While saving, the button shows the unit **being saved** as selected (`updateSettings.variables.default_unit`), so the UI responds instantly. Errors show "Couldn't save: …".
-2. **Weekly split.** A hint, then `<SplitEditor split={…} muscleGroups={…} />` once both queries have loaded (`QueryStatus` until then).
+2. **Weekly split.** A hint, then an "Edit weekly split ›" row (`.linkRow`, a `Link` to `/settings/split`). The editor itself is on [SplitPage](#splitpage).
 3. **Muscle groups.** A hint ("New muscle groups appear on the Home screen."), then `AddByName` ("+ Add muscle group"). After adding, it shows "“Name” is on the Home screen." because the new tile isn't visible from here.
 
 There's no back link: Settings is a tab, reached from the tab bar.
+
+---
+
+## SplitPage
+
+**File:** [`pages/SplitPage.tsx`](../../frontend/src/pages/SplitPage.tsx) · **Route:** `/settings/split` · **Styles:** reuses `SettingsPage.module.css` (`title`, `hint`)
+
+**Data:** `useSplit()`, `useMuscleGroups()`.
+
+A `BackLink` "‹ Settings" → `/settings` (so swiping right also goes back), the heading "Weekly split", a hint, then `<SplitEditor split={…} muscleGroups={…} />` once both queries have loaded (`QueryStatus` until then). The Settings tab stays highlighted, because the path starts with `/settings`.
+
+Leaving the page throws away unsaved changes in the editor's draft, just like any other page's local state.
 
 ---
 

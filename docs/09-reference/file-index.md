@@ -177,6 +177,7 @@ When you add, rename or delete a file, update this page.
 | `src/flash.ts` | Flash message types | [Utilities](../06-frontend/utilities.md#flashts) |
 | `src/tabs.ts` | Tab order and slide direction | [Utilities](../06-frontend/utilities.md#tabsts) |
 | `src/useSwipe.ts` | Swipe-detection custom hook | [Utilities](../06-frontend/utilities.md#useswipets) |
+| `src/swipeBack.ts` | `SwipeBackContext`: where swiping right goes | [Utilities](../06-frontend/utilities.md#swipebackts) |
 | `src/bodyRegions.ts` | Muscle group name → body region | [Utilities](../06-frontend/utilities.md#bodyregionsts) |
 
 ### frontend/src/pages/
@@ -191,6 +192,7 @@ When you add, rename or delete a file, update this page.
 | `pages/FormPage.module.css` | Shared by log/edit pages | [Pages](../06-frontend/routing-and-pages.md#formpagemodulecss) |
 | `pages/CalendarPage.tsx` + `.module.css` | `/calendar` | [Pages](../06-frontend/routing-and-pages.md#calendarpage) |
 | `pages/SettingsPage.tsx` + `.module.css` | `/settings` | [Pages](../06-frontend/routing-and-pages.md#settingspage) |
+| `pages/SplitPage.tsx` | `/settings/split` | [Pages](../06-frontend/routing-and-pages.md#splitpage) |
 | `pages/NotFoundPage.tsx` | `*` | [Pages](../06-frontend/routing-and-pages.md#notfoundpage) |
 
 ### frontend/src/components/
