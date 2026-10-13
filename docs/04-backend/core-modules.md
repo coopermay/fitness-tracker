@@ -108,7 +108,7 @@ A factory returning a fresh `Field(...)` for `created_at`: `timestamptz`, `serve
 | `Lift(MetadataBase)` | `lifts` | `muscle_group_id: int` (FK) | `uq_lifts_muscle_group_name` on `(muscle_group_id, lower(trim(name)))` |
 | `Machine(MetadataBase)` | `machines` | `gym_id: int` (FK) | `uq_machines_gym_name` on `(gym_id, lower(trim(name)))` |
 | `WorkoutSet(SQLModel)` | `sets` | see below | `ck_sets_reps_positive`, `ck_sets_weight_non_negative` |
-| `Settings(SQLModel)` | `settings` | `id: int = 1`, `default_unit: WeightUnit`, `theme_base: ThemeBase`, `theme_accent: ThemeAccent` | `ck_settings_single_row` (`id = 1`) |
+| `Settings(SQLModel)` | `settings` | `id: int = 1`, `default_unit: WeightUnit`, `theme_base: ThemeBase`, `theme_accent: ThemeAccent`, `rep_range_min: int = 6`, `rep_range_max: int = 8` | `ck_settings_single_row` (`id = 1`), `ck_settings_rep_range` (`1 ≤ min ≤ max ≤ 50`) |
 | `SplitDay(SQLModel)` | `split_days` | `weekday: int` (PK), `muscle_group_id: int` (PK, FK) | `ck_split_days_weekday` (`0..6`) |
 
 ### `WorkoutSet` fields
@@ -198,8 +198,15 @@ Full column/constraint reference: [Tables](../03-database/tables.md).
 | `SplitDayBody` | `weekday: int (0..6)`, `muscle_group_ids: list[int]` |
 | `SplitBody` | `days: list[SplitDayBody]`, used for both the `PUT /split` body and the `GET`/`PUT` response |
 | `Insights` | `plateaued_lift_ids: list[int]` |
-| `SettingsRead(ReadModel)` | `default_unit`, `theme_base`, `theme_accent` |
-| `SettingsUpdate` | the same three, all optional (`= None`) and not nullable |
+| `SettingsRead(ReadModel)` | `default_unit`, `theme_base`, `theme_accent`, `rep_range_min`, `rep_range_max` |
+| `SettingsUpdate` | the same five, all optional (`= None`) and not nullable; rep counts `ge=1, le=50` |
+| `TodayResponse` | `date`, `groups: list[TodayGroup]`, `next_training: NextTraining \| None`, `lifts_done`, `set_count`, `pr_count`, `rep_range_min`, `rep_range_max` |
+| `TodayGroup` | `id`, `name`, `lifts`, `other_lifts` (both `list[TodayLift]`) |
+| `TodayLift` | `id`, `name`, `plateaued`, `machine_id`, `machine_name`, `last_session: LastSession \| None`, `target: Target \| None`, `sets_today: list[TodaySet]` |
+| `LastSession` | `date`, `machine_name`, `sets: list[TodaySet]` |
+| `Target` | `weight_value: float`, `weight_unit`, `reps`, `move_up: bool` |
+| `TodaySet` | `id`, `weight_value: float`, `weight_unit`, `reps`, `approximate`, `is_pr` |
+| `NextTraining` | `date`, `muscle_groups: list[str]` |
 
 ### Why weights change type
 Input weights are `Decimal`, so validation is exact and they match `NUMERIC` in the database. Output weights are `float`, so JSON carries plain numbers (`185.0`, `72.5`) rather than strings, which is what Pydantic does with `Decimal` by default. Values have at most 2 decimals, so floats represent them closely enough for display.

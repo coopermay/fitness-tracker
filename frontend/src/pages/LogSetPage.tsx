@@ -1,4 +1,4 @@
-import { useNavigate, useParams } from 'react-router'
+import { useNavigate, useParams, useSearchParams } from 'react-router'
 import { useCreateSet, useLiftRecords, useSettings } from '../api/queries'
 import type { SetFields } from '../api/types'
 import { QueryStatus } from '../components/QueryStatus'
@@ -12,6 +12,10 @@ export function LogSetPage() {
   const liftId = Number(useParams().liftId)
   // useNavigate gives a function for changing pages from code (e.g. after saving).
   const navigate = useNavigate()
+  // ?from=today (the Today page's "Log set") sends you back there afterwards.
+  // useSearchParams reads the part of the URL after "?".
+  const [searchParams] = useSearchParams()
+  const returnTo = searchParams.get('from') === 'today' ? '/today' : `/lifts/${liftId}`
   const records = useLiftRecords(liftId)
   const settings = useSettings()
   const createSet = useCreateSet(liftId)
@@ -46,7 +50,7 @@ export function LogSetPage() {
     }
     // replace: true swaps out the form in the browser history, so the phone's
     // back button goes to the muscle group instead of back into the form.
-    navigate(`/lifts/${liftId}`, { replace: true, state })
+    navigate(returnTo, { replace: true, state })
   }
 
   return (
@@ -61,6 +65,7 @@ export function LogSetPage() {
         defaultUnit={defaultUnit}
         submitLabel="Save set"
         onSubmit={handleSubmit}
+        cancelTo={returnTo}
       />
     </>
   )

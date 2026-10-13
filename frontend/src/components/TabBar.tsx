@@ -4,21 +4,22 @@ import { slideStateFor, tabIndex, TAB_PATHS } from '../tabs'
 import styles from './TabBar.module.css'
 
 // The bar fixed to the bottom of every screen, like a social media app.
-// Five slots: blank placeholders for future tabs, Home in the middle, then
-// Calendar and Settings on the right.
+// Five slots: a blank placeholder for a future tab, Today, Home in the middle,
+// then Calendar and Settings on the right.
 export function TabBar() {
   const { pathname } = useLocation()
   const onSettings = pathname.startsWith('/settings')
   const onCalendar = pathname.startsWith('/calendar')
+  const onToday = pathname.startsWith('/today')
 
   return (
     <nav className={styles.bar} aria-label="Main">
       <div className={styles.slots}>
         <span className={styles.placeholder} aria-hidden="true" />
-        <span className={styles.placeholder} aria-hidden="true" />
+        <Tab to="/today" label="Today" active={onToday} icon={<TodayIcon />} />
         {/* Home stays highlighted on muscle group and lift pages too, since
             they're all reached from Home. */}
-        <Tab to="/" label="Home" active={!onSettings && !onCalendar} icon={<HomeIcon />} />
+        <Tab to="/" label="Home" active={!onSettings && !onCalendar && !onToday} icon={<HomeIcon />} />
         <Tab to="/calendar" label="Calendar" active={onCalendar} icon={<CalendarIcon />} />
         <Tab to="/settings" label="Settings" active={onSettings} icon={<SettingsIcon />} />
       </div>
@@ -58,6 +59,17 @@ function HomeIcon() {
       strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
       <path d="M3 10.5 12 3l9 7.5" />
       <path d="M5 9.5V21h5v-6h4v6h5V9.5" />
+    </svg>
+  )
+}
+
+// A clipboard with a tick: today's checklist.
+function TodayIcon() {
+  return (
+    <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor"
+      strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <rect x="5" y="4" width="14" height="17" rx="2" />
+      <path d="M9 4V3h6v1M9 13l2 2 4-4" />
     </svg>
   )
 }

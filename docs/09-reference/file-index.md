@@ -41,6 +41,7 @@ When you add, rename or delete a file, update this page.
 | `docs/05-api/sets.md` | Sets |
 | `docs/05-api/records.md` | Lift records |
 | `docs/05-api/calendar-split-insights.md` | Calendar, split, insights |
+| `docs/05-api/today.md` | `GET /today` |
 | `docs/05-api/settings-and-health.md` | Settings, health |
 | `docs/06-frontend/README.md` | Frontend architecture, routes, component tree |
 | `docs/06-frontend/routing-and-pages.md` | `main.tsx`, `App.tsx`, every page |
@@ -85,6 +86,7 @@ When you add, rename or delete a file, update this page.
 | `app/records.py` | Epley, `recency_key`, records, progress points, `previous_best_reps` | [Domain logic](../04-backend/domain-logic.md#recordspy) |
 | `app/calendar.py` | `find_pr_set_ids`, `build_calendar` | [Domain logic](../04-backend/domain-logic.md#calendarpy) |
 | `app/insights.py` | `plateaued_lift_ids` | [Domain logic](../04-backend/domain-logic.md#insightspy) |
+| `app/today.py` | `build_today`, `target_for`, `usual_lift_ids`, `weight_increment` | [Domain logic](../04-backend/domain-logic.md#todaypy) |
 
 ### backend/app/routers/
 
@@ -100,6 +102,7 @@ When you add, rename or delete a file, update this page.
 | `routers/calendar.py` | `GET /calendar` | [Routers](../04-backend/routers.md#calendarpy), [API](../05-api/calendar-split-insights.md#calendar) |
 | `routers/split.py` | `GET/PUT /split` | [Routers](../04-backend/routers.md#splitpy), [API](../05-api/calendar-split-insights.md#weekly-split) |
 | `routers/insights.py` | `GET /insights` | [Routers](../04-backend/routers.md#insightspy), [API](../05-api/calendar-split-insights.md#insights) |
+| `routers/today.py` | `GET /today` | [Routers](../04-backend/routers.md#todaypy), [API](../05-api/today.md) |
 
 ### backend/migrations/
 
@@ -110,6 +113,7 @@ When you add, rename or delete a file, update this page.
 | `migrations/README` | Alembic's one-line placeholder | [Migrations](../03-database/migrations.md#files) |
 | `migrations/versions/0001_initial_schema.py` | All core tables, the enum, the settings row | [Migrations](../03-database/migrations.md#0001_initial_schemapy-revision-ba7a79739cdb) |
 | `migrations/versions/0002_split_days.py` | The `split_days` table | [Migrations](../03-database/migrations.md#0002_split_dayspy-revision-0002_split_days) |
+| `migrations/versions/0004_settings_rep_range.py` | `settings.rep_range_min` / `rep_range_max` + check | [Migrations](../03-database/migrations.md#0004_settings_rep_rangepy-revision-0004_settings_rep_range) |
 | `migrations/versions/0003_settings_theme.py` | `settings.theme_base` / `theme_accent` and their enums | [Migrations](../03-database/migrations.md#0003_settings_themepy-revision-0003_settings_theme) |
 
 ### backend/scripts/
@@ -127,7 +131,8 @@ When you add, rename or delete a file, update this page.
 | `tests/test_metadata.py` | 15 | [Testing](../08-testing/testing.md#test_metadatapy-15-idempotent-create-archive-rename) |
 | `tests/test_records.py` | 19 | [Testing](../08-testing/testing.md#test_recordspy-19-epley-records-new-best-flag-progress) |
 | `tests/test_sets.py` | 7 | [Testing](../08-testing/testing.md#test_setspy-7-set-validation) |
-| `tests/test_settings.py` | 3 | [Testing](../08-testing/testing.md#test_settingspy-3) |
+| `tests/test_settings.py` | 5 | [Testing](../08-testing/testing.md#test_settingspy-5) |
+| `tests/test_today.py` | 10 | [Testing](../08-testing/testing.md#test_todaypy-10) |
 | `tests/test_calendar.py` | 6 | [Testing](../08-testing/testing.md#test_calendarpy-6) |
 | `tests/test_split.py` | 5 | [Testing](../08-testing/testing.md#test_splitpy-5) |
 | `tests/test_insights.py` | 4 | [Testing](../08-testing/testing.md#test_insightspy-4) |
@@ -196,6 +201,7 @@ When you add, rename or delete a file, update this page.
 | `pages/CalendarPage.tsx` + `.module.css` | `/calendar` | [Pages](../06-frontend/routing-and-pages.md#calendarpage) |
 | `pages/SettingsPage.tsx` + `.module.css` | `/settings` | [Pages](../06-frontend/routing-and-pages.md#settingspage) |
 | `pages/SplitPage.tsx` | `/settings/split` | [Pages](../06-frontend/routing-and-pages.md#splitpage) |
+| `pages/TodayPage.tsx` + `.module.css` | `/today` | [Pages](../06-frontend/routing-and-pages.md#todaypage) |
 | `pages/ThemePage.tsx` | `/settings/theme` | [Pages](../06-frontend/routing-and-pages.md#themepage) |
 | `pages/NotFoundPage.tsx` | `*` | [Pages](../06-frontend/routing-and-pages.md#notfoundpage) |
 
@@ -216,3 +222,4 @@ When you add, rename or delete a file, update this page.
 | `components/SetForm.tsx` + `.module.css` | Set form | [Components](../06-frontend/components.md#setform) |
 | `components/SplitEditor.tsx` + `.module.css` | Weekly split editor | [Components](../06-frontend/components.md#spliteditor) |
 | `components/TabBar.tsx` + `.module.css` | Bottom navigation | [Components](../06-frontend/components.md#tabbar) |
+| `components/TodayLiftCard.tsx` + `.module.css` | One lift on the Today page | [Components](../06-frontend/components.md#todayliftcard) |

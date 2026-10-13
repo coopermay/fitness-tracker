@@ -3,7 +3,7 @@
 How URLs map to screens (`App.tsx`), and a detailed reference for every page component in [`frontend/src/pages/`](../../frontend/src/pages/). Pages fetch data with hooks from the [data layer](data-layer.md) and assemble [components](components.md).
 
 - [`main.tsx`](#maintsx) · [`App.tsx`](#apptsx)
-- Pages: [Home](#homepage) · [Muscle group](#musclegrouppage) · [Lift](#liftpage) · [Log set](#logsetpage) · [Edit set](#editsetpage) · [Calendar](#calendarpage) · [Settings](#settingspage) · [Weekly split](#splitpage) · [Theme](#themepage) · [Not found](#notfoundpage)
+- Pages: [Today](#todaypage) · [Home](#homepage) · [Muscle group](#musclegrouppage) · [Lift](#liftpage) · [Log set](#logsetpage) · [Edit set](#editsetpage) · [Calendar](#calendarpage) · [Settings](#settingspage) · [Weekly split](#splitpage) · [Theme](#themepage) · [Not found](#notfoundpage)
 - [`FormPage.module.css`](#formpagemodulecss)
 
 ---
@@ -36,6 +36,7 @@ The route table, the theme, swiping (between tabs, and back out of nested pages)
 
 ```tsx
 <Route path="/" element={<HomePage />} />
+<Route path="/today" element={<TodayPage />} />
 <Route path="/muscle-groups/:muscleGroupId" element={<MuscleGroupPage />} />
 <Route path="/lifts/:liftId" element={<LiftPage />} />
 <Route path="/lifts/:liftId/log" element={<LogSetPage />} />
@@ -75,6 +76,25 @@ The handlers are spread onto the page wrapper on every page.
 
 ### Layout
 `<main>` contains the page wrapper and then `<TabBar />`, which is fixed to the bottom and shown on every page.
+
+---
+
+## TodayPage
+
+**File:** [`pages/TodayPage.tsx`](../../frontend/src/pages/TodayPage.tsx) · **Route:** `/today` (tab 0) · **Styles:** `TodayPage.module.css`
+
+The gym screen: today's split groups, your usual lifts for each, what you did last time and what to beat. All data comes from one request, [`GET /today`](../05-api/today.md).
+
+**Data:** `useToday(todayIsoDate())`.
+
+**Layout:**
+1. "Today", then the long date and today's group names ("Monday, Oct 12 · Biceps, Triceps").
+2. A flash banner when you come back from logging (the same `LiftPageState` mechanism as the lift page: copied into state once, then cleared from history).
+3. A summary line. Before anything is logged it reminds you of the range ("Target 6–8 reps; move up after 9."); afterwards it shows "2 lifts · 7 sets · 1 PRs today".
+4. One `GroupSection` per group: an uppercase heading with "*n* of *m* done", a [`TodayLiftCard`](components.md#todayliftcard) per usual lift, and a dashed **Show all (*k* more)** toggle that reveals `other_lifts` below them. If nothing in the group was trained in the last 6 weeks, it says so (and Show all lists the lifts).
+5. **Rest day** (no groups): "Rest day", "Next up: Back, Biceps on Saturday, Oct 17" (or a link to set up the split), and a "Train anyway: browse muscle groups" link to Home.
+
+`GroupSection` keeps its own `showAll` state, so each group opens independently.
 
 ---
 
@@ -180,9 +200,11 @@ The form for logging a new set. It's a thin wrapper around [`SetForm`](component
 
 `unitFollowsMachine` is **true**: picking another machine re-derives the unit.
 
-**On submit:** `createSet.mutateAsync({lift_id, ...fields})`. This waits for the cache refresh, so the lift page is current when it appears. Then:
+**Coming from Today:** the Today page links here with `?from=today`. `useSearchParams()` reads it, and `returnTo` becomes `/today` instead of `/lifts/:liftId`. It's used for both the redirect after saving and the form's Cancel (`cancelTo`). A URL parameter (rather than router state) survives a refresh.
+
+**On submit:** `createSet.mutateAsync({lift_id, ...fields})`. This waits for the cache refresh, so the page you return to is current when it appears. Then:
 ```ts
-navigate(`/lifts/${liftId}`, { replace: true, state: { flash } })
+navigate(returnTo, { replace: true, state: { flash } })
 ```
 where `flash` is `{text: "New best at 185 lbs!", isRecord: true}` if `is_new_record`, else `{text: "Logged 185 lbs × 4", isRecord: false}`. `replace: true` swaps the form out of the browser history.
 
@@ -215,7 +237,7 @@ Edit or delete an existing set. It's reached by tapping a row in a machine card'
 
 ## CalendarPage
 
-**File:** [`pages/CalendarPage.tsx`](../../frontend/src/pages/CalendarPage.tsx) · **Route:** `/calendar` (tab 1) · **Styles:** `CalendarPage.module.css`
+**File:** [`pages/CalendarPage.tsx`](../../frontend/src/pages/CalendarPage.tsx) · **Route:** `/calendar` (tab 2) · **Styles:** `CalendarPage.module.css`
 
 A GitHub-style activity heatmap turned vertical: one row per week (Sunday to Saturday), newest week at the top.
 
@@ -248,7 +270,7 @@ A GitHub-style activity heatmap turned vertical: one row per week (Sunday to Sat
 
 ## SettingsPage
 
-**File:** [`pages/SettingsPage.tsx`](../../frontend/src/pages/SettingsPage.tsx) · **Route:** `/settings` (tab 2) · **Styles:** `SettingsPage.module.css`
+**File:** [`pages/SettingsPage.tsx`](../../frontend/src/pages/SettingsPage.tsx) · **Route:** `/settings` (tab 3) · **Styles:** `SettingsPage.module.css`
 
 **Data:** `useSettings()` (blocks), `useUpdateSettings()`, `useCreateMuscleGroup()`.
 
@@ -256,7 +278,8 @@ A GitHub-style activity heatmap turned vertical: one row per week (Sunday to Sat
 1. **Muscle groups.** A hint ("New muscle groups appear on the Home screen."), then `AddByName` ("+ Add muscle group"). After adding, it shows "“Name” is on the Home screen." because the new tile isn't visible from here.
 2. **Weekly split.** A hint, then an "Edit weekly split ›" row that opens [SplitPage](#splitpage).
 3. **Theme.** A hint, then a "Change theme ›" row that opens [ThemePage](#themepage).
-4. **Default unit.** A segmented control (lbs / kg / plates). Tapping calls `updateSettings.mutate({default_unit})`. The update is optimistic (the cache changes before the server answers), so the selection moves instantly. Errors show "Couldn't save: …".
+4. **Default unit.** A segmented control (lbs / kg / plates). Tapping calls `updateSettings.mutate({default_unit})`. The update is optimistic (the cache changes before the server answers), so the selection moves instantly.
+5. **Target reps.** Two `<select>`s (1–20), "6 to 8 reps", saving `{rep_range_min}` / `{rep_range_max}` on change. Options that would cross the other end are disabled. The hint names the move-up point (max + 1). Errors from either control show "Couldn't save: …".
 
 The two rows use `SettingsLink` (in the same file): a `Link` styled `.linkRow` with a chevron.
 

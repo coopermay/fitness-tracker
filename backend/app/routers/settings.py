@@ -1,4 +1,4 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, HTTPException
 
 from app.db import SessionDep
 from app.models import Settings
@@ -18,7 +18,15 @@ def get_settings(session: SessionDep):
 @router.patch("", response_model=SettingsRead)
 def update_settings(body: SettingsUpdate, session: SessionDep):
     settings = session.get(Settings, SETTINGS_ID)
-    for field, value in body.model_dump(exclude_unset=True).items():
+    changes = body.model_dump(exclude_unset=True)
+    # A request may change only one end of the range, so check the result,
+    # before touching the row.
+    rep_min = changes.get("rep_range_min", settings.rep_range_min)
+    rep_max = changes.get("rep_range_max", settings.rep_range_max)
+    if rep_min > rep_max:
+        raise HTTPException(status_code=422, detail="rep_range_min can't be above rep_range_max")
+
+    for field, value in changes.items():
         setattr(settings, field, value)
     session.add(settings)
     session.commit()

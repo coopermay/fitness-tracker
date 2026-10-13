@@ -33,6 +33,7 @@ flowchart TD
         r_cal["calendar.py"]
         r_split["split.py"]
         r_ins["insights.py"]
+        r_today["today.py"]
     end
 
     subgraph domain["Domain logic"]
@@ -41,6 +42,7 @@ flowchart TD
         records["records.py<br/>records, Epley, progress"]
         calendar["calendar.py<br/>PR replay, per-day activity"]
         insights["insights.py<br/>plateau"]
+        today["today.py<br/>usual lifts, targets"]
     end
 
     db["db.py<br/>engine, SessionDep"]
@@ -54,6 +56,8 @@ flowchart TD
     r_split --> metadata
     r_cal --> calendar
     r_ins --> insights
+    r_today --> today
+    today --> calendar & insights & records
     routers --> db & schemas & models
 
     metadata --> names

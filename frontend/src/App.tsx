@@ -12,6 +12,7 @@ import { NotFoundPage } from './pages/NotFoundPage'
 import { SettingsPage } from './pages/SettingsPage'
 import { SplitPage } from './pages/SplitPage'
 import { ThemePage } from './pages/ThemePage'
+import { TodayPage } from './pages/TodayPage'
 import { SwipeBackContext } from './swipeBack'
 import { useTheme } from './theme'
 import { slideStateFor, tabIndex, TAB_PATHS, type SlideState } from './tabs'
@@ -29,7 +30,7 @@ function App() {
   const settings = useSettings()
   useTheme(settings.data?.theme_base, settings.data?.theme_accent)
 
-  // On a tab page (Home, Calendar, Settings), swiping moves to the next tab.
+  // On a tab page (Today, Home, Calendar, Settings), swiping moves to the next tab.
   const currentTab = tabIndex(location.pathname)
   function goToTab(index: number) {
     if (index >= 0 && index < TAB_PATHS.length) {
@@ -68,6 +69,7 @@ function App() {
         <div key={location.pathname} className={`${styles.page} ${slideClass}`} {...swipeHandlers}>
           <Routes>
             <Route path="/" element={<HomePage />} />
+            <Route path="/today" element={<TodayPage />} />
             <Route path="/muscle-groups/:muscleGroupId" element={<MuscleGroupPage />} />
             <Route path="/lifts/:liftId" element={<LiftPage />} />
             <Route path="/lifts/:liftId/log" element={<LogSetPage />} />

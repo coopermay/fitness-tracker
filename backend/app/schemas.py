@@ -226,6 +226,8 @@ class SettingsRead(ReadModel):
     default_unit: WeightUnit
     theme_base: ThemeBase
     theme_accent: ThemeAccent
+    rep_range_min: int
+    rep_range_max: int
 
 
 class SettingsUpdate(BaseModel):
@@ -234,3 +236,68 @@ class SettingsUpdate(BaseModel):
     default_unit: WeightUnit = None
     theme_base: ThemeBase = None
     theme_accent: ThemeAccent = None
+    rep_range_min: int = Field(default=None, ge=1, le=50)
+    rep_range_max: int = Field(default=None, ge=1, le=50)
+
+
+# --- Today ------------------------------------------------------------------
+
+
+class TodaySet(BaseModel):
+    id: int
+    weight_value: float
+    weight_unit: WeightUnit
+    reps: int
+    approximate: bool
+    is_pr: bool = Field(description="Same rule as the calendar: first at a weight, or more reps.")
+
+
+class LastSession(BaseModel):
+    date: date
+    machine_name: str | None
+    sets: list[TodaySet] = Field(description="That day's sets on that machine + unit, in entry order.")
+
+
+class Target(BaseModel):
+    weight_value: float
+    weight_unit: WeightUnit
+    reps: int = Field(description="Reps to reach: one more than your best, or the bottom of the range.")
+    move_up: bool = Field(description="True when this is a new, heavier weight.")
+
+
+class TodayLift(BaseModel):
+    id: int
+    name: str
+    plateaued: bool
+    machine_id: int | None = Field(description="The machine used most recently for this lift.")
+    machine_name: str | None
+    last_session: LastSession | None = Field(description="The latest dated day before today.")
+    target: Target | None
+    sets_today: list[TodaySet]
+
+
+class TodayGroup(BaseModel):
+    id: int
+    name: str
+    lifts: list[TodayLift] = Field(
+        description="Your usual lifts for this group, plus any others done today."
+    )
+    other_lifts: list[TodayLift] = Field(description="The rest of the group, for \"Show all\".")
+
+
+class NextTraining(BaseModel):
+    date: date
+    muscle_groups: list[str]
+
+
+class TodayResponse(BaseModel):
+    date: date
+    groups: list[TodayGroup] = Field(description="Today's split groups; empty on a rest day.")
+    next_training: NextTraining | None = Field(
+        description="On a rest day, the next day with groups in the split."
+    )
+    lifts_done: int
+    set_count: int
+    pr_count: int
+    rep_range_min: int
+    rep_range_max: int

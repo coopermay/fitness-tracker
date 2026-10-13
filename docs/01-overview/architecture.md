@@ -190,10 +190,11 @@ fitness-tracker/
 │   │   ├── records.py         Records, Epley, progress points
 │   │   ├── calendar.py        Per-day activity and PR detection
 │   │   ├── insights.py        Plateau flags
+│   │   ├── today.py           Today page: usual lifts, targets
 │   │   └── routers/           One file per resource
 │   ├── migrations/            Alembic environment and versions
 │   ├── scripts/seed.py        Idempotent import of seed_data.json
-│   └── tests/                 pytest suite (60 tests)
+│   └── tests/                 pytest suite (72 tests)
 └── frontend/
     ├── package.json           npm scripts and dependencies
     ├── vite.config.ts         Dev server + /api proxy
@@ -225,7 +226,7 @@ The app records exactly what the machine or bar shows: the stack number, or **pl
 - `performed_on` is a plain calendar date (`YYYY-MM-DD`), with no time and no timezone. It can be **null** for imported sets whose date is unknown.
 - `created_at` / `updated_at` are UTC timestamps (`timestamptz`).
 - The frontend never parses `"2026-09-25"` with `new Date(string)`, because that's treated as UTC midnight and shows the previous day in US timezones. It builds dates from their parts (`frontend/src/dates.ts`, `format.ts`).
-- Anything that depends on **today** (the insights endpoint) takes the date **from the client**, because the server runs on UTC.
+- Anything that depends on **today** (the insights and Today endpoints) takes the date **from the client**, because the server runs on UTC.
 
 ### Archive, don't delete
 Gyms, muscle groups, lifts and machines are never deleted. Archiving hides them from lists and pickers but keeps their history visible. Sets *can* be deleted. See [Design decisions](design-decisions.md#6-archive-metadata-never-delete-it).

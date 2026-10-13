@@ -10,30 +10,33 @@ Roughly ordered by how much they'd help at the gym.
 
 | Idea | What it would do | Notes |
 | --- | --- | --- |
-| **"Last time" in the log form** | When a machine is picked, show your last session on it ("Sep 25: 185 × 5, 175 × 6") | All the data is already in the records response (`history`); frontend-only |
-| **Next target** | Suggest what to beat: "185 × 6 for a new best", or "hit 12+ at 105 → try 110" | Simple rules over records. Progressive-overload suggestions were out of scope for the first version. |
-| **Today's workout** | On a split day, list today's lifts with last numbers and targets on one screen | Combines the split, records and next target; could use a placeholder tab |
+| **"Last time" in the log form** | When a machine is picked, show your last session and target on it, like the Today cards | The data is in the records response (`history`); the target rule is in `today.py` |
+| **Targets on the lift page** | Show the Today-style target on each machine card | Reuse `target_for` from `today.py` |
 | **Weekly volume** | Hard sets per muscle group per week, shown next to the split or on the calendar | A new aggregation endpoint (sets per group per ISO week) |
 | **Rest timer** | Starts automatically after saving a set | Frontend only; vibrate/notify when done |
 | **PR dots on the calendar** | Mark PR days on the grid itself, not just in the tap details | `pr_count` is already in the response |
-| **AI assistant** | A chat that answers questions from your data ("what should I go for on bench today?") | See [below](#ai-assistant-plan) |
+| **AI coach** (pinned) | A chat in the far-left tab that answers questions from your data | See [below](#ai-assistant-plan) |
 | **Multi-gym UI** | A gym picker, shown once a second gym exists | The schema already supports gyms; needs `PATCH /gyms`, gym selection in the set form, and per-gym machine lists |
 | **Move a lift between muscle groups** | `PATCH /lifts/{id}` with `muscle_group_id` | Must re-check name uniqueness in the target group |
 | **Merge duplicate metadata** | Merge two machines or lifts, re-pointing their sets | Explicitly out of scope so far; rename returns 409 instead |
 | **Charts beyond est. 1RM** | Volume per session, per-weight rep trends | Extend `ProgressPoint` or add a new series |
 
 ### AI assistant plan
-A natural next learning project. A suggested path:
-1. **Basic chat.** A FastAPI endpoint that calls a hosted LLM API, plus a chat page (in a placeholder tab). The API key stays on the **backend** only.
-2. **Read-only tools.** Let the model call functions backed by existing logic (records for a lift, the calendar, insights), so answers come from real data.
-3. **Streaming.** Stream replies token by token (FastAPI streaming responses + incremental rendering in React).
-4. **Actions with confirmation.** "Log 185 for 6 on bench" produces a proposed set the UI asks you to confirm before calling `POST /sets`.
+On hold for now, but planned for the far-left tab slot. The user wants to **self-host an open model** to learn about it.
 
-Before building:
-- your training data would be sent to the LLM provider, so it'd no longer stay entirely on your home server,
-- each message has a small per-message cost.
+- **Don't fine-tune on the data. Use tool calling.** The model calls functions backed by the existing logic (`today.py` targets, records, calendar, insights), so answers come from real numbers. Fine-tuning teaches style, not facts, and the data changes every workout.
+- **Other documents** (training articles, notes): RAG, with embeddings stored in this Postgres database via the **pgvector** extension.
+- **Runtime:** [Ollama](https://ollama.com) as another Compose service, called through its OpenAI-compatible API from FastAPI. It's a new dependency, so it needs approval first. Pick a current small model that supports tool calling, sized to the homelab (a GPU with 8–16 GB runs 7–14B well; CPU-only suits about 3–4B, slowly).
+- **Privacy:** self-hosted means the training data never leaves the server.
 
-Building "last time" and "next target" first is useful: they become the assistant's best tools.
+Steps:
+1. Ollama on the homelab, chat from the terminal.
+2. `POST /api/coach/chat` plus a chat page in the far-left slot.
+3. Read-only tools (Today, records, calendar, insights).
+4. Streaming replies.
+5. RAG with pgvector for your own documents.
+6. Actions with confirmation ("log 185×6 on bench" → confirm → `POST /sets`).
+7. Optional: a LoRA fine-tune experiment for tone.
 
 ---
 

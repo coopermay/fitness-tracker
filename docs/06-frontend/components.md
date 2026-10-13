@@ -17,6 +17,7 @@ Every reusable component in [`frontend/src/components/`](../../frontend/src/comp
 | [SetForm](#setform) | The set form (log and edit) | LogSetPage, EditSetPage |
 | [SplitEditor](#spliteditor) | Weekly split editor with a draft + Save | SplitPage |
 | [TabBar](#tabbar) | Fixed bottom navigation | App |
+| [TodayLiftCard](#todayliftcard) | One lift on Today: last session, target, today's sets, Log set | TodayPage |
 
 ---
 
@@ -275,6 +276,7 @@ The set form, shared by the log and edit pages. The pages decide the initial val
 | `submitLabel` | `string` | "Save set" / "Save changes" |
 | `onSubmit` | `(fields: SetFields) => Promise<void>` | Saves. The form shows errors and stays open on failure. |
 | `onDelete?` | `() => Promise<void>` | If given, shows **Delete set** (with a confirmation) |
+| `cancelTo?` | `string` | Where **Cancel** goes; defaults to the lift page. The log page passes `/today` when opened from Today. |
 
 **`SetFormValues`** (exported) is the form's own state. Numbers stay as **strings** so half-typed input like `"72."` isn't mangled:
 ```ts
@@ -347,8 +349,8 @@ The bottom navigation bar, fixed to the screen's bottom on every page.
 **Five equal slots:**
 | Slot | Content |
 | --- | --- |
-| 1 | Empty placeholder (`aria-hidden`) for a future tab |
-| 2 | Empty placeholder |
+| 1 | Empty placeholder (`aria-hidden`) for a future tab (planned: the AI coach) |
+| 2 | **Today** → `/today` (clipboard-with-tick icon) |
 | 3 (middle) | **Home** → `/` (house icon) |
 | 4 | **Calendar** → `/calendar` (calendar icon) |
 | 5 | **Settings** → `/settings` (gear icon) |
@@ -362,3 +364,26 @@ The bottom navigation bar, fixed to the screen's bottom on every page.
 **Icons:** `HomeIcon`, `CalendarIcon` and `SettingsIcon` are inline 24×24 SVGs drawn with `stroke="currentColor"`, so they take the tab's text colour.
 
 **Adding a tab:** replace a placeholder `<span>` with `<Tab to="/x" label="X" icon={<XIcon/>} />`, add `/x` to `TAB_PATHS` in [`tabs.ts`](utilities.md#tabsts) at the matching position, and add the route in `App.tsx`.
+
+---
+
+## TodayLiftCard
+
+**File:** [`components/TodayLiftCard.tsx`](../../frontend/src/components/TodayLiftCard.tsx)
+
+| Prop | Type | Meaning |
+| --- | --- | --- |
+| `lift` | `TodayLift` | One lift from `GET /today` |
+
+Renders an `<article>` card:
+- **Header:** the lift name (a link to the lift page), an amber **Plateau** pill if flagged, and **✓ Done** on the right once you've logged a set today (the card also gets an accent border).
+- The machine name, muted.
+- A `<dl>` (description list) of rows, each a label and a value:
+  - **Today:** today's sets, if any.
+  - **Last:** the last session's date and sets.
+  - **Beat** or **Move up:** the target, in accent colour: "185 lbs × 8", or "60 lbs × 6+" when moving up.
+- "Not logged yet." when there's no history at all.
+- A full-width **Log set** button → `/lifts/:id/log?from=today`.
+
+Sets are shown compactly by the in-file `SetList`, "185 × 6 PR · 185 × 5 lbs", with the unit once at the end. Each set has `white-space: nowrap`, so one set never splits across lines. PR badges use the same fixed green as the calendar.
+

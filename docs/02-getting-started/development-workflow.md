@@ -155,7 +155,7 @@ Full details are in [Migrations](../03-database/migrations.md).
 ## Quality checks before committing
 
 ```bash
-cd backend && uv run pytest              # 60 tests, ~5s; needs the db container
+cd backend && uv run pytest              # 72 tests, ~5s; needs the db container
 cd frontend && npm run build             # type-checks (tsc -b) then bundles
 cd frontend && npm run lint              # oxlint
 ```

@@ -58,6 +58,8 @@ erDiagram
         weight_unit default_unit "default lbs"
         theme_base theme_base "default system"
         theme_accent theme_accent "default blue"
+        int rep_range_min "default 6"
+        int rep_range_max "default 8"
     }
     SPLIT_DAYS {
         int weekday PK "0 = Monday ... 6 = Sunday"

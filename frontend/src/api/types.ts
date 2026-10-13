@@ -92,6 +92,9 @@ export interface Settings {
   default_unit: WeightUnit
   theme_base: ThemeBase
   theme_accent: ThemeAccent
+  // Target rep range on the Today page; move up a weight past the top.
+  rep_range_min: number
+  rep_range_max: number
 }
 
 // --- GET /lifts/{id}/records ---
@@ -176,4 +179,57 @@ export interface Split {
 
 export interface Insights {
   plateaued_lift_ids: number[] // trained in the last 3 weeks, no PR in that time
+}
+
+// --- GET /today ---
+
+export interface TodaySet {
+  id: number
+  weight_value: number
+  weight_unit: WeightUnit
+  reps: number
+  approximate: boolean
+  is_pr: boolean
+}
+
+export interface LastSession {
+  date: DateString
+  machine_name: string | null
+  sets: TodaySet[] // that day's sets on that machine + unit
+}
+
+export interface Target {
+  weight_value: number
+  weight_unit: WeightUnit
+  reps: number
+  move_up: boolean // true when it's a new, heavier weight
+}
+
+export interface TodayLift {
+  id: number
+  name: string
+  plateaued: boolean
+  machine_id: number | null // the machine used most recently
+  machine_name: string | null
+  last_session: LastSession | null // the latest dated day before today
+  target: Target | null
+  sets_today: TodaySet[]
+}
+
+export interface TodayGroup {
+  id: number
+  name: string
+  lifts: TodayLift[] // your usual lifts, plus any others done today
+  other_lifts: TodayLift[] // the rest, for "Show all"
+}
+
+export interface TodayResponse {
+  date: DateString
+  groups: TodayGroup[] // empty on a rest day
+  next_training: { date: DateString; muscle_groups: string[] } | null
+  lifts_done: number
+  set_count: number
+  pr_count: number
+  rep_range_min: number
+  rep_range_max: number
 }

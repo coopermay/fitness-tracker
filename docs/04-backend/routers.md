@@ -15,6 +15,7 @@ All routers are mounted under `/api` by [`main.py`](core-modules.md#mainpy).
 | [`calendar.py`](#calendarpy) | `/calendar` | calendar | GET | `build_calendar` |
 | [`split.py`](#splitpy) | `/split` | split | GET, PUT | `get_or_404` |
 | [`insights.py`](#insightspy) | `/insights` | insights | GET | `plateaued_lift_ids` |
+| [`today.py`](#todaypy) | `/today` | today | GET | `build_today` |
 
 ### Patterns every router follows
 - Every handler takes **`session: SessionDep`**, a database session for the request (see [db.py](core-modules.md#dbpy)).
@@ -107,7 +108,7 @@ There's no `archived` filter, so archived machines still label their old sets.
 | --- | --- |
 | `SETTINGS_ID = 1` | The single row's id, created by the first migration |
 | `get_settings(session)` → `GET /settings` | `session.get(Settings, 1)` |
-| `update_settings(body: SettingsUpdate, session)` → `PATCH /settings` | Applies only the fields sent (`model_dump(exclude_unset=True)`), commits, returns the row |
+| `update_settings(body: SettingsUpdate, session)` → `PATCH /settings` | Merges the fields sent (`model_dump(exclude_unset=True)`) with the saved rep range and returns **422** if min would be above max, **before** changing the row. Then applies the fields, commits, returns the row. |
 
 There's no 404 handling. The row always exists unless someone deletes it by hand.
 
@@ -140,3 +141,13 @@ Weekday range (0–6) is validated by the `SplitDayBody` schema (`ge=0, le=6`) b
 | `get_insights(session, today: date \| None = None)` | `GET /insights` | `today = today or date.today()`. Loads all sets and returns `Insights(plateaued_lift_ids=plateaued_lift_ids(sets, today))`. |
 
 The frontend always passes `today` from the phone. The server-date fallback exists for manual use (e.g. in `/docs`).
+
+---
+
+## today.py
+
+**File:** [`routers/today.py`](../../backend/app/routers/today.py)
+
+| Handler | Route | Does |
+| --- | --- | --- |
+| `get_today(session, today: date \| None = None)` | `GET /today` | `today = today or date.today()`. Loads the settings row (for the rep range), all sets, lifts, muscle groups, machines and split rows, and returns `build_today(...)`. |

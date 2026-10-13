@@ -1,6 +1,6 @@
 # Testing
 
-How Lift Tracker is tested: the backend's automated pytest suite (60 tests), what each test covers, how to write new ones, and the manual checks used for the frontend.
+How Lift Tracker is tested: the backend's automated pytest suite (72 tests), what each test covers, how to write new ones, and the manual checks used for the frontend.
 
 ---
 
@@ -29,7 +29,7 @@ uv run pytest -k "plateau"                       # tests whose name matches
 uv run pytest -x                                 # stop at the first failure
 ```
 
-Expected output ends with `60 passed, 1 warning`. The warning is a harmless Starlette deprecation notice about `httpx`.
+Expected output ends with `72 passed, 1 warning`. The warning is a harmless Starlette deprecation notice about `httpx`.
 
 ---
 
@@ -43,7 +43,7 @@ flowchart TD
     B --> C["create lifts_test DB if missing<br/>(connects to 'postgres' with AUTOCOMMIT)"]
     C --> D["alembic downgrade base<br/>alembic upgrade head<br/>(against lifts_test)"]
     D --> E["for each test"]
-    E --> F["session fixture:<br/>TRUNCATE split_days, sets, lifts, machines,<br/>muscle_groups, gyms RESTART IDENTITY CASCADE<br/>+ reset settings to lbs, system, blue"]
+    E --> F["session fixture:<br/>TRUNCATE split_days, sets, lifts, machines,<br/>muscle_groups, gyms RESTART IDENTITY CASCADE<br/>+ reset settings to lbs, system, blue, 6-8"]
     F --> G["client fixture:<br/>override get_session → test session<br/>TestClient(app)"]
     G --> H["test runs real HTTP requests"]
     H --> E
@@ -121,12 +121,30 @@ Because tables are truncated **before** each test (not after), the last test's d
 | `test_patch_rejects_null_for_required_fields` | `reps: null` → 422 |
 | `test_delete_set` | 204, then gone, then a second delete → 404 |
 
-### `test_settings.py` (3)
+### `test_settings.py` (5)
 | Test | Checks |
 | --- | --- |
-| `test_defaults` | `{default_unit: lbs, theme_base: system, theme_accent: blue}` |
+| `test_defaults` | `{default_unit: lbs, theme_base: system, theme_accent: blue, rep_range_min: 6, rep_range_max: 8}` |
 | `test_patch_changes_only_the_fields_sent` | Changing the unit leaves the theme alone, and vice versa; the change persists |
 | `test_unknown_theme_values_are_rejected` | Unknown base/accent → 422, `null` → 422, nothing changes |
+| `test_rep_range_can_change_one_end_at_a_time` | `{rep_range_max: 10}`, then `{rep_range_min: 8}` |
+| `test_rep_range_min_cannot_pass_max` | min 9 with max 8 → 422; 0 and 51 → 422; nothing changes |
+
+### `test_today.py` (10)
+Uses `TODAY = "2026-10-01"` (a Thursday), Chest (Bench, Fly, Dips) and Back (Row), and Cable/Barbell machines.
+
+| Test | Checks |
+| --- | --- |
+| `test_below_the_top_of_the_range_aim_for_one_more_rep` | Best 7 at 185 → 185 × 8; the last session lists that day's sets |
+| `test_past_the_top_of_the_range_move_up_one_increment` | 55 × 9 with a 50 → 55 history → 60 × 6, `move_up` |
+| `test_moving_up_to_a_weight_already_tried_aims_to_beat_it` | Old 60 × 6 → 60 × 7 |
+| `test_increment_defaults_by_unit_and_range_comes_from_settings` | Range 8–12, one kg weight → 22.5 kg × 8 |
+| `test_uses_the_machine_used_most_recently` | Barbell (most recent) beats an older cable history |
+| `test_usual_lifts_are_the_two_done_on_the_most_days` | Top 2 by days; a tie goes to creation order; the rest in `other_lifts` |
+| `test_more_days_beats_more_recent` | Frequency first; lifts outside the 6 weeks aren't usual |
+| `test_a_lift_done_today_joins_the_main_list` | Done-today lift added after the usual ones; totals and PR flag |
+| `test_rest_day_points_to_the_next_training_day` | No groups → `next_training` = Saturday's Back |
+| `test_archived_lifts_and_groups_are_left_out` | Archived group and lift are hidden |
 
 ### `test_calendar.py` (6)
 | Test | Checks |
@@ -164,7 +182,7 @@ Uses `TODAY = "2026-10-01"`, so the 3-week window is Sep 11 – Oct 1, with Benc
 - Put it in the file for its area (or a new `test_<area>.py`).
 - Use the **`client`** fixture and make real requests. Build data through the API (`client.post(...)`) or the `gym_id`, `muscle_group_id` and `lift_id` fixtures.
 - Small helpers at the top of a test file keep tests readable (e.g. `log_set`, `get_records`, `rows` in `test_records.py`).
-- **Never depend on today's date.** Pass explicit dates, and for insights pass `?today=`.
+- **Never depend on today's date.** Pass explicit dates, and for insights and Today pass `?today=`.
 - Name tests as sentences describing the behaviour: `test_tie_on_reps_prefers_most_recent_date`.
 - Test the error paths: 404 for every id the endpoint accepts, 422 for invalid input.
 - If you add a table, add it to the `TRUNCATE` statement in `conftest.py`.
@@ -186,10 +204,11 @@ There are no automated UI tests. After UI changes, run `npm run build && npm run
 5. **Edit set:** change reps → "Set updated". Delete → confirm → "Set deleted", with no "Not found" flash.
 6. **Calendar:** grid, today outlined, tap a day → details with PR badges and lift links; tap again or ✕ to close.
 7. **Settings:** order is muscle groups, split, theme, default unit; the default unit switches instantly; Edit weekly split → change a day → Save split → Home reflects it; add a muscle group.
-8. **Tabs:** tap each tab (it slides in); swipe left/right on Home/Calendar/Settings.
+8. **Tabs:** tap each tab (it slides in); swipe left/right across Today/Home/Calendar/Settings.
 9. **Swipe back:** on a lift page swipe right → muscle group, again → Home (each slides in from the left); same on Weekly split → Settings. The log/edit set forms don't swipe.
 10. **Themes:** in Settings → Change theme, try each background and a few accents (buttons, Home tiles, calendar, chart); on System, toggle macOS/iOS dark mode; reload and check there's no flash of the old colours.
 11. **Narrow screen:** 320px and 390px in DevTools' device mode.
+12. **Today:** today's groups with 2 lifts each, last session and target; Log set → save → back on Today with the banner, ✓ Done and "1 of 2 done"; Cancel returns to Today; Show all; change Target reps in Settings and the targets update; on a rest day, the next training day shows.
 
 ---
 

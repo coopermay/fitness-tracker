@@ -34,7 +34,7 @@ flowchart TD
 
 ```mermaid
 flowchart LR
-    base(("base<br/>empty")) --> m1["ba7a79739cdb<br/>0001_initial_schema"] --> m2["0002_split_days<br/>weekly split"] --> m3["0003_settings_theme<br/>theme settings"] --> head(("head"))
+    base(("base<br/>empty")) --> m1["ba7a79739cdb<br/>0001_initial_schema"] --> m2["0002_split_days<br/>weekly split"] --> m3["0003_settings_theme<br/>theme settings"] --> m4["0004_settings_rep_range<br/>target rep range"] --> head(("head"))
 ```
 
 ### `0001_initial_schema.py` (revision `ba7a79739cdb`)
@@ -72,6 +72,13 @@ Created on 2026-10-12, hand-written. `down_revision = '0002_split_days'`.
 2. Adds `settings.theme_base` (default `'system'`) and `settings.theme_accent` (default `'blue'`), both `NOT NULL`. The server defaults fill in the existing row.
 
 **Downgrade** drops both columns, then both enum types.
+
+### `0004_settings_rep_range.py` (revision `0004_settings_rep_range`)
+Created on 2026-10-13, hand-written. `down_revision = '0003_settings_theme'`.
+
+**Upgrade** adds `settings.rep_range_min` (default `6`) and `settings.rep_range_max` (default `8`), both `integer NOT NULL` (the server defaults fill in the existing row), then the check `ck_settings_rep_range`: `rep_range_min >= 1 AND rep_range_min <= rep_range_max AND rep_range_max <= 50`.
+
+**Downgrade** drops the check, then both columns.
 
 ---
 

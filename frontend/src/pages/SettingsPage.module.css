@@ -148,6 +148,24 @@
   background: var(--accent-swatch); /* set per data-accent in index.css */
 }
 
+/* "6 to 8 reps" */
+.repRange {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.select {
+  min-width: 72px;
+  min-height: var(--tap-size);
+  padding: 0 10px;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius);
+  background: var(--surface);
+  color: var(--text);
+  font: inherit; /* 16px, so iOS doesn't zoom in */
+}
+
 .error {
   color: var(--error);
 }

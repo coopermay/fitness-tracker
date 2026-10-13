@@ -117,7 +117,14 @@ A chart needs at least two dated sessions.
 Which muscle groups you plan to train on each weekday. Each weekday can have any number of muscle groups. A weekday with none is a **rest day**. Weekdays are numbered **Monday = 0 … Sunday = 6** (Python's `date.weekday()`). The split is edited in Settings and saved as a whole week at once.
 
 ### Today
-"Today" always means **the phone's local date**, not the server's. The frontend sends it to the insights endpoint (`?today=YYYY-MM-DD`), which uses it to place the 3-week plateau window. Home uses it to put today's split muscle groups first, with a **TODAY** label.
+"Today" always means **the phone's local date**, not the server's. The frontend sends it to the insights and Today endpoints (`?today=YYYY-MM-DD`), which use it to place the 3-week plateau window and pick today's split groups. Home uses it to put today's split muscle groups first, with a **TODAY** label.
+
+### Today page terms
+- **Usual lifts:** per muscle group, the (up to) 2 lifts trained on the most days in the last 6 weeks. The user trains two lifts per group.
+- **Target rep range:** a setting, 6–8 by default. Aim to finish sets in it.
+- **Working weight:** the heaviest weight in a lift's most recent session (on its most recent machine + unit).
+- **Target:** what to beat next. Within the range: one more rep at the working weight. Past the top (e.g. 9 with 6–8): **move up** to the next weight, aiming for at least the bottom of the range. This is "double progression".
+- **Increment:** the step to the next weight: the smallest gap between weights you've used on that machine + unit (else 5 lbs / 2.5 kg / 1 plate).
 
 ### Plateau
 A lift is **plateaued** if it has at least one set dated in the **last 21 days** (3 weeks, today included) and **none** of those sets is a PR (calendar rule above). Plateaued lifts get an amber **Plateau** pill on their row in the muscle group's lift list. Lifts you haven't trained in the last 21 days are never plateaued. This is the app's only alert.
@@ -167,8 +174,8 @@ Changing an item's display name. Renaming onto a name another item already uses 
 
 | Term | Meaning |
 | --- | --- |
-| **Tab** | One of the bottom-bar destinations: Home, Calendar, Settings. Two slots left of Home are blank placeholders for future tabs. |
-| **Tab page** | `/`, `/calendar`, `/settings`. Swiping left/right here changes tab. On other pages with a back link, swiping right goes back instead. |
+| **Tab** | One of the bottom-bar destinations: Today, Home, Calendar, Settings. The far-left slot is a blank placeholder (planned: an AI coach). |
+| **Tab page** | `/today`, `/`, `/calendar`, `/settings`. Swiping left/right here changes tab. On other pages with a back link, swiping right goes back instead. |
 | **Machine card** | One card per machine on a lift page: records per unit, a progress chart, and an expandable history. |
 | **Flash message** | A one-off banner on the lift page after saving ("New best at 185 lbs!", "Logged 185 lbs × 4", "Set updated", "Set deleted"), passed via router state. |
 | **Body figure** | The small SVG person on each Home tile, with the muscle group's body part highlighted. Back, triceps and glutes show the figure from behind. |

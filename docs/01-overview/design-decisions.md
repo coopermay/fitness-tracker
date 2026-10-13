@@ -137,7 +137,7 @@ A log of the significant choices made while building Lift Tracker: what was deci
 **Consequences:** On the Intel Mac this was built on, `brew install uv` failed, so the official installer (`curl … | sh`) is the documented route.
 
 ## 27. Swipe between tabs, with a slide-in animation
-**Decision:** Left/right swipes change tabs on the three tab pages. The new page slides 48px in from the side and fades in. Tapping a tab slides the same way. (The user chose "swipe then slide" over following the finger.)
+**Decision:** Left/right swipes change tabs on the tab pages. The new page slides 48px in from the side and fades in. Tapping a tab slides the same way. (The user chose "swipe then slide" over following the finger.)
 **Why:** It feels native without the complexity, and conflicts with vertical scrolling, of a drag-to-follow carousel.
 **Consequences:** The page wrapper is keyed by path, so every navigation remounts the page. Nested pages swipe differently; see 30.
 
@@ -170,6 +170,11 @@ A log of the significant choices made while building Lift Tracker: what was deci
 **Decision:** Settings offers a base (System, Light, Dark, Black, Navy) and one of 8 accents, stored as `settings.theme_base` / `theme_accent`. CSS token blocks keyed by `data-base`/`data-accent` on `<html>` do the colouring; the calendar scale and tile tint are derived from the accent with `color-mix()`. The last theme is cached in `localStorage` only so `index.html` can apply it before the first paint.
 **Why:** The user chose presets + accent over free colour pickers (every combination stays readable) and kept "System" as the default. Saving on the server means the theme follows you across devices now, and can become per-user when logins are added.
 **Consequences:** On today's Home tiles the figure's grey is overridden with a stronger mix of `--text-muted`, because the plain `--figure` blended into the accent tint. New bases/accents need an enum migration plus CSS (see [Styling](../06-frontend/styling.md#accents)). `color-mix()` needs a 2023-or-newer browser (Safari 16.2+, Chrome 111+). The web manifest and icon keep the default blue.
+
+## 34. A Today tab built from one endpoint, with the user's progression rule
+**Decision:** The Today tab (next to Home) shows today's split groups, each group's 2 usual lifts (most days trained in 6 weeks), the last session on the most recent machine, and a target. `GET /today` returns all of it in one request. The target follows the user's double progression: beat your best by a rep until you pass the top of a configurable range (default 6–8), then move up by the increment learned from your own history (smallest gap between weights used). Logging from Today returns to Today (`?from=today`).
+**Why:** It's the screen used mid-workout on gym Wi-Fi, so one request beats one per lift. The rule and the "2 per group" choice are how the user actually trains; "same 2 lifts most sessions" made frequency the right ranking. The rep range is a setting because it differs between people and programs.
+**Consequences:** Progressive-overload suggestions, once out of scope, now exist for Today only. The target ignores today's sets so it doesn't shift while you log. A lift trained on several machines is targeted on the most recent one only. `USUAL_LIFTS_PER_GROUP` (2) is a constant, not a setting.
 
 ---
 

@@ -160,12 +160,15 @@ App-wide settings. **Exactly one row**, with `id = 1`.
 | `id` | `integer` | no | `1` | Primary key; must be 1 |
 | `default_unit` | `weight_unit` enum | no | `'lbs'` | Unit preselected the first time you log a lift + machine |
 | `theme_base` | `theme_base` enum | no | `'system'` | Background: `system`, `light`, `dark`, `black`, `navy` (added in `0003_settings_theme`) |
+| `rep_range_min` | `integer` | no | `6` | Bottom of the Today page's target rep range (added in `0004_settings_rep_range`) |
+| `rep_range_max` | `integer` | no | `8` | Top of the range; beat it and Today suggests the next weight |
 | `theme_accent` | `theme_accent` enum | no | `'blue'` | Accent: `blue`, `green`, `purple`, `orange`, `red`, `pink`, `teal`, `gold` |
 
 | Constraint / index | Definition |
 | --- | --- |
 | `settings_pkey` | `PRIMARY KEY (id)` |
 | `ck_settings_single_row` | `CHECK (id = 1)` |
+| `ck_settings_rep_range` | `CHECK (rep_range_min >= 1 AND rep_range_min <= rep_range_max AND rep_range_max <= 50)` |
 
 The row is inserted by migration `0001_initial_schema` (`INSERT INTO settings (id) VALUES (1)`). The API reads and updates `id = 1` (`SETTINGS_ID` in `routers/settings.py`).
 
@@ -204,7 +207,7 @@ Alembic's bookkeeping: a single row with the revision id the database is at.
 
 | Column | Type | Notes |
 | --- | --- | --- |
-| `version_num` | `varchar(32)` | Primary key. The current head is `0003_settings_theme`. |
+| `version_num` | `varchar(32)` | Primary key. The current head is `0004_settings_rep_range`. |
 
 Never edit it by hand except to recover from a broken migration. See [Migrations](migrations.md).
 

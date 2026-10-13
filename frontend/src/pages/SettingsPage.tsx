@@ -7,6 +7,8 @@ import { QueryStatus } from '../components/QueryStatus'
 import styles from './SettingsPage.module.css'
 
 const UNITS: WeightUnit[] = ['lbs', 'kg', 'plates']
+// Choices for the target rep range: 1 to 20.
+const REP_CHOICES = Array.from({ length: 20 }, (_, i) => i + 1)
 
 export function SettingsPage() {
   const settings = useSettings()
@@ -24,9 +26,9 @@ export function SettingsPage() {
     return <QueryStatus isError={settings.isError} error={settings.error} />
   }
 
-  // useUpdateSettings changes the cache before the server answers, so this
-  // already shows what was just tapped.
-  const selected = settings.data.default_unit
+  // useUpdateSettings changes the cache before the server answers, so these
+  // already show what was just picked.
+  const { default_unit: selected, rep_range_min: repMin, rep_range_max: repMax } = settings.data
 
   return (
     <>
@@ -68,6 +70,40 @@ export function SettingsPage() {
             {unit}
           </button>
         ))}
+      </div>
+
+      <h2 className={styles.sectionLabel}>Target reps</h2>
+      <p className={styles.hint}>
+        The Today page aims for this range, and suggests the next weight up once you beat the top
+        of it (at {repMax + 1}).
+      </p>
+      <div className={styles.repRange}>
+        <select
+          className={styles.select}
+          aria-label="Fewest reps"
+          value={repMin}
+          onChange={(event) => updateSettings.mutate({ rep_range_min: Number(event.target.value) })}
+        >
+          {REP_CHOICES.map((reps) => (
+            <option key={reps} value={reps} disabled={reps > repMax}>
+              {reps}
+            </option>
+          ))}
+        </select>
+        to
+        <select
+          className={styles.select}
+          aria-label="Most reps"
+          value={repMax}
+          onChange={(event) => updateSettings.mutate({ rep_range_max: Number(event.target.value) })}
+        >
+          {REP_CHOICES.map((reps) => (
+            <option key={reps} value={reps} disabled={reps < repMin}>
+              {reps}
+            </option>
+          ))}
+        </select>
+        reps
       </div>
       {updateSettings.isError && (
         <p className={styles.error}>Couldn't save: {updateSettings.error.message}</p>

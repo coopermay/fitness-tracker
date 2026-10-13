@@ -30,6 +30,7 @@ interface SetFormProps {
   submitLabel: string
   onSubmit: (fields: SetFields) => Promise<void>
   onDelete?: () => Promise<void>
+  cancelTo?: string // where Cancel goes; defaults to the lift page
 }
 
 // Shared by the "log set" and "edit set" pages.
@@ -41,6 +42,7 @@ export function SetForm({
   submitLabel,
   onSubmit,
   onDelete,
+  cancelTo,
 }: SetFormProps) {
   // One state object for the whole form. `update` changes one field and keeps
   // the rest (`...values` copies the old fields; the new one overrides).
@@ -218,7 +220,7 @@ export function SetForm({
       <button type="submit" className={styles.submit} disabled={!isValid || isSaving}>
         {isSaving ? 'Saving…' : submitLabel}
       </button>
-      <Link className={styles.cancel} to={`/lifts/${records.lift.id}`}>
+      <Link className={styles.cancel} to={cancelTo ?? `/lifts/${records.lift.id}`}>
         Cancel
       </Link>
       {onDelete && (

@@ -1,0 +1,114 @@
+.title {
+  margin: 8px 0 0;
+  font-size: 1.5rem;
+}
+
+.date {
+  margin: 0 0 12px;
+  color: var(--text-muted);
+}
+
+.summary {
+  margin: 0 0 8px;
+  color: var(--text-muted);
+  font-size: 0.9rem;
+}
+
+.flash,
+.flashRecord {
+  margin: 0 0 16px;
+  padding: 12px 16px;
+  border-radius: var(--radius);
+  font-weight: 600;
+}
+
+.flash {
+  background: var(--surface-pressed);
+}
+
+.flashRecord {
+  background: #1a7f37; /* same as the lift page's "New best" banner */
+  color: #ffffff;
+  font-size: 1.15rem;
+}
+
+.group {
+  margin-top: 20px;
+}
+
+.groupTitle {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  margin: 0 0 10px;
+  font-size: 1rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.groupProgress {
+  color: var(--text-muted);
+  font-size: 0.8rem;
+  font-weight: 600;
+  letter-spacing: normal;
+  text-transform: none;
+}
+
+.cards {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.empty {
+  margin: 0 0 8px;
+  color: var(--text-muted);
+}
+
+.showAll {
+  width: 100%;
+  min-height: var(--tap-size);
+  margin-top: 10px;
+  border: 1px dashed var(--border-strong);
+  border-radius: var(--radius);
+  background: none;
+  color: var(--text-muted);
+  font: inherit;
+  font-weight: 600;
+}
+
+.rest {
+  margin-top: 24px;
+  padding: 20px 16px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface);
+  text-align: center;
+}
+
+.restTitle {
+  margin: 0;
+  font-size: 1.25rem;
+  font-weight: 700;
+}
+
+.restNext {
+  margin: 6px 0 16px;
+  color: var(--text-muted);
+}
+
+.restNext a {
+  color: var(--accent);
+}
+
+.restLink {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: var(--tap-size);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius);
+  color: var(--accent);
+  font-weight: 600;
+  text-decoration: none;
+}

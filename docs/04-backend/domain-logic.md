@@ -1,6 +1,6 @@
 # Domain logic
 
-The business rules of Lift Tracker live in five modules. Apart from two small exceptions (noted below), they're **plain functions**: they take lists of model objects, return schema objects, and know nothing about HTTP. That makes them easy to read, test and reuse.
+The business rules of Lift Tracker live in six modules. Apart from two small exceptions (noted below), they're **plain functions**: they take lists of model objects, return schema objects, and know nothing about HTTP. That makes them easy to read, test and reuse.
 
 | Module | Rules it owns |
 | --- | --- |
@@ -9,6 +9,7 @@ The business rules of Lift Tracker live in five modules. Apart from two small ex
 | [`records.py`](#recordspy) | Records per weight, recency order, Epley est. 1RM, progress points, "new best" check |
 | [`calendar.py`](#calendarpy) | Which sets were PRs (history replay), per-day activity |
 | [`insights.py`](#insightspy) | Plateaued lifts |
+| [`today.py`](#todaypy) | The Today page: usual lifts, last session, targets (double progression) |
 
 The vocabulary used here (record, PR, session, plateau…) is defined in the [Domain glossary](../01-overview/domain-glossary.md).
 
@@ -208,6 +209,53 @@ A lift you haven't done in the last 21 days is never plateaued. Example (today =
 | Aug 1: 185 × 5 | no | yes | — |
 | Sep 20: 185 × 5 | yes | no (tie) | |
 | Sep 27: 185 × 4 | yes | no | **plateaued** |
+
+---
+
+## today.py
+
+**File:** [`backend/app/today.py`](../../backend/app/today.py) — everything behind [`GET /today`](../05-api/today.md).
+
+| Constant | Value | Meaning |
+| --- | --- | --- |
+| `USUAL_WINDOW_DAYS` | `42` | "The last 6 weeks", including today |
+| `USUAL_LIFTS_PER_GROUP` | `2` | The user trains two lifts per muscle group |
+| `DEFAULT_INCREMENT` | lbs 5, kg 2.5, plates 1 | Weight step when there's no history to learn it from |
+
+### `weight_increment(sets, unit) -> Decimal`
+The smallest gap between distinct weights in `sets` (one machine + unit), or `DEFAULT_INCREMENT[unit]` if there's only one weight. Machines and dumbbells go up in fixed steps, so your own history is the best guide.
+
+### `target_for(sets, rep_min, rep_max) -> Target | None`
+Double progression, the user's own method. `sets` are the sets **before today** on one machine + unit.
+
+```mermaid
+flowchart TD
+    A["working weight = heaviest weight<br/>in the most recent session"] --> B{"best reps at it<br/>above rep_max?"}
+    B -- "no" --> C["target: working weight x best + 1"]
+    B -- "yes" --> D["next = working + weight_increment"]
+    D --> E["target: next x max of rep_min and best at next + 1<br/>move_up = true"]
+```
+
+Examples with a 6–8 range:
+
+| History (same machine + unit) | Target |
+| --- | --- |
+| 185 × 6 (Sep 24), 185 × 7 + 175 × 8 (Sep 28) | 185 × **8** (working weight 185, best 7) |
+| 50 × 8, then 55 × **9** | **60** × 6, move up (9 > 8; step 5 from 50 → 55) |
+| 60 × 6 (old), then 55 × 9 | **60** × 7, move up (beat the old 60 × 6) |
+| 20 kg × 13, nothing else, range 8–12 | **22.5 kg** × 8 (default kg step) |
+
+### `usual_lift_ids(lifts, sets_by_lift, today) -> list[int]`
+Ranks the group's lifts by **distinct days trained** in the window, then the most recent of those days, then creation order, and returns the top 2. Lifts not trained in the window are never "usual".
+
+### `build_today_lift(...) -> TodayLift`
+For one lift: today's sets, then the machine + unit of the most recent set before today. From those sets it builds `last_session` (the latest dated day) and `target_for(...)`.
+
+### `next_training_day(split_days, groups_by_id, today) -> NextTraining | None`
+Looks 1–7 days ahead for a weekday with visible groups in the split.
+
+### `build_today(today, sets, lifts, muscle_groups, machines_by_id, split_days, rep_min, rep_max) -> TodayResponse`
+Today's split groups (non-archived, creation order). For each: the usual lifts plus anything else done today, then the rest as `other_lifts` (most recently done first). Also the day's totals, using `find_pr_set_ids` for PRs and `plateaued_lift_ids` for the pills.
 
 ---
 

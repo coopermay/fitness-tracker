@@ -41,13 +41,14 @@ flowchart TD
 
 | Path | Page | Data hooks | Swipe | Tab highlighted |
 | --- | --- | --- | --- | --- |
-| `/` | `HomePage` | `useMuscleGroups`, `useSplit`, `useInsights` | Tab (index 0) | Home |
+| `/today` | `TodayPage` | `useToday` | Tab (index 0) | Today |
+| `/` | `HomePage` | `useMuscleGroups`, `useSplit` | Tab (index 1) | Home |
 | `/muscle-groups/:muscleGroupId` | `MuscleGroupPage` | `useMuscleGroups`, `useLifts`, `useInsights` (+ create lift, update group) | Right → Home | Home |
 | `/lifts/:liftId` | `LiftPage` | `useLiftRecords`, `useMuscleGroups` (+ update lift) | Right → muscle group | Home |
 | `/lifts/:liftId/log` | `LogSetPage` | `useLiftRecords`, `useSettings` (+ create set) | — | Home |
 | `/lifts/:liftId/sets/:setId` | `EditSetPage` | `useLiftRecords`, `useSettings` (+ update/delete set) | — | Home |
-| `/calendar` | `CalendarPage` | `useCalendar` | Tab (index 1) | Calendar |
-| `/settings` | `SettingsPage` | `useSettings` (+ default unit, create group) | Tab (index 2) | Settings |
+| `/calendar` | `CalendarPage` | `useCalendar` | Tab (index 2) | Calendar |
+| `/settings` | `SettingsPage` | `useSettings` (+ default unit, create group) | Tab (index 3) | Settings |
 | `/settings/split` | `SplitPage` | `useSplit`, `useMuscleGroups` (+ split) | Right → Settings | Settings |
 | `/settings/theme` | `ThemePage` | `useSettings` (+ theme) | Right → Settings | Settings |
 | `*` | `NotFoundPage` | — | — | Home |
@@ -65,6 +66,9 @@ flowchart LR
     MG -->|back link or swipe right| Home
     Lift -->|back link or swipe right| MG
     Cal["Calendar /calendar"] -->|tap lift in day details| Lift
+    Today["Today /today"] <-->|swipe or tab| Home
+    Today -->|Log set| Log
+    Log -->|Save, from Today| Today
     Home <-->|swipe or tab| Cal
     Cal <-->|swipe or tab| Set["Settings /settings"]
     Set -->|Edit weekly split| Split["Weekly split"]
@@ -73,7 +77,7 @@ flowchart LR
     Theme -->|back link or swipe right| Set
 ```
 
-- **Tabs** (Home, Calendar, Settings) are reached from the bottom bar or by swiping left/right on a tab page.
+- **Tabs** (Today, Home, Calendar, Settings) are reached from the bottom bar or by swiping left/right on a tab page.
 - **Drill-down pages** (muscle group → lift, Settings → weekly split / theme) use the **back link** at the top, and **swiping right** does the same thing. When installed as an app there's no browser back button, so every non-tab page has a back link or a Cancel button. The set forms only have Cancel and don't swipe, so a half-filled form can't be lost by accident.
 - **Forms navigate with `replace: true`**, so the phone's back button after saving goes to the muscle group, not back into the form.
 
@@ -84,6 +88,8 @@ flowchart LR
 ```mermaid
 flowchart TD
     App --> TabBar
+    App --> TodayPage
+    TodayPage --> TodayLiftCard
     App --> HomePage
     App --> MuscleGroupPage
     App --> LiftPage
@@ -211,6 +217,8 @@ This project was also a way to learn React and TypeScript. Each concept below is
 | Lifting state up / controlled child | `SetForm.tsx` ↔ `MachineCombobox.tsx` |
 | Draft vs saved state | `components/SplitEditor.tsx` |
 | Custom hooks | `useSwipe.ts` |
+| URL search params (`useSearchParams`) | `pages/LogSetPage.tsx` (`?from=today`) |
+| Description lists (`<dl>`/`<dt>`/`<dd>`) | `components/TodayLiftCard.tsx` |
 | Context (`createContext`, `useContext`, provider) | `swipeBack.ts`, `App.tsx`, `components/BackLink.tsx` |
 | `useCallback` (a function that stays the same between renders) | `App.tsx` (`setSwipeBackTarget`) |
 | `key` to force a remount | `App.tsx` (page wrapper), `MachineCard.tsx` (chart) |

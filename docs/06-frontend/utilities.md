@@ -106,7 +106,7 @@ The form pages pass it as router state, `navigate('/lifts/3', { replace: true, s
 
 | Export | Value / behaviour |
 | --- | --- |
-| `TAB_PATHS` | `['/', '/calendar', '/settings']`, the swipeable pages in tab-bar order (placeholders skipped) |
+| `TAB_PATHS` | `['/today', '/', '/calendar', '/settings']`, the swipeable pages in tab-bar order (the placeholder is skipped) |
 | `tabIndex(pathname)` | Index in `TAB_PATHS` for an **exact** match, else `null` (e.g. `/lifts/3` → `null`, where swiping right goes back instead) |
 | `interface SlideState` | `{ slideFrom: 'left' \| 'right' }`, carried in router state |
 | `slideStateFor(from, to)` | `undefined` if `from` is null or the same tab; else `{slideFrom: to > from ? 'right' : 'left'}` |

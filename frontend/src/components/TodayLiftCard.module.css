@@ -1,0 +1,112 @@
+.card {
+  padding: 14px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface);
+}
+
+/* Logged today: an accent edge, like today's tiles on Home */
+.done {
+  border-color: var(--accent);
+}
+
+.header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+.name {
+  color: var(--text);
+  font-size: 1.15rem;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.plateau {
+  padding: 1px 8px;
+  border: 1px solid var(--warn);
+  border-radius: 999px;
+  color: var(--warn);
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.doneMark {
+  margin-left: auto;
+  color: var(--accent);
+  font-size: 0.85rem;
+  font-weight: 700;
+}
+
+.machine {
+  margin: 2px 0 0;
+  color: var(--text-muted);
+  font-size: 0.9rem;
+}
+
+.rows {
+  margin: 10px 0 0;
+}
+
+.row {
+  display: flex;
+  gap: 10px;
+  padding: 3px 0;
+}
+
+.label {
+  flex-shrink: 0;
+  width: 4.5em;
+  color: var(--text-muted);
+  font-size: 0.85rem;
+  line-height: 1.5rem;
+}
+
+.value {
+  margin: 0;
+}
+
+/* Never split one set ("45 × 10 PR") across two lines */
+.set {
+  white-space: nowrap;
+}
+
+.target {
+  color: var(--accent);
+  font-size: 1.1rem;
+}
+
+.muted {
+  color: var(--text-muted);
+}
+
+/* Same green as the calendar's PR badge */
+.pr {
+  margin-left: 4px;
+  padding: 0 5px;
+  border-radius: 4px;
+  background: #1a7f37;
+  color: #ffffff;
+  font-size: 0.7rem;
+  font-weight: 700;
+  vertical-align: 1px;
+}
+
+.logButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: var(--tap-size);
+  margin-top: 12px;
+  border-radius: var(--radius);
+  background: var(--accent);
+  color: var(--on-accent);
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.logButton:active {
+  opacity: 0.85;
+}

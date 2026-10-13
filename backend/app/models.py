@@ -126,7 +126,13 @@ class Settings(SQLModel, table=True):
     """Exactly one row (id = 1), created by the initial migration."""
 
     __tablename__ = "settings"
-    __table_args__ = (CheckConstraint("id = 1", name="ck_settings_single_row"),)
+    __table_args__ = (
+        CheckConstraint("id = 1", name="ck_settings_single_row"),
+        CheckConstraint(
+            "rep_range_min >= 1 AND rep_range_min <= rep_range_max AND rep_range_max <= 50",
+            name="ck_settings_rep_range",
+        ),
+    )
 
     id: int = Field(default=1, primary_key=True)
     default_unit: WeightUnit = Field(
@@ -144,6 +150,10 @@ class Settings(SQLModel, table=True):
         sa_type=SAEnum(ThemeAccent, name="theme_accent"),
         sa_column_kwargs={"server_default": ThemeAccent.blue.value},
     )
+    # The target rep range on the Today page: aim to finish a set between
+    # these, and move up a weight once you beat the top of the range.
+    rep_range_min: int = Field(default=6, sa_column_kwargs={"server_default": text("6")})
+    rep_range_max: int = Field(default=8, sa_column_kwargs={"server_default": text("8")})
 
 
 class SplitDay(SQLModel, table=True):

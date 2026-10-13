@@ -26,6 +26,7 @@ import type {
   Settings,
   Split,
   WorkoutSet,
+  TodayResponse,
 } from './types'
 
 // Query keys identify cached data. Keeping them in one place avoids typos.
@@ -42,6 +43,7 @@ export const queryKeys = {
   calendar: ['calendar'] as const,
   split: ['split'] as const,
   insights: ['insights'] as const,
+  today: ['today'] as const,
 }
 
 // --- Queries -----------------------------------------------------------------
@@ -97,6 +99,14 @@ export function useInsights(today: string) {
   })
 }
 
+// Everything on the Today page. Like insights, `today` is the phone's date.
+export function useToday(today: string) {
+  return useQuery({
+    queryKey: [...queryKeys.today, today],
+    queryFn: () => apiGet<TodayResponse>(`/today?today=${today}`),
+  })
+}
+
 export function useMachines() {
   return useQuery({
     queryKey: queryKeys.machines,
@@ -136,7 +146,10 @@ export function useCreateLift(muscleGroupId: number) {
   return useMutation({
     mutationFn: (name: string) =>
       apiPost<Lift>('/lifts', { name, muscle_group_id: muscleGroupId }),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: queryKeys.lifts }),
+    onSuccess: () => {
+      void queryClient.invalidateQueries({ queryKey: queryKeys.today }) // may be in today's groups
+      return queryClient.invalidateQueries({ queryKey: queryKeys.lifts })
+    },
   })
 }
 
@@ -160,6 +173,7 @@ export function useUpdateMuscleGroup() {
       apiPatch<MuscleGroup>(`/muscle-groups/${id}`, changes),
     onSuccess: () => {
       void queryClient.invalidateQueries({ queryKey: queryKeys.muscleGroups })
+      void queryClient.invalidateQueries({ queryKey: queryKeys.today })
     },
   })
 }
@@ -173,6 +187,7 @@ export function useUpdateLift() {
       void queryClient.invalidateQueries({ queryKey: queryKeys.lifts })
       void queryClient.invalidateQueries({ queryKey: queryKeys.liftRecords(lift.id) })
       void queryClient.invalidateQueries({ queryKey: queryKeys.calendar })
+      void queryClient.invalidateQueries({ queryKey: queryKeys.today })
     },
   })
 }
@@ -187,6 +202,7 @@ export function useUpdateMachine() {
       // A machine's name appears in the records of every lift that used it.
       void queryClient.invalidateQueries({ queryKey: queryKeys.allLiftRecords })
       void queryClient.invalidateQueries({ queryKey: queryKeys.calendar })
+      void queryClient.invalidateQueries({ queryKey: queryKeys.today })
     },
   })
 }
@@ -210,8 +226,13 @@ export function useUpdateSettings() {
       queryClient.setQueryData(queryKeys.settings, context?.previous)
     },
     // The response is the saved settings, so put it straight into the cache
-    // instead of refetching.
-    onSuccess: (settings) => queryClient.setQueryData(queryKeys.settings, settings),
+    // instead of refetching. Today's targets depend on the rep range.
+    onSuccess: (settings, changes) => {
+      queryClient.setQueryData(queryKeys.settings, settings)
+      if ('rep_range_min' in changes || 'rep_range_max' in changes) {
+        void queryClient.invalidateQueries({ queryKey: queryKeys.today })
+      }
+    },
   })
 }
 
@@ -219,7 +240,10 @@ export function useUpdateSplit() {
   const queryClient = useQueryClient()
   return useMutation({
     mutationFn: (split: Split) => apiPut<Split>('/split', split),
-    onSuccess: (split) => queryClient.setQueryData(queryKeys.split, split),
+    onSuccess: (split) => {
+      queryClient.setQueryData(queryKeys.split, split)
+      void queryClient.invalidateQueries({ queryKey: queryKeys.today }) // which groups are today's
+    },
   })
 }
 
@@ -234,6 +258,7 @@ function refreshAfterSetChange(queryClient: QueryClient, liftId: number) {
     queryClient.invalidateQueries({ queryKey: queryKeys.lifts }),
     queryClient.invalidateQueries({ queryKey: queryKeys.calendar }),
     queryClient.invalidateQueries({ queryKey: queryKeys.insights }),
+    queryClient.invalidateQueries({ queryKey: queryKeys.today }),
   ])
 }
 
