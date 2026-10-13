@@ -29,6 +29,7 @@ import type {
   Split,
   WorkoutSet,
   TodayResponse,
+  StandardGuide,
 } from './types'
 
 // Query keys identify cached data. Keeping them in one place avoids typos.
@@ -47,6 +48,7 @@ export const queryKeys = {
   insights: ['insights'] as const,
   today: ['today'] as const,
   body: ['body'] as const,
+  standards: ['standards'] as const,
 }
 
 // --- Queries -----------------------------------------------------------------
@@ -115,6 +117,16 @@ export function useBody(today: string) {
   return useQuery({
     queryKey: [...queryKeys.body, today],
     queryFn: () => apiGet<BodyStats>(`/body?today=${today}`),
+  })
+}
+
+// The strength standards behind the grades. They never change while the app
+// runs, so they're fetched once.
+export function useStrengthStandards() {
+  return useQuery({
+    queryKey: queryKeys.standards,
+    queryFn: () => apiGet<StandardGuide[]>('/body/standards'),
+    staleTime: Infinity,
   })
 }
 

@@ -87,14 +87,15 @@ The handlers are spread onto the page wrapper on every page.
 
 Numbers worked out from your body stats and your lifts. (Not to be confused with the backend's [`GET /api/insights`](../05-api/calendar-split-insights.md#insights), which only returns plateau flags for the muscle group page; this page uses [`GET /body`](../05-api/body.md).)
 
-**Data:** `useBody(todayIsoDate())`.
+**Data:** `useBody(todayIsoDate())`, `useSettings()` (units and sex), `useStrengthStandards()` (the guide).
 
 1. "Insights".
 2. **Setup prompt** (dashed card) while body stats are missing: "Add your sex, height… in Settings → Body stats to see everything here" (or "…your calories" when only the calorie inputs are missing), linking to `/settings/body`.
 3. **Strength score card** (accent border and tint): the 0–100 score in large type, "Strength score · Intermediate", and how many lifts it's from. Shown once a lift is graded.
 4. **Your numbers:** a `<dl>` card with **Maintenance**, Cut (−500), Lean bulk (+300), **Protein**, and **Water** ("90 fl oz a day", with "105 fl oz on training days" as a smaller second line; litres on metric). `Stat` takes an optional `note` for that second line. (Age and resting calories were removed at the user's request.)
 5. **Relative strength:** lifts strongest first. Each row: the name; the machine, "(auto)" if picked automatically, and the best set ("Barbell (auto) · 185 lbs × 6"); on the right the ratio ("1.26×") and, for graded lifts, a level pill ("Intermediate"). Rows link to the lift page, where the machine can be changed. The hint explains this, and asks for sex when grades need it.
-6. A footnote naming the formulas and saying the standards are approximate and not age-adjusted.
+6. **Which lifts get a grade?**: an in-file `StandardsGuide`, built on a native `<details>`/`<summary>` (it opens and closes on tap without any React state). It explains the matching rule, then lists the barbell and dumbbell standards from `useStrengthStandards()`: each lift's name, the words its name needs (and the excluded variations), and the ratios for each level for your sex (both sexes if it isn't set). Each "Level N×" stays on one line.
+7. A footnote naming the formulas and saying the standards are approximate and not age-adjusted.
 
 ---
 

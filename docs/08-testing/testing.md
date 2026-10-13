@@ -1,6 +1,6 @@
 # Testing
 
-How Lift Tracker is tested: the backend's automated pytest suite (101 tests), what each test covers, how to write new ones, and the manual checks used for the frontend.
+How Lift Tracker is tested: the backend's automated pytest suite (102 tests), what each test covers, how to write new ones, and the manual checks used for the frontend.
 
 ---
 
@@ -29,7 +29,7 @@ uv run pytest -k "plateau"                       # tests whose name matches
 uv run pytest -x                                 # stop at the first failure
 ```
 
-Expected output ends with `101 passed, 1 warning`. The warning is a harmless Starlette deprecation notice about `httpx`.
+Expected output ends with `102 passed, 1 warning`. The warning is a harmless Starlette deprecation notice about `httpx`.
 
 ---
 
@@ -130,7 +130,7 @@ Because tables are truncated **before** each test (not after), the last test's d
 | `test_rep_range_can_change_one_end_at_a_time` | `{rep_range_max: 10}`, then `{rep_range_min: 8}` |
 | `test_rep_range_min_cannot_pass_max` | min 9 with max 8 → 422; 0 and 51 → 422; nothing changes |
 
-### `test_body.py` (25)
+### `test_body.py` (26)
 Uses `TODAY = "2026-10-01"` and a profile of male, born 1996-10-02 (29 on that day), 180 cm, 80 kg.
 
 | Test | Checks |
@@ -149,6 +149,7 @@ Uses `TODAY = "2026-10-01"` and a profile of male, born 1996-10-02 (29 on that d
 | `test_standard_for` (×8) | Name + machine matching, including exclusions (incline, Smith, leg curl, Romanian, no machine) |
 | `test_grade_levels_and_scores` | Beginner 16.7, Intermediate 62.5, Elite 100, the women's table, `level_for_score` |
 | `test_water_target` | 2800 ml, 3300 on training days |
+| `test_standards_guide_lists_every_graded_lift` | `GET /body/standards` has one entry per standard; barbell bench in full |
 
 ### `test_today.py` (14)
 Uses `TODAY = "2026-10-01"` (a Thursday), Chest (Bench, Fly, Dips) and Back (Row), and Cable/Barbell machines.
@@ -233,7 +234,7 @@ There are no automated UI tests. After UI changes, run `npm run build && npm run
 10. **Themes:** in Settings → Change theme, try each background and a few accents (buttons, Home tiles, calendar, chart); on System, toggle macOS/iOS dark mode; reload and check there's no flash of the old colours.
 11. **Narrow screen:** 320px and 390px in DevTools' device mode.
 12. **Today:** a tab per muscle group (with n/m done), 2 lifts each with Best and Goal; switching tabs keeps your place after logging; Log set → save → back on Today with the banner, ✓ Done and "1 of 2 done"; Cancel returns to Today; Show all; change Target reps in Settings and the targets update; on a rest day, the next training day shows.
-13. **Body stats + Insights:** Insights first shows the setup prompt; enter sex, date of birth, height and weight in ft/lbs, Save, follow the link to Insights and check the strength score, Your numbers (water, no age/BMR) and graded relative strength; on a lift with two machines, change "Relative strength uses" and see Insights follow; switch to cm/kg and the values convert; the Settings row shows `5'10" • 165 lbs`.
+13. **Body stats + Insights:** Insights first shows the setup prompt; enter sex, date of birth, height and weight in ft/lbs, Save, follow the link to Insights and check the strength score, Your numbers (water, no age/BMR) and graded relative strength; on a lift with two machines, change "Relative strength uses" and see Insights follow; open "Which lifts get a grade?"; switch to cm/kg and the values convert; the Settings row shows `5'10" • 165 lbs`.
 
 ---
 

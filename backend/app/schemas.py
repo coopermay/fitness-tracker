@@ -374,3 +374,16 @@ class BodyStats(BaseModel):
         description="Strongest first. Empty without a weight. Plates are left out."
     )
     missing: list[str] = Field(description="Body fields still needed for every calculation.")
+
+
+class StandardGuide(BaseModel):
+    """One graded lift, for the "Which lifts get a grade?" guide on Insights."""
+
+    key: str
+    equipment: str = Field(description='"Barbell" or "Dumbbell": the machine name must contain it.')
+    label: str
+    name_words: list[str] = Field(description="The lift name must contain one of these.")
+    excluded_words: list[str] = Field(description="...and none of these (other variations).")
+    levels: list[str] = Field(description="The levels the thresholds are for: Novice ... Elite.")
+    male: list[float] = Field(description="1RM / bodyweight needed for each level.")
+    female: list[float]

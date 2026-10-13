@@ -204,6 +204,7 @@ Full column/constraint reference: [Tables](../03-database/tables.md).
 | `BodyStats` | `age`, `calories: CalorieTargets \| None`, `protein: ProteinRange \| None`, `water: WaterTarget \| None`, `strength_score: StrengthScore \| None`, `relative_strength: list[RelativeStrength]`, `missing: list[str]` |
 | `WaterTarget` | `daily_ml`, `training_day_ml` |
 | `StrengthScore` | `score: int` (0–100), `level`, `graded_lifts` |
+| `StandardGuide` | `key`, `equipment`, `label`, `name_words`, `excluded_words`, `levels`, `male`, `female` |
 | `CalorieTargets` | `bmr`, `maintenance`, `cut`, `lean_bulk` (ints) |
 | `ProteinRange` | `min_g`, `max_g` |
 | `RelativeStrength` | `lift_id`, `lift_name`, `machine_id`, `machine_name`, `automatic`, `weight_value`, `reps`, `one_rep_max`, `weight_unit`, `ratio`, `level: str \| None`, `score: float \| None` |

@@ -10,6 +10,7 @@ stack weights), so there's nothing fair to compare them with.
 """
 
 from app.models import Sex
+from app.schemas import StandardGuide
 
 LEVELS = ["Beginner", "Novice", "Intermediate", "Advanced", "Elite"]
 
@@ -42,6 +43,38 @@ _LIFT_PATTERNS: dict[str, list[tuple[str, list[str], list[str]]]] = {
         ("dumbbell_curl", ["curl"], ["leg", "hamstring", "wrist", "concentration"]),
     ],
 }
+
+
+# Display names for the guide on the Insights page.
+LABELS = {
+    "barbell_bench": "Bench press",
+    "barbell_squat": "Squat",
+    "barbell_deadlift": "Deadlift",
+    "barbell_overhead_press": "Overhead press",
+    "barbell_row": "Row",
+    "barbell_curl": "Curl",
+    "dumbbell_bench": "Bench press",
+    "dumbbell_shoulder_press": "Shoulder press",
+    "dumbbell_curl": "Curl (incl. hammer curl)",
+}
+
+
+def standards_guide() -> list[StandardGuide]:
+    """Every graded lift, with how it's matched and its thresholds, for the guide."""
+    return [
+        StandardGuide(
+            key=key,
+            equipment=equipment.capitalize(),
+            label=LABELS[key],
+            name_words=include,
+            excluded_words=exclude,
+            levels=LEVELS[1:],
+            male=STANDARDS[key][Sex.male],
+            female=STANDARDS[key][Sex.female],
+        )
+        for equipment, patterns in _LIFT_PATTERNS.items()
+        for key, include, exclude in patterns
+    ]
 
 
 def standard_for(lift_name: str, machine_name: str | None) -> str | None:

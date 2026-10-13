@@ -7,7 +7,8 @@ from app.body import build_body_stats
 from app.db import SessionDep
 from app.models import Lift, Machine, Settings, WorkoutSet
 from app.routers.settings import SETTINGS_ID
-from app.schemas import BodyStats
+from app.schemas import BodyStats, StandardGuide
+from app.standards import standards_guide
 
 router = APIRouter(prefix="/body", tags=["body"])
 
@@ -26,3 +27,9 @@ def get_body_stats(session: SessionDep, today: date | None = None):
         lifts_by_id={lift.id: lift for lift in session.exec(select(Lift))},
         machines_by_id={m.id: m for m in session.exec(select(Machine))},
     )
+
+
+@router.get("/standards", response_model=list[StandardGuide])
+def get_strength_standards():
+    """Which lifts get a grade on Insights, how they're matched, and the thresholds."""
+    return standards_guide()

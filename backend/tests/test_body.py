@@ -6,7 +6,7 @@ import pytest
 
 from app.body import age_on, bmr_mifflin_st_jeor, calorie_targets, water_target
 from app.models import ActivityLevel, Sex
-from app.standards import grade, level_for_score, standard_for
+from app.standards import STANDARDS, grade, level_for_score, standard_for
 
 TODAY = "2026-10-01"
 PROFILE = {"sex": "male", "birth_date": "1996-10-02", "height_cm": 180, "weight_kg": 80}
@@ -187,3 +187,20 @@ def test_grade_levels_and_scores():
 def test_water_target():
     target = water_target(80)  # 80 x 35 = 2800 ml
     assert (target.daily_ml, target.training_day_ml) == (2800, 3300)
+
+
+
+def test_standards_guide_lists_every_graded_lift(client):
+    guide = client.get("/api/body/standards").json()
+    assert len(guide) == len(STANDARDS)
+    bench = next(item for item in guide if item["key"] == "barbell_bench")
+    assert bench == {
+        "key": "barbell_bench",
+        "equipment": "Barbell",
+        "label": "Bench press",
+        "name_words": ["bench"],
+        "excluded_words": ["incline", "decline", "close"],
+        "levels": ["Novice", "Intermediate", "Advanced", "Elite"],
+        "male": [0.75, 1.0, 1.5, 2.0],
+        "female": [0.5, 0.75, 1.0, 1.5],
+    }

@@ -196,7 +196,7 @@ fitness-tracker/
 │   │   └── routers/           One file per resource
 │   ├── migrations/            Alembic environment and versions
 │   ├── scripts/seed.py        Idempotent import of seed_data.json
-│   └── tests/                 pytest suite (101 tests)
+│   └── tests/                 pytest suite (102 tests)
 └── frontend/
     ├── package.json           npm scripts and dependencies
     ├── vite.config.ts         Dev server + /api proxy

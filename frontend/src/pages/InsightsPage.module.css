@@ -167,6 +167,65 @@
   font-weight: 700;
 }
 
+/* "Which lifts get a grade?" */
+.guide {
+  margin-top: 24px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface);
+}
+
+.guideSummary {
+  display: flex;
+  align-items: center;
+  min-height: var(--tap-size);
+  padding: 0 14px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.guide[open] .guideSummary {
+  border-bottom: 1px solid var(--border);
+}
+
+.guide > .hint {
+  margin: 12px 14px;
+}
+
+.guideHeading {
+  margin: 16px 14px 4px;
+  color: var(--text-muted);
+  font-size: 0.8rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.guideList {
+  margin: 0 0 8px;
+  padding: 0;
+  list-style: none;
+}
+
+.guideItem {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 8px 14px;
+}
+
+.guideItem + .guideItem {
+  border-top: 1px solid var(--border);
+}
+
+.guideThresholds {
+  color: var(--accent);
+  font-size: 0.8rem;
+}
+
+.nowrap {
+  white-space: nowrap;
+}
+
 .footnote {
   margin: 16px 0 0;
   color: var(--text-muted);

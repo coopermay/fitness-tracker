@@ -305,6 +305,7 @@ Worked example (80 kg, 180 cm, 29, male, moderate): BMR `800 + 1125 − 145 + 5 
 | `standard_for(lift_name, machine_name)` | The key for a lift, or `None`. The machine name must contain "barbell" or "dumbbell"; then the first pattern whose include words appear in the lift name, and none of its exclude words (e.g. "Bench press" + "Barbell" → `barbell_bench`; "Incline bench" → none; "Hammer curl" + "Dumbbells" → `dumbbell_curl`). |
 | `grade(ratio, sex, key)` | `(level, score)`. The level is the number of thresholds reached. The score is 25 per level plus the fraction of the way to the next threshold (from 0 for Beginner), 100 at Elite: men's bench at 1.25× → Intermediate, 62.5. |
 | `level_for_score(score)` | The level for an overall score: 25 points per level |
+| `LABELS`, `standards_guide()` | Display names, and the list of `StandardGuide`s behind `GET /body/standards`, built from the same patterns and thresholds the grading uses |
 
 Machines are never graded, since their numbers depend on the machine.
 

@@ -87,7 +87,7 @@ When you add, rename or delete a file, update this page.
 | `app/records.py` | Epley, `recency_key`, records, progress points, `previous_best_reps` | [Domain logic](../04-backend/domain-logic.md#recordspy) |
 | `app/calendar.py` | `find_pr_set_ids`, `build_calendar` | [Domain logic](../04-backend/domain-logic.md#calendarpy) |
 | `app/insights.py` | `plateaued_lift_ids` | [Domain logic](../04-backend/domain-logic.md#insightspy) |
-| `app/standards.py` | `STANDARDS`, `standard_for`, `grade`, `level_for_score` | [Domain logic](../04-backend/domain-logic.md#standardspy) |
+| `app/standards.py` | `STANDARDS`, `standard_for`, `grade`, `level_for_score`, `standards_guide` | [Domain logic](../04-backend/domain-logic.md#standardspy) |
 | `app/body.py` | `build_body_stats`, `bmr_mifflin_st_jeor`, `calorie_targets`, `protein_range`, `relative_strength`, `age_on` | [Domain logic](../04-backend/domain-logic.md#bodypy) |
 | `app/today.py` | `build_today`, `target_for`, `usual_lift_ids`, `weight_increment` | [Domain logic](../04-backend/domain-logic.md#todaypy) |
 
@@ -105,7 +105,7 @@ When you add, rename or delete a file, update this page.
 | `routers/calendar.py` | `GET /calendar` | [Routers](../04-backend/routers.md#calendarpy), [API](../05-api/calendar-split-insights.md#calendar) |
 | `routers/split.py` | `GET/PUT /split` | [Routers](../04-backend/routers.md#splitpy), [API](../05-api/calendar-split-insights.md#weekly-split) |
 | `routers/insights.py` | `GET /insights` | [Routers](../04-backend/routers.md#insightspy), [API](../05-api/calendar-split-insights.md#insights) |
-| `routers/body.py` | `GET /body` | [Routers](../04-backend/routers.md#bodypy), [API](../05-api/body.md) |
+| `routers/body.py` | `GET /body`, `GET /body/standards` | [Routers](../04-backend/routers.md#bodypy), [API](../05-api/body.md) |
 | `routers/today.py` | `GET /today` | [Routers](../04-backend/routers.md#todaypy), [API](../05-api/today.md) |
 
 ### backend/migrations/
@@ -138,7 +138,7 @@ When you add, rename or delete a file, update this page.
 | `tests/test_records.py` | 19 | [Testing](../08-testing/testing.md#test_recordspy-19-epley-records-new-best-flag-progress) |
 | `tests/test_sets.py` | 7 | [Testing](../08-testing/testing.md#test_setspy-7-set-validation) |
 | `tests/test_settings.py` | 5 | [Testing](../08-testing/testing.md#test_settingspy-5) |
-| `tests/test_body.py` | 25 | [Testing](../08-testing/testing.md#test_bodypy-25) |
+| `tests/test_body.py` | 26 | [Testing](../08-testing/testing.md#test_bodypy-26) |
 | `tests/test_today.py` | 14 | [Testing](../08-testing/testing.md#test_todaypy-14) |
 | `tests/test_calendar.py` | 6 | [Testing](../08-testing/testing.md#test_calendarpy-6) |
 | `tests/test_split.py` | 5 | [Testing](../08-testing/testing.md#test_splitpy-5) |

@@ -276,3 +276,17 @@ export interface BodyStats {
   relative_strength: RelativeStrength[] // strongest first
   missing: ('sex' | 'birth_date' | 'height_cm' | 'weight_kg')[]
 }
+
+// --- GET /body/standards ---
+
+// One graded lift, for the "Which lifts get a grade?" guide.
+export interface StandardGuide {
+  key: string
+  equipment: 'Barbell' | 'Dumbbell' // the machine name must contain this
+  label: string
+  name_words: string[] // the lift name must contain one of these...
+  excluded_words: string[] // ...and none of these
+  levels: StrengthLevel[] // Novice ... Elite, matching the thresholds below
+  male: number[] // 1RM / bodyweight needed for each level
+  female: number[]
+}

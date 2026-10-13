@@ -16,7 +16,7 @@ All routers are mounted under `/api` by [`main.py`](core-modules.md#mainpy).
 | [`split.py`](#splitpy) | `/split` | split | GET, PUT | `get_or_404` |
 | [`insights.py`](#insightspy) | `/insights` | insights | GET | `plateaued_lift_ids` |
 | [`today.py`](#todaypy) | `/today` | today | GET | `build_today` |
-| [`body.py`](#bodypy) | `/body` | body | GET | `build_body_stats` |
+| [`body.py`](#bodypy) | `/body` | body | GET, GET standards | `build_body_stats`, `standards_guide` |
 
 ### Patterns every router follows
 - Every handler takes **`session: SessionDep`**, a database session for the request (see [db.py](core-modules.md#dbpy)).
@@ -162,4 +162,5 @@ The frontend always passes `today` from the phone. The server-date fallback exis
 | Handler | Route | Does |
 | --- | --- | --- |
 | `get_body_stats(session, today: date \| None = None)` | `GET /body` | Loads the settings row, all sets, lifts and machines, and returns `build_body_stats(...)` |
+| `get_strength_standards()` | `GET /body/standards` | Returns `standards_guide()`; no database access |
 

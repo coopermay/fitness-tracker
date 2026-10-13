@@ -45,7 +45,7 @@ This wiki covers the whole project: how it's put together, every database table,
 - [Configuration](04-backend/configuration.md): `pyproject.toml`, `uv.lock`, `alembic.ini`, environment
 
 ### 5. API reference
-- [API overview](05-api/README.md): conventions, status codes, errors, and an index of all 25 endpoints
+- [API overview](05-api/README.md): conventions, status codes, errors, and an index of all 26 endpoints
 - [Gyms, muscle groups, lifts, machines](05-api/metadata-endpoints.md)
 - [Sets](05-api/sets.md)
 - [Lift records](05-api/records.md)

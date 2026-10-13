@@ -81,6 +81,7 @@ TypeScript descriptions of the JSON the API sends and receives. **They're checke
 | `TodayResponse`, `TodayGroup`, `TodayLift`, `Target`, `TodaySet` | the `Today*` schemas | See [Today](../05-api/today.md) |
 | `Sex`, `ActivityLevel`, `BodyUnits` | the model enums | string-literal unions |
 | `BodyStats`, `RelativeStrength`, `StrengthLevel` | `BodyStats`, `RelativeStrength` (+ inline calorie/protein/water/score shapes); `StrengthLevel` is the union of level names |
+| `StandardGuide` | `StandardGuide` | One graded lift for the guide |
 | `LiftUpdate` | `LiftUpdate` | `MetadataUpdate` plus optional `strength_machine_id` (`null` = automatic) | See [Body stats](../05-api/body.md) |
 | `RecordRow` | `RecordRow` | |
 | `ProgressPoint` | `ProgressPoint` | |
@@ -137,6 +138,7 @@ Keeping keys in one object avoids typos and makes it obvious what can be invalid
 | `useInsights(today)` | `['insights', today]` | `GET /insights?today=` | default | Depends on sets and the date; the key includes `today` so a new day is a new cache entry |
 | `useMachines()` | `['machines']` | `GET /machines` | `Infinity` | Metadata |
 | `useGyms()` | `['gyms']` | `GET /gyms` | `Infinity` | Metadata |
+| `useStrengthStandards()` | `['standards']` | `GET /body/standards` | `Infinity` | Static; the grading guide on Insights |
 | `useBody(today)` | `['body', today]` | `GET /body?today=` | default | The Insights tab. Calculations from body stats; refreshed by any settings change, set changes and lift/machine updates |
 | `useToday(today)` | `['today', today]` | `GET /today?today=` | default | Changes with sets, the split, the rep range and names; the key includes `today` |
 | `useSettings()` | `['settings']` | `GET /settings` | `Infinity` | Only changes in Settings. Also read by `App.tsx` for the theme. |

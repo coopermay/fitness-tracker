@@ -228,6 +228,7 @@ This project was also a way to learn React and TypeScript. Each concept below is
 | Custom hooks | `useSwipe.ts` |
 | URL search params (`useSearchParams`) | `pages/LogSetPage.tsx` (`?from=today`) |
 | Description lists (`<dl>`/`<dt>`/`<dd>`) | `components/TodayLiftCard.tsx` |
+| Native collapsible (`<details>`/`<summary>`) | `pages/InsightsPage.tsx` (`StandardsGuide`) |
 | Context (`createContext`, `useContext`, provider) | `swipeBack.ts`, `App.tsx`, `components/BackLink.tsx` |
 | `useCallback` (a function that stays the same between renders) | `App.tsx` (`setSwipeBackTarget`) |
 | `key` to force a remount | `App.tsx` (page wrapper), `MachineCard.tsx` (chart) |

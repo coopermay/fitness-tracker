@@ -86,4 +86,35 @@ curl -s "localhost:8000/api/body?today=2026-10-01"
 }
 ```
 
-**Used by:** the Insights tab (`useBody`). Settings changes, set changes and lift/machine updates (including picking a lift's machine) refresh it.
+---
+
+## Strength standards guide
+
+`GET /api/body/standards`
+
+Every graded lift, for the "Which lifts get a grade?" guide on Insights. Static: it comes straight from `standards.py`, so the guide and the grading can't disagree.
+
+**Response 200:** a list of `StandardGuide`, barbell lifts first:
+
+| Field | Type | Meaning |
+| --- | --- | --- |
+| `key` | string | e.g. `barbell_bench` |
+| `equipment` | `"Barbell"` \| `"Dumbbell"` | The machine name must contain this |
+| `label` | string | e.g. "Bench press", "Curl (incl. hammer curl)" |
+| `name_words` | string[] | The lift name must contain one of these |
+| `excluded_words` | string[] | …and none of these |
+| `levels` | string[] | `Novice`, `Intermediate`, `Advanced`, `Elite` |
+| `male`, `female` | number[] | The 1RM ÷ bodyweight needed for each level |
+
+```json
+[{"key": "barbell_bench", "equipment": "Barbell", "label": "Bench press",
+  "name_words": ["bench"], "excluded_words": ["incline", "decline", "close"],
+  "levels": ["Novice", "Intermediate", "Advanced", "Elite"],
+  "male": [0.75, 1.0, 1.5, 2.0], "female": [0.5, 0.75, 1.0, 1.5]}, ...]
+```
+
+**Used by:** the guide on Insights (`useStrengthStandards`, fetched once).
+
+---
+
+**`GET /body` is used by:** the Insights tab (`useBody`). Settings changes, set changes and lift/machine updates (including picking a lift's machine) refresh it.
